@@ -23004,7 +23004,7 @@
 		(descr "Diode Mini-MELF (SOD-80)")
 		(tags "Diode Mini-MELF (SOD-80)")
 		(property "Reference" "D1"
-			(at 0 -2.000001 0)
+			(at -0.0026 1.905 0)
 			(layer "F.SilkS")
 			(uuid "599d0c6c-0999-463e-bb51-bb7d5a674f8e")
 			(effects
