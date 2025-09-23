@@ -3120,6 +3120,216 @@
 			)
 			(embedded_fonts no)
 		)
+		(symbol "Connector_Generic_MountingPin:Conn_01x03_MountingPin"
+			(pin_names
+				(offset 1.016)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "J"
+				(at 0 5.08 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "Conn_01x03_MountingPin"
+				(at 1.27 -5.08 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Generic connectable mounting pin connector, single row, 01x03, script generated (kicad-library-utils/schlib/autogen/connector/)"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "connector"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_fp_filters" "Connector*:*_1x??-1MP*"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "Conn_01x03_MountingPin_1_1"
+				(rectangle
+					(start -1.27 3.81)
+					(end 1.27 -3.81)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+				(rectangle
+					(start -1.27 2.667)
+					(end 0 2.413)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start -1.27 0.127)
+					(end 0 -0.127)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start -1.27 -2.413)
+					(end 0 -2.667)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -1.016 -4.572) (xy 1.016 -4.572)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(text "Mounting"
+					(at 0 -4.191 0)
+					(effects
+						(font
+							(size 0.381 0.381)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 2.54 0)
+					(length 3.81)
+					(name "Pin_1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 0 0)
+					(length 3.81)
+					(name "Pin_2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 -2.54 0)
+					(length 3.81)
+					(name "Pin_3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 0 -7.62 90)
+					(length 3.048)
+					(name "MountPin"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "MP"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 		(symbol "Connector_Generic_MountingPin:Conn_01x04_MountingPin"
 			(pin_names
 				(offset 1.016)
@@ -5378,6 +5588,113 @@
 						)
 					)
 					(number "6"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "Mechanical:MountingHole_Pad"
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 1.016)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom no)
+			(on_board yes)
+			(property "Reference" "H"
+				(at 0 6.35 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "MountingHole_Pad"
+				(at 0 4.445 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Mounting Hole with connection"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "mounting hole"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_fp_filters" "MountingHole*Pad*"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "MountingHole_Pad_0_1"
+				(circle
+					(center 0 1.27)
+					(radius 1.27)
+					(stroke
+						(width 1.27)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "MountingHole_Pad_1_1"
+				(pin input line
+					(at 0 -2.54 90)
+					(length 2.54)
+					(name "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -12090,7 +12407,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "02d35b17-2057-460f-a73e-8ed7f9d520b4")
-		(property "Reference" "#PWR019"
+		(property "Reference" "#PWR049"
 			(at 181.61 318.77 0)
 			(effects
 				(font
@@ -12140,24 +12457,24 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR019")
+					(reference "#PWR049")
 					(unit 1)
 				)
 			)
 		)
 	)
 	(symbol
-		(lib_id "Connector_Generic:Conn_01x03")
-		(at 297.18 125.73 0)
+		(lib_id "Mechanical:MountingHole_Pad")
+		(at 306.07 308.61 0)
 		(unit 1)
 		(exclude_from_sim no)
-		(in_bom yes)
+		(in_bom no)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "042d0c30-7202-4b93-ba87-1c8536b70ee2")
-		(property "Reference" "J9"
-			(at 299.212 124.5178 0)
+		(uuid "02e39a12-2684-4b38-b004-f7e2ff4d4fb9")
+		(property "Reference" "H4"
+			(at 308.61 306.0699 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12165,8 +12482,8 @@
 				(justify left)
 			)
 		)
-		(property "Value" "Conn_01x03"
-			(at 299.212 126.9421 0)
+		(property "Value" "MountingHole_Pad"
+			(at 308.61 308.6099 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12174,8 +12491,8 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
-			(at 297.18 125.73 0)
+		(property "Footprint" "MountingHole:MountingHole_3.2mm_M3_Pad_Via"
+			(at 306.07 308.61 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12184,7 +12501,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 297.18 125.73 0)
+			(at 306.07 308.61 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12192,28 +12509,22 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Generic connector, single row, 01x03, script generated (kicad-library-utils/schlib/autogen/connector/)"
-			(at 297.18 125.73 0)
+		(property "Description" "Mounting Hole with connection"
+			(at 306.07 308.61 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(hide yes)
 			)
-		)
-		(pin "3"
-			(uuid "6d4fb465-53db-4c8b-a982-d48d9e0e64c0")
-		)
-		(pin "2"
-			(uuid "d176b51c-847a-4869-990d-c3f562395875")
 		)
 		(pin "1"
-			(uuid "a903d3a5-fa80-4bae-8d31-f46ca33c46fb")
+			(uuid "d335dcaa-e67c-41a0-9ed6-2d853be4ec48")
 		)
 		(instances
-			(project ""
+			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "J9")
+					(reference "H4")
 					(unit 1)
 				)
 			)
@@ -12229,7 +12540,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "054a8621-d47b-494a-a09d-c1961e4f5497")
-		(property "Reference" "#PWR028"
+		(property "Reference" "#PWR045"
 			(at 163.83 369.57 0)
 			(effects
 				(font
@@ -12279,7 +12590,74 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR028")
+					(reference "#PWR045")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Mechanical:MountingHole_Pad")
+		(at 280.67 293.37 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "078d511b-62ad-4bc0-81f1-4a88cf0bc071")
+		(property "Reference" "H1"
+			(at 283.21 290.8299 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "MountingHole_Pad"
+			(at 283.21 293.3699 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "MountingHole:MountingHole_3.2mm_M3_Pad_Via"
+			(at 280.67 293.37 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 280.67 293.37 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Mounting Hole with connection"
+			(at 280.67 293.37 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "e2f62c28-bc17-4fdc-a55d-ea5967c96b28")
+		)
+		(instances
+			(project ""
+				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
+					(reference "H1")
 					(unit 1)
 				)
 			)
@@ -12296,7 +12674,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "0bfe3852-6d9e-4740-861a-67ce0a156fa3")
-		(property "Reference" "U1"
+		(property "Reference" "U3"
 			(at 133.2253 91.5434 0)
 			(effects
 				(font
@@ -12369,7 +12747,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "U1")
+					(reference "U3")
 					(unit 1)
 				)
 			)
@@ -12385,7 +12763,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "0c911904-c430-4895-b840-3f053a88803e")
-		(property "Reference" "R16"
+		(property "Reference" "R9"
 			(at 128.778 308.6678 0)
 			(effects
 				(font
@@ -12403,7 +12781,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
 			(at 125.222 309.88 90)
 			(effects
 				(font
@@ -12439,7 +12817,73 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "R16")
+					(reference "R9")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 306.07 311.15 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "0f03100b-a8e3-47ab-b07f-c6f97a2fbe7b")
+		(property "Reference" "#PWR080"
+			(at 306.07 317.5 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 306.07 316.23 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 306.07 311.15 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 306.07 311.15 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
+			(at 306.07 311.15 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "1441be4c-bdeb-4d82-9a8f-15035353b803")
+		)
+		(instances
+			(project "connector-test-stand"
+				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
+					(reference "#PWR080")
 					(unit 1)
 				)
 			)
@@ -12455,7 +12899,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "100ec0e1-3666-4a41-821b-6b9b492a1062")
-		(property "Reference" "#PWR044"
+		(property "Reference" "#PWR062"
 			(at 449.58 224.79 0)
 			(effects
 				(font
@@ -12505,7 +12949,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR044")
+					(reference "#PWR062")
 					(unit 1)
 				)
 			)
@@ -12522,7 +12966,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "10f656ce-524b-448e-bb1a-73a82a5d0ca3")
-		(property "Reference" "J10"
+		(property "Reference" "J5"
 			(at 58.42 176.1955 0)
 			(effects
 				(font
@@ -12538,7 +12982,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Connector_JST:JST_PH_S4B-PH-SM4-TB_1x04-1MP_P2.00mm_Horizontal"
 			(at 58.42 184.15 0)
 			(effects
 				(font
@@ -12583,7 +13027,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "J10")
+					(reference "J5")
 					(unit 1)
 				)
 			)
@@ -12599,7 +13043,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "1118d1a6-b4a5-46da-a9ef-6f962af81e9a")
-		(property "Reference" "J1"
+		(property "Reference" "J12"
 			(at 521.462 86.4178 0)
 			(effects
 				(font
@@ -12617,7 +13061,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Connector_Video:DVI-I_Molex_74320-1004_Horizontal"
 			(at 511.175 77.47 0)
 			(effects
 				(font
@@ -12737,7 +13181,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "J1")
+					(reference "J12")
 					(unit 1)
 				)
 			)
@@ -12770,7 +13214,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "TerminalBlock:TerminalBlock_Altech_AK300-2_P5.00mm"
 			(at 57.15 50.8 0)
 			(effects
 				(font
@@ -12838,7 +13282,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Fuse:Fuseholder_Clip-5x20mm_Schurter_CQM_Inline_P20.60x5.00mm_D1.00mm_Horizontal"
 			(at 182.88 342.138 90)
 			(effects
 				(font
@@ -12891,7 +13335,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "12fb7d5f-d619-4704-9c62-826c9da31b7e")
-		(property "Reference" "#PWR033"
+		(property "Reference" "#PWR056"
 			(at 236.22 58.42 0)
 			(effects
 				(font
@@ -12941,7 +13385,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR033")
+					(reference "#PWR056")
 					(unit 1)
 				)
 			)
@@ -12957,7 +13401,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "17349682-c3f8-43cd-890f-bdfdb0a34a45")
-		(property "Reference" "#PWR074"
+		(property "Reference" "#PWR028"
 			(at 129.54 293.37 0)
 			(effects
 				(font
@@ -13007,7 +13451,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR074")
+					(reference "#PWR028")
 					(unit 1)
 				)
 			)
@@ -13023,7 +13467,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "193ced01-d8b5-484a-b3bf-9f5b3ac0b497")
-		(property "Reference" "#PWR04"
+		(property "Reference" "#PWR011"
 			(at 82.55 124.46 0)
 			(effects
 				(font
@@ -13073,7 +13517,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR04")
+					(reference "#PWR011")
 					(unit 1)
 				)
 			)
@@ -13089,7 +13533,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "1a6bc216-4368-4bec-a8fe-16e1684d9c22")
-		(property "Reference" "#PWR06"
+		(property "Reference" "#PWR018"
 			(at 116.84 142.24 0)
 			(effects
 				(font
@@ -13139,7 +13583,73 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR06")
+					(reference "#PWR018")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 297.18 133.35 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "1cc1de94-e579-49a2-b7a7-bd271dfebd23")
+		(property "Reference" "#PWR081"
+			(at 297.18 139.7 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 297.18 138.43 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 297.18 133.35 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 297.18 133.35 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
+			(at 297.18 133.35 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "1935c3ce-be5e-4442-8cda-843202152665")
+		)
+		(instances
+			(project ""
+				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
+					(reference "#PWR081")
 					(unit 1)
 				)
 			)
@@ -13155,7 +13665,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "1d53553f-9005-48fa-8936-fda62f826e74")
-		(property "Reference" "R14"
+		(property "Reference" "R12"
 			(at 227.33 134.5395 90)
 			(effects
 				(font
@@ -13171,7 +13681,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
 			(at 227.33 141.478 90)
 			(effects
 				(font
@@ -13207,7 +13717,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "R14")
+					(reference "R12")
 					(unit 1)
 				)
 			)
@@ -13224,7 +13734,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "1fc0a667-0541-4da7-bfdd-a9e04f5ed657")
-		(property "Reference" "#PWR040"
+		(property "Reference" "#PWR053"
 			(at 217.17 88.9 0)
 			(effects
 				(font
@@ -13274,7 +13784,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR040")
+					(reference "#PWR053")
 					(unit 1)
 				)
 			)
@@ -13306,7 +13816,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Fuse:Fuseholder_Clip-5x20mm_Schurter_CQM_Inline_P20.60x5.00mm_D1.00mm_Horizontal"
 			(at 182.88 352.298 90)
 			(effects
 				(font
@@ -13375,7 +13885,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "TerminalBlock:TerminalBlock_Altech_AK300-2_P5.00mm"
 			(at 58.42 73.66 0)
 			(effects
 				(font
@@ -13427,7 +13937,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "26a2ac6d-a4b0-429d-9fd4-443896d3ed04")
-		(property "Reference" "FB6"
+		(property "Reference" "FB1"
 			(at 93.9292 134.1839 90)
 			(effects
 				(font
@@ -13443,7 +13953,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Inductor_SMD:L_0805_2012Metric"
 			(at 93.98 142.748 90)
 			(effects
 				(font
@@ -13479,7 +13989,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "FB6")
+					(reference "FB1")
 					(unit 1)
 				)
 			)
@@ -13495,7 +14005,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "2c111c9f-26eb-4880-99ec-5daf3b2dc9c7")
-		(property "Reference" "R9"
+		(property "Reference" "R2"
 			(at 38.608 365.8178 0)
 			(effects
 				(font
@@ -13549,7 +14059,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "R9")
+					(reference "R2")
 					(unit 1)
 				)
 			)
@@ -13565,7 +14075,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "2cb08092-56f5-4ab2-8553-e9855b01aad9")
-		(property "Reference" "#PWR066"
+		(property "Reference" "#PWR072"
 			(at 494.03 45.72 0)
 			(effects
 				(font
@@ -13615,7 +14125,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR066")
+					(reference "#PWR072")
 					(unit 1)
 				)
 			)
@@ -13631,7 +14141,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "2df76e86-9c59-4b68-80ce-55d141a9a458")
-		(property "Reference" "#PWR02"
+		(property "Reference" "#PWR034"
 			(at 135.89 111.76 0)
 			(effects
 				(font
@@ -13681,7 +14191,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR02")
+					(reference "#PWR034")
 					(unit 1)
 				)
 			)
@@ -13697,7 +14207,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "3230ac8b-a6c4-469a-9ae2-781c9e9516b6")
-		(property "Reference" "#PWR043"
+		(property "Reference" "#PWR063"
 			(at 449.58 254 0)
 			(effects
 				(font
@@ -13747,7 +14257,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR043")
+					(reference "#PWR063")
 					(unit 1)
 				)
 			)
@@ -13763,7 +14273,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "34ef839f-aebf-453a-a258-9b6559296104")
-		(property "Reference" "FB2"
+		(property "Reference" "FB4"
 			(at 476.1992 52.9039 90)
 			(effects
 				(font
@@ -13779,7 +14289,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Inductor_SMD:L_0805_2012Metric"
 			(at 476.25 61.468 90)
 			(effects
 				(font
@@ -13815,7 +14325,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "FB2")
+					(reference "FB4")
 					(unit 1)
 				)
 			)
@@ -13847,7 +14357,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Fuse:Fuseholder_Clip-5x20mm_Schurter_CQM_Inline_P20.60x5.00mm_D1.00mm_Horizontal"
 			(at 182.88 349.758 90)
 			(effects
 				(font
@@ -13899,7 +14409,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "392720e8-d9e6-4aaf-9387-569f8743abce")
-		(property "Reference" "U4"
+		(property "Reference" "U10"
 			(at 480.9333 286.6855 0)
 			(effects
 				(font
@@ -13971,7 +14481,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "U4")
+					(reference "U10")
 					(unit 1)
 				)
 			)
@@ -13987,7 +14497,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "39cb09ac-28dd-4d5b-9f40-5c80cbad537e")
-		(property "Reference" "#PWR013"
+		(property "Reference" "#PWR05"
 			(at 63.5 214.63 0)
 			(effects
 				(font
@@ -14037,7 +14547,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR013")
+					(reference "#PWR05")
 					(unit 1)
 				)
 			)
@@ -14053,7 +14563,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "39ebf4cc-54fe-42d6-9194-3e7cbca53f73")
-		(property "Reference" "R9"
+		(property "Reference" "R6"
 			(at 51.308 365.8178 0)
 			(effects
 				(font
@@ -14107,7 +14617,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "R9")
+					(reference "R6")
 					(unit 1)
 				)
 			)
@@ -14123,7 +14633,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "3b14b561-cbc5-494c-9094-c985f36a2850")
-		(property "Reference" "#PWR055"
+		(property "Reference" "#PWR039"
 			(at 146.05 255.27 0)
 			(effects
 				(font
@@ -14173,7 +14683,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR055")
+					(reference "#PWR039")
 					(unit 1)
 				)
 			)
@@ -14189,7 +14699,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "3b868282-e161-406d-9417-30a8805c94e0")
-		(property "Reference" "U3"
+		(property "Reference" "U9"
 			(at 469.9 219.3755 0)
 			(effects
 				(font
@@ -14205,7 +14715,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm"
 			(at 469.9 234.95 0)
 			(effects
 				(font
@@ -14259,7 +14769,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "U3")
+					(reference "U9")
 					(unit 1)
 				)
 			)
@@ -14291,7 +14801,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Fuse:Fuseholder_Clip-5x20mm_Schurter_CQM_Inline_P20.60x5.00mm_D1.00mm_Horizontal"
 			(at 182.88 357.378 90)
 			(effects
 				(font
@@ -14344,7 +14854,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "41306a38-40ce-4846-a67a-08bc65f7bda5")
-		(property "Reference" "RV3"
+		(property "Reference" "RV4"
 			(at 161.798 156.2678 0)
 			(effects
 				(font
@@ -14362,7 +14872,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Potentiometer_THT:Potentiometer_Bourns_3266W_Vertical"
 			(at 160.02 157.48 0)
 			(effects
 				(font
@@ -14401,7 +14911,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "RV3")
+					(reference "RV4")
 					(unit 1)
 				)
 			)
@@ -14417,7 +14927,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "42ef8b0c-f4b5-4f72-a6f9-63fa75027fcd")
-		(property "Reference" "#PWR017"
+		(property "Reference" "#PWR027"
 			(at 128.27 254 0)
 			(effects
 				(font
@@ -14467,7 +14977,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR017")
+					(reference "#PWR027")
 					(unit 1)
 				)
 			)
@@ -14483,7 +14993,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "435ff347-464c-4ca2-8be6-e6735e7f4fd9")
-		(property "Reference" "#PWR061"
+		(property "Reference" "#PWR021"
 			(at 121.92 325.12 0)
 			(effects
 				(font
@@ -14533,7 +15043,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR061")
+					(reference "#PWR021")
 					(unit 1)
 				)
 			)
@@ -14549,7 +15059,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "473f5ae0-12fe-4963-8955-515c4725394b")
-		(property "Reference" "C4"
+		(property "Reference" "C13"
 			(at 489.331 276.9178 0)
 			(effects
 				(font
@@ -14567,7 +15077,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
 			(at 487.3752 281.94 0)
 			(effects
 				(font
@@ -14603,7 +15113,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "C4")
+					(reference "C13")
 					(unit 1)
 				)
 			)
@@ -14619,7 +15129,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "47bf33d6-19c0-434b-834c-c98962b13363")
-		(property "Reference" "#PWR015"
+		(property "Reference" "#PWR03"
 			(at 55.88 250.19 0)
 			(effects
 				(font
@@ -14669,7 +15179,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR015")
+					(reference "#PWR03")
 					(unit 1)
 				)
 			)
@@ -14685,7 +15195,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "4b2605d9-9a04-4fe4-9537-d51bf9e6a645")
-		(property "Reference" "R6"
+		(property "Reference" "R10"
 			(at 161.798 146.1078 0)
 			(effects
 				(font
@@ -14703,7 +15213,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
 			(at 158.242 147.32 90)
 			(effects
 				(font
@@ -14739,7 +15249,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "R6")
+					(reference "R10")
 					(unit 1)
 				)
 			)
@@ -14755,7 +15265,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "4b26b382-9f90-4bcc-9541-f859969f1ba3")
-		(property "Reference" "#PWR036"
+		(property "Reference" "#PWR012"
 			(at 82.55 181.61 0)
 			(effects
 				(font
@@ -14805,7 +15315,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR036")
+					(reference "#PWR012")
 					(unit 1)
 				)
 			)
@@ -14821,7 +15331,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "4d39d3e6-aa56-4a59-9ec4-335fa98a48a9")
-		(property "Reference" "C13"
+		(property "Reference" "C6"
 			(at 132.461 292.1578 0)
 			(effects
 				(font
@@ -14839,7 +15349,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
 			(at 130.5052 297.18 0)
 			(effects
 				(font
@@ -14875,7 +15385,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "C13")
+					(reference "C6")
 					(unit 1)
 				)
 			)
@@ -14977,7 +15487,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "51615b37-db0a-485e-948e-59a90470b732")
-		(property "Reference" "#PWR063"
+		(property "Reference" "#PWR041"
 			(at 158.75 326.39 0)
 			(effects
 				(font
@@ -15027,7 +15537,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR063")
+					(reference "#PWR041")
 					(unit 1)
 				)
 			)
@@ -15043,7 +15553,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "51e60f2d-15cf-4394-af15-5a49dadfe142")
-		(property "Reference" "#PWR024"
+		(property "Reference" "#PWR02"
 			(at 43.18 382.27 0)
 			(effects
 				(font
@@ -15093,7 +15603,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR024")
+					(reference "#PWR02")
 					(unit 1)
 				)
 			)
@@ -15109,7 +15619,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "52a648e5-095d-49fc-93b0-f8c27b6b9fa1")
-		(property "Reference" "#PWR023"
+		(property "Reference" "#PWR01"
 			(at 43.18 342.9 0)
 			(effects
 				(font
@@ -15159,7 +15669,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR023")
+					(reference "#PWR01")
 					(unit 1)
 				)
 			)
@@ -15175,7 +15685,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "534cb0d4-d68c-476a-a5f1-be709d752e59")
-		(property "Reference" "#PWR057"
+		(property "Reference" "#PWR033"
 			(at 135.89 90.17 0)
 			(effects
 				(font
@@ -15225,7 +15735,83 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR057")
+					(reference "#PWR033")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Connector_Generic_MountingPin:Conn_01x03_MountingPin")
+		(at 297.18 125.73 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "541c429b-f292-4bcc-af1f-ae0781b68945")
+		(property "Reference" "J11"
+			(at 299.72 124.8155 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "Conn_01x03_MountingPin"
+			(at 299.72 127.3555 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Connector_JST:JST_PH_S3B-PH-SM4-TB_1x03-1MP_P2.00mm_Horizontal"
+			(at 297.18 125.73 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 297.18 125.73 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Generic connectable mounting pin connector, single row, 01x03, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(at 297.18 125.73 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "2"
+			(uuid "b774da02-3e02-4fb9-b898-df2299bbbc0b")
+		)
+		(pin "1"
+			(uuid "07e2d535-3cf5-40b8-9a70-c5146c864324")
+		)
+		(pin "3"
+			(uuid "07ff516c-7428-4867-8193-a79b1fcaa1db")
+		)
+		(pin "MP"
+			(uuid "897253ef-fbf9-45a4-9043-cf7234f5e893")
+		)
+		(instances
+			(project ""
+				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
+					(reference "J11")
 					(unit 1)
 				)
 			)
@@ -15241,7 +15827,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "586be9c8-39a0-4a26-8e8f-873c0ce2a9f1")
-		(property "Reference" "R3"
+		(property "Reference" "R17"
 			(at 499.618 215.9578 0)
 			(effects
 				(font
@@ -15259,7 +15845,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
 			(at 496.062 217.17 90)
 			(effects
 				(font
@@ -15295,7 +15881,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "R3")
+					(reference "R17")
 					(unit 1)
 				)
 			)
@@ -15311,7 +15897,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "58a9aec8-f349-4f28-9d71-e348e929a76a")
-		(property "Reference" "J8"
+		(property "Reference" "J9"
 			(at 236.22 33.9555 0)
 			(effects
 				(font
@@ -15327,7 +15913,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Connector_JST:JST_PH_S4B-PH-SM4-TB_1x04-1MP_P2.00mm_Horizontal"
 			(at 236.22 41.91 0)
 			(effects
 				(font
@@ -15372,7 +15958,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "J8")
+					(reference "J9")
 					(unit 1)
 				)
 			)
@@ -15404,7 +15990,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Fuse:Fuseholder_Clip-5x20mm_Schurter_CQM_Inline_P20.60x5.00mm_D1.00mm_Horizontal"
 			(at 182.88 347.218 90)
 			(effects
 				(font
@@ -15456,7 +16042,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "5c5788b2-b539-4808-8e21-e8a20ec5e1cc")
-		(property "Reference" "#PWR050"
+		(property "Reference" "#PWR067"
 			(at 478.79 320.04 0)
 			(effects
 				(font
@@ -15506,7 +16092,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR050")
+					(reference "#PWR067")
 					(unit 1)
 				)
 			)
@@ -15600,7 +16186,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "5fdf8d3b-08c0-4862-b7de-6fcd34bdbf78")
-		(property "Reference" "#PWR09"
+		(property "Reference" "#PWR036"
 			(at 138.43 173.99 0)
 			(effects
 				(font
@@ -15650,7 +16236,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR09")
+					(reference "#PWR036")
 					(unit 1)
 				)
 			)
@@ -15666,7 +16252,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "60d34c49-a839-4f62-913a-0a54f3539533")
-		(property "Reference" "#PWR046"
+		(property "Reference" "#PWR076"
 			(at 509.27 260.35 0)
 			(effects
 				(font
@@ -15716,7 +16302,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR046")
+					(reference "#PWR076")
 					(unit 1)
 				)
 			)
@@ -15732,7 +16318,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "62407ed2-e8bf-467b-b211-f179711b2d6c")
-		(property "Reference" "#PWR01"
+		(property "Reference" "#PWR020"
 			(at 121.92 111.76 0)
 			(effects
 				(font
@@ -15782,7 +16368,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR01")
+					(reference "#PWR020")
 					(unit 1)
 				)
 			)
@@ -15798,7 +16384,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "6254bab7-9df6-4b6b-8c99-29cebad9fbf0")
-		(property "Reference" "#PWR065"
+		(property "Reference" "#PWR054"
 			(at 233.68 96.52 0)
 			(effects
 				(font
@@ -15848,7 +16434,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR065")
+					(reference "#PWR054")
 					(unit 1)
 				)
 			)
@@ -15856,17 +16442,15 @@
 	)
 	(symbol
 		(lib_id "Connector_Generic:Conn_01x02")
-		(at 50.8 241.3 0)
-		(mirror y)
+		(at 50.8 243.84 180)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(fields_autoplaced yes)
 		(uuid "64f4fa31-ebcd-484f-bdca-a38f3351e9a8")
-		(property "Reference" "J5"
-			(at 50.8 235.8855 0)
+		(property "Reference" "J1"
+			(at 50.8 249.2545 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -15874,15 +16458,15 @@
 			)
 		)
 		(property "Value" "Conn_01x02"
-			(at 50.8 238.3098 0)
+			(at 50.8 246.8302 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 			)
 		)
-		(property "Footprint" ""
-			(at 50.8 241.3 0)
+		(property "Footprint" "Connector_AMASS:AMASS_XT30PW-M_1x02_P2.50mm_Horizontal"
+			(at 50.8 243.84 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -15891,7 +16475,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 50.8 241.3 0)
+			(at 50.8 243.84 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -15900,7 +16484,7 @@
 			)
 		)
 		(property "Description" "Generic connector, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)"
-			(at 50.8 241.3 0)
+			(at 50.8 243.84 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -15917,7 +16501,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "J5")
+					(reference "J1")
 					(unit 1)
 				)
 			)
@@ -15933,7 +16517,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "6548e3de-7cf2-4260-8964-efc5370f4f1d")
-		(property "Reference" "R15"
+		(property "Reference" "R13"
 			(at 272.288 113.0878 0)
 			(effects
 				(font
@@ -15951,7 +16535,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
 			(at 268.732 114.3 90)
 			(effects
 				(font
@@ -15987,7 +16571,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "R15")
+					(reference "R13")
 					(unit 1)
 				)
 			)
@@ -16003,7 +16587,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "65aefda8-76e0-4aaa-b391-bd9f558d0aef")
-		(property "Reference" "#PWR021"
+		(property "Reference" "#PWR07"
 			(at 64.77 336.55 0)
 			(effects
 				(font
@@ -16053,7 +16637,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR021")
+					(reference "#PWR07")
 					(unit 1)
 				)
 			)
@@ -16069,7 +16653,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "68f5ef14-96c7-4452-9453-495f1310e360")
-		(property "Reference" "#PWR049"
+		(property "Reference" "#PWR066"
 			(at 478.79 292.1 0)
 			(effects
 				(font
@@ -16119,7 +16703,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR049")
+					(reference "#PWR066")
 					(unit 1)
 				)
 			)
@@ -16135,7 +16719,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "6cc48093-9929-46a1-8207-5c550b80111b")
-		(property "Reference" "C8"
+		(property "Reference" "C3"
 			(at 94.361 317.5578 0)
 			(effects
 				(font
@@ -16153,7 +16737,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
 			(at 92.4052 322.58 0)
 			(effects
 				(font
@@ -16189,7 +16773,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "C8")
+					(reference "C3")
 					(unit 1)
 				)
 			)
@@ -16205,7 +16789,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "6cee5807-4187-40f9-9132-61a8c20c04ef")
-		(property "Reference" "#PWR071"
+		(property "Reference" "#PWR038"
 			(at 138.43 320.04 0)
 			(effects
 				(font
@@ -16255,7 +16839,74 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR071")
+					(reference "#PWR038")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Mechanical:MountingHole_Pad")
+		(at 280.67 308.61 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "70753f0b-5d6e-46df-b8dc-a2e891fe340f")
+		(property "Reference" "H3"
+			(at 283.21 306.0699 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "MountingHole_Pad"
+			(at 283.21 308.6099 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "MountingHole:MountingHole_3.2mm_M3_Pad_Via"
+			(at 280.67 308.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 280.67 308.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Mounting Hole with connection"
+			(at 280.67 308.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "ee64c1d3-626c-4a54-a7e7-c534c254964f")
+		)
+		(instances
+			(project "connector-test-stand"
+				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
+					(reference "H3")
 					(unit 1)
 				)
 			)
@@ -16272,7 +16923,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "7330ee27-b21f-47cb-87ef-128bb1c364c4")
-		(property "Reference" "C7"
+		(property "Reference" "C10"
 			(at 171.069 310.3188 0)
 			(effects
 				(font
@@ -16290,7 +16941,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:CP_Elec_10x10"
 			(at 173.0248 316.23 0)
 			(effects
 				(font
@@ -16326,7 +16977,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "C7")
+					(reference "C10")
 					(unit 1)
 				)
 			)
@@ -16342,7 +16993,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "7373c745-3e42-4092-ab53-f48535d49417")
-		(property "Reference" "#PWR062"
+		(property "Reference" "#PWR022"
 			(at 121.92 335.28 0)
 			(effects
 				(font
@@ -16392,7 +17043,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR062")
+					(reference "#PWR022")
 					(unit 1)
 				)
 			)
@@ -16408,7 +17059,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "754b73c2-53b4-4781-b718-cf1b892e4fb8")
-		(property "Reference" "R4"
+		(property "Reference" "R18"
 			(at 511.048 215.9578 0)
 			(effects
 				(font
@@ -16426,7 +17077,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
 			(at 507.492 217.17 90)
 			(effects
 				(font
@@ -16462,7 +17113,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "R4")
+					(reference "R18")
 					(unit 1)
 				)
 			)
@@ -16479,7 +17130,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "75c80c60-0460-448d-aaf0-ec991412bb83")
-		(property "Reference" "#PWR018"
+		(property "Reference" "#PWR048"
 			(at 181.61 303.53 0)
 			(effects
 				(font
@@ -16529,7 +17180,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR018")
+					(reference "#PWR048")
 					(unit 1)
 				)
 			)
@@ -16545,7 +17196,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "79938b84-9377-443d-b764-4150cd3b720a")
-		(property "Reference" "#PWR029"
+		(property "Reference" "#PWR060"
 			(at 431.8 217.17 0)
 			(effects
 				(font
@@ -16595,7 +17246,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR029")
+					(reference "#PWR060")
 					(unit 1)
 				)
 			)
@@ -16611,7 +17262,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "7a815228-6c68-4abb-8274-a15f841bc23d")
-		(property "Reference" "#PWR054"
+		(property "Reference" "#PWR070"
 			(at 486.41 278.13 0)
 			(effects
 				(font
@@ -16661,7 +17312,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR054")
+					(reference "#PWR070")
 					(unit 1)
 				)
 			)
@@ -16677,7 +17328,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "7c187b05-11ff-42b9-a8cc-9e6b74e9236e")
-		(property "Reference" "R8"
+		(property "Reference" "R1"
 			(at 38.608 345.4978 0)
 			(effects
 				(font
@@ -16731,7 +17382,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "R8")
+					(reference "R1")
 					(unit 1)
 				)
 			)
@@ -16747,7 +17398,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "7ccb51bd-72ca-4d96-966a-bfdee09b4740")
-		(property "Reference" "#PWR014"
+		(property "Reference" "#PWR08"
 			(at 67.31 255.27 0)
 			(effects
 				(font
@@ -16797,7 +17448,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR014")
+					(reference "#PWR08")
 					(unit 1)
 				)
 			)
@@ -16813,7 +17464,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "7ce8f843-8598-4966-bb83-177e5e8d61ce")
-		(property "Reference" "#PWR073"
+		(property "Reference" "#PWR046"
 			(at 171.45 303.53 0)
 			(effects
 				(font
@@ -16863,7 +17514,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR073")
+					(reference "#PWR046")
 					(unit 1)
 				)
 			)
@@ -16879,7 +17530,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "7d76a820-7508-4f65-980a-d36d33fe1aaf")
-		(property "Reference" "#PWR016"
+		(property "Reference" "#PWR026"
 			(at 128.27 242.57 0)
 			(effects
 				(font
@@ -16929,7 +17580,73 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR016")
+					(reference "#PWR026")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 280.67 311.15 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "7eb1bc65-346c-4132-bcbe-c49049517361")
+		(property "Reference" "#PWR079"
+			(at 280.67 317.5 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 280.67 316.23 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 280.67 311.15 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 280.67 311.15 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
+			(at 280.67 311.15 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "149abf6d-35e4-49fb-831d-6fcd7c3ae12a")
+		)
+		(instances
+			(project "connector-test-stand"
+				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
+					(reference "#PWR079")
 					(unit 1)
 				)
 			)
@@ -16945,7 +17662,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "7f552fb5-77a4-4417-9686-beb5be524258")
-		(property "Reference" "FB7"
+		(property "Reference" "FB2"
 			(at 93.9292 148.1539 90)
 			(effects
 				(font
@@ -16961,7 +17678,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Inductor_SMD:L_0805_2012Metric"
 			(at 93.98 156.718 90)
 			(effects
 				(font
@@ -16997,7 +17714,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "FB7")
+					(reference "FB2")
 					(unit 1)
 				)
 			)
@@ -17031,7 +17748,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
 			(at 83.5152 114.3 0)
 			(effects
 				(font
@@ -17083,7 +17800,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "84619971-db6e-44cb-b7e6-2d2cf46f8d65")
-		(property "Reference" "R8"
+		(property "Reference" "R4"
 			(at 44.958 365.8178 0)
 			(effects
 				(font
@@ -17137,7 +17854,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "R8")
+					(reference "R4")
 					(unit 1)
 				)
 			)
@@ -17153,7 +17870,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "868a89a3-d98a-4249-b16c-babe65d2c375")
-		(property "Reference" "#PWR027"
+		(property "Reference" "#PWR044"
 			(at 163.83 339.09 0)
 			(effects
 				(font
@@ -17203,7 +17920,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR027")
+					(reference "#PWR044")
 					(unit 1)
 				)
 			)
@@ -17219,7 +17936,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "86ee7f66-02cc-4c2e-ab5c-c6c19f274f2f")
-		(property "Reference" "#PWR031"
+		(property "Reference" "#PWR051"
 			(at 189.23 369.57 0)
 			(effects
 				(font
@@ -17269,7 +17986,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR031")
+					(reference "#PWR051")
 					(unit 1)
 				)
 			)
@@ -17285,7 +18002,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "896f4b9e-a6f7-4870-bae2-0aa41040a782")
-		(property "Reference" "R11"
+		(property "Reference" "R5"
 			(at 51.308 345.4978 0)
 			(effects
 				(font
@@ -17339,7 +18056,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "R11")
+					(reference "R5")
 					(unit 1)
 				)
 			)
@@ -17355,7 +18072,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "8a948f9b-8a98-4cc7-a97d-f91120f67719")
-		(property "Reference" "#PWR025"
+		(property "Reference" "#PWR031"
 			(at 129.54 382.27 0)
 			(effects
 				(font
@@ -17405,7 +18122,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR025")
+					(reference "#PWR031")
 					(unit 1)
 				)
 			)
@@ -17420,7 +18137,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "8c6d42c0-e195-4011-a4cc-36ca4bf7d8d2")
-		(property "Reference" "U6"
+		(property "Reference" "U1"
 			(at 82.55 326.0555 0)
 			(effects
 				(font
@@ -17436,7 +18153,7 @@
 				)
 			)
 		)
-		(property "Footprint" "PCF8574RGTR:QFN50P300X300X100-17N"
+		(property "Footprint" "th:QFN50P300X300X100-17N"
 			(at 82.55 350.52 0)
 			(effects
 				(font
@@ -17628,7 +18345,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "U6")
+					(reference "U1")
 					(unit 1)
 				)
 			)
@@ -17644,7 +18361,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "8c75fdc3-e9b1-4056-869e-4da196ff9aa2")
-		(property "Reference" "R2"
+		(property "Reference" "R7"
 			(at 97.028 109.2778 0)
 			(effects
 				(font
@@ -17662,7 +18379,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
 			(at 93.472 110.49 90)
 			(effects
 				(font
@@ -17698,7 +18415,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "R2")
+					(reference "R7")
 					(unit 1)
 				)
 			)
@@ -17714,7 +18431,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "8e720149-c081-437c-b267-66c9deff7747")
-		(property "Reference" "#PWR022"
+		(property "Reference" "#PWR017"
 			(at 102.87 377.19 0)
 			(effects
 				(font
@@ -17764,7 +18481,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR022")
+					(reference "#PWR017")
 					(unit 1)
 				)
 			)
@@ -17780,7 +18497,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "8f923463-f85b-4ca2-b777-821364166067")
-		(property "Reference" "R13"
+		(property "Reference" "R15"
 			(at 441.198 221.0378 0)
 			(effects
 				(font
@@ -17798,7 +18515,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
 			(at 437.642 222.25 90)
 			(effects
 				(font
@@ -17834,7 +18551,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "R13")
+					(reference "R15")
 					(unit 1)
 				)
 			)
@@ -17866,7 +18583,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Fuse:Fuseholder_Cylinder-5x20mm_Bulgin_FX0456_Vertical_Closed"
 			(at 74.93 243.078 90)
 			(effects
 				(font
@@ -17935,7 +18652,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "TerminalBlock_Altech:Altech_AK100_1x05_P5.00mm"
 			(at 58.42 147.32 0)
 			(effects
 				(font
@@ -17997,7 +18714,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "93440229-15d6-41e0-821a-6825f5d749fc")
-		(property "Reference" "#PWR034"
+		(property "Reference" "#PWR057"
 			(at 236.22 86.36 0)
 			(effects
 				(font
@@ -18047,7 +18764,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR034")
+					(reference "#PWR057")
 					(unit 1)
 				)
 			)
@@ -18055,16 +18772,16 @@
 	)
 	(symbol
 		(lib_id "Connector_Generic:Conn_01x10")
-		(at 196.85 347.98 0)
+		(at 196.85 350.52 0)
+		(mirror x)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(fields_autoplaced yes)
 		(uuid "97a63c34-7d88-4e04-a2a6-d73041eed112")
-		(property "Reference" "J7"
-			(at 198.882 348.0378 0)
+		(property "Reference" "J8"
+			(at 198.882 350.4622 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -18073,7 +18790,7 @@
 			)
 		)
 		(property "Value" "Conn_01x10"
-			(at 198.882 350.4621 0)
+			(at 198.882 348.0379 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -18081,8 +18798,8 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
-			(at 196.85 347.98 0)
+		(property "Footprint" "TerminalBlock_Altech:Altech_AK100_1x10_P5.00mm"
+			(at 196.85 350.52 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -18091,7 +18808,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 196.85 347.98 0)
+			(at 196.85 350.52 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -18100,7 +18817,7 @@
 			)
 		)
 		(property "Description" "Generic connector, single row, 01x10, script generated (kicad-library-utils/schlib/autogen/connector/)"
-			(at 196.85 347.98 0)
+			(at 196.85 350.52 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -18141,7 +18858,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "J7")
+					(reference "J8")
 					(unit 1)
 				)
 			)
@@ -18157,7 +18874,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "9829bf97-e1dd-4e59-8de7-2bb842e58930")
-		(property "Reference" "R7"
+		(property "Reference" "R11"
 			(at 161.798 163.8878 0)
 			(effects
 				(font
@@ -18175,7 +18892,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
 			(at 158.242 165.1 90)
 			(effects
 				(font
@@ -18211,7 +18928,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "R7")
+					(reference "R11")
 					(unit 1)
 				)
 			)
@@ -18227,7 +18944,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "9aa0277b-5602-4d8a-b7fd-3491aa6ce910")
-		(property "Reference" "#PWR037"
+		(property "Reference" "#PWR013"
 			(at 82.55 199.39 0)
 			(effects
 				(font
@@ -18277,7 +18994,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR037")
+					(reference "#PWR013")
 					(unit 1)
 				)
 			)
@@ -18293,7 +19010,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "9ad6518a-ce60-4c3a-8602-1b05b2730b59")
-		(property "Reference" "#PWR08"
+		(property "Reference" "#PWR035"
 			(at 138.43 156.21 0)
 			(effects
 				(font
@@ -18343,7 +19060,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR08")
+					(reference "#PWR035")
 					(unit 1)
 				)
 			)
@@ -18359,7 +19076,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "9bd5be12-dde8-47a2-b10a-56888bfa3bf2")
-		(property "Reference" "#PWR060"
+		(property "Reference" "#PWR015"
 			(at 91.44 328.93 0)
 			(effects
 				(font
@@ -18409,7 +19126,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR060")
+					(reference "#PWR015")
 					(unit 1)
 				)
 			)
@@ -18426,7 +19143,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "9d5694a5-844d-45bf-b7a2-bbe2ff86a977")
-		(property "Reference" "#PWR039"
+		(property "Reference" "#PWR052"
 			(at 217.17 60.96 0)
 			(effects
 				(font
@@ -18476,7 +19193,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR039")
+					(reference "#PWR052")
 					(unit 1)
 				)
 			)
@@ -18492,7 +19209,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "9fead949-fe41-4640-9add-a598b72c716e")
-		(property "Reference" "FB5"
+		(property "Reference" "FB7"
 			(at 476.1992 70.6839 90)
 			(effects
 				(font
@@ -18508,7 +19225,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Inductor_SMD:L_0805_2012Metric"
 			(at 476.25 79.248 90)
 			(effects
 				(font
@@ -18544,7 +19261,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "FB5")
+					(reference "FB7")
 					(unit 1)
 				)
 			)
@@ -18560,7 +19277,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "a0b1d3eb-0bab-42c6-9b11-786ae949c60e")
-		(property "Reference" "J11"
+		(property "Reference" "J6"
 			(at 156.972 246.3222 0)
 			(effects
 				(font
@@ -18578,7 +19295,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Connector_AMASS:AMASS_XT30PW-M_1x02_P2.50mm_Horizontal"
 			(at 154.94 246.38 0)
 			(effects
 				(font
@@ -18614,7 +19331,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "J11")
+					(reference "J6")
 					(unit 1)
 				)
 			)
@@ -18630,7 +19347,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "a33dd2ea-199e-49a9-a3ee-fd8575703812")
-		(property "Reference" "#PWR056"
+		(property "Reference" "#PWR069"
 			(at 486.41 45.72 0)
 			(effects
 				(font
@@ -18680,7 +19397,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR056")
+					(reference "#PWR069")
 					(unit 1)
 				)
 			)
@@ -18696,7 +19413,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "a43bc110-35f2-4ce6-ac92-cdcbc840bbea")
-		(property "Reference" "C12"
+		(property "Reference" "C5"
 			(at 126.111 134.6778 0)
 			(effects
 				(font
@@ -18714,7 +19431,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
 			(at 124.1552 139.7 0)
 			(effects
 				(font
@@ -18750,7 +19467,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "C12")
+					(reference "C5")
 					(unit 1)
 				)
 			)
@@ -18766,7 +19483,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "a906fe32-977a-4d16-b131-ec4fb6337b3c")
-		(property "Reference" "#PWR064"
+		(property "Reference" "#PWR042"
 			(at 158.75 336.55 0)
 			(effects
 				(font
@@ -18816,7 +19533,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR064")
+					(reference "#PWR042")
 					(unit 1)
 				)
 			)
@@ -18832,7 +19549,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "a95a20f0-d3f7-4399-a8a4-bb56bddc59e2")
-		(property "Reference" "#PWR072"
+		(property "Reference" "#PWR037"
 			(at 138.43 297.18 0)
 			(effects
 				(font
@@ -18882,7 +19599,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR072")
+					(reference "#PWR037")
 					(unit 1)
 				)
 			)
@@ -18898,7 +19615,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "ad530aca-3177-49cb-8c65-86ab519704d3")
-		(property "Reference" "#PWR048"
+		(property "Reference" "#PWR075"
 			(at 509.27 217.17 0)
 			(effects
 				(font
@@ -18948,7 +19665,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR048")
+					(reference "#PWR075")
 					(unit 1)
 				)
 			)
@@ -18964,7 +19681,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "af5ad3eb-9b4c-4f8f-82a8-f866f673edf9")
-		(property "Reference" "#PWR035"
+		(property "Reference" "#PWR010"
 			(at 76.2 181.61 0)
 			(effects
 				(font
@@ -19014,7 +19731,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR035")
+					(reference "#PWR010")
 					(unit 1)
 				)
 			)
@@ -19030,7 +19747,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "af716215-0899-40bb-82f9-047fc95c3892")
-		(property "Reference" "C10"
+		(property "Reference" "C9"
 			(at 161.671 325.1778 0)
 			(effects
 				(font
@@ -19048,7 +19765,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
 			(at 159.7152 330.2 0)
 			(effects
 				(font
@@ -19084,7 +19801,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "C10")
+					(reference "C9")
 					(unit 1)
 				)
 			)
@@ -19100,7 +19817,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "af905081-980e-4c40-87d0-57615bd46a57")
-		(property "Reference" "#PWR05"
+		(property "Reference" "#PWR09"
 			(at 74.93 170.18 0)
 			(effects
 				(font
@@ -19150,7 +19867,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR05")
+					(reference "#PWR09")
 					(unit 1)
 				)
 			)
@@ -19167,7 +19884,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "b103f635-ff2d-4208-8057-ee24eb4187bd")
-		(property "Reference" "#PWR020"
+		(property "Reference" "#PWR047"
 			(at 173.99 326.39 0)
 			(effects
 				(font
@@ -19217,7 +19934,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR020")
+					(reference "#PWR047")
 					(unit 1)
 				)
 			)
@@ -19233,7 +19950,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "b1463f81-0796-4792-ac7d-f49d56dce099")
-		(property "Reference" "RV2"
+		(property "Reference" "RV3"
 			(at 101.092 147.3778 0)
 			(effects
 				(font
@@ -19251,7 +19968,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Potentiometer_THT:Potentiometer_Bourns_3266W_Vertical"
 			(at 102.87 148.59 0)
 			(effects
 				(font
@@ -19290,7 +20007,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "RV2")
+					(reference "RV3")
 					(unit 1)
 				)
 			)
@@ -19306,7 +20023,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "b1c217d2-a961-4140-bf71-d3196a55df9a")
-		(property "Reference" "D2"
+		(property "Reference" "D3"
 			(at 511.302 248.6603 90)
 			(effects
 				(font
@@ -19363,7 +20080,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "D2")
+					(reference "D3")
 					(unit 1)
 				)
 			)
@@ -19395,7 +20112,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Fuse:Fuseholder_Clip-5x20mm_Schurter_CQM_Inline_P20.60x5.00mm_D1.00mm_Horizontal"
 			(at 182.88 359.918 90)
 			(effects
 				(font
@@ -19447,7 +20164,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "b3eba96c-88ae-4d64-b48f-e299ff48e3c1")
-		(property "Reference" "R5"
+		(property "Reference" "R16"
 			(at 498.348 299.7778 0)
 			(effects
 				(font
@@ -19465,7 +20182,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
 			(at 494.792 300.99 90)
 			(effects
 				(font
@@ -19501,7 +20218,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "R5")
+					(reference "R16")
 					(unit 1)
 				)
 			)
@@ -19517,7 +20234,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "b5b6481c-1eff-49ec-8b14-2fbc006b93c4")
-		(property "Reference" "#PWR067"
+		(property "Reference" "#PWR068"
 			(at 481.33 149.86 0)
 			(effects
 				(font
@@ -19567,7 +20284,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR067")
+					(reference "#PWR068")
 					(unit 1)
 				)
 			)
@@ -19583,7 +20300,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "b5ce2655-8285-4b13-a098-f0a27f34b4ac")
-		(property "Reference" "C6"
+		(property "Reference" "C1"
 			(at 70.231 243.8978 0)
 			(effects
 				(font
@@ -19601,7 +20318,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
 			(at 68.2752 248.92 0)
 			(effects
 				(font
@@ -19637,7 +20354,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "C6")
+					(reference "C1")
 					(unit 1)
 				)
 			)
@@ -19653,7 +20370,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "b7650883-2af5-404a-9f21-db287104cc4a")
-		(property "Reference" "#PWR07"
+		(property "Reference" "#PWR019"
 			(at 116.84 160.02 0)
 			(effects
 				(font
@@ -19703,7 +20420,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR07")
+					(reference "#PWR019")
 					(unit 1)
 				)
 			)
@@ -19719,7 +20436,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "b76fae95-1e38-4b21-b844-d0930e4dce08")
-		(property "Reference" "#PWR053"
+		(property "Reference" "#PWR071"
 			(at 486.41 288.29 0)
 			(effects
 				(font
@@ -19769,7 +20486,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR053")
+					(reference "#PWR071")
 					(unit 1)
 				)
 			)
@@ -19866,6 +20583,73 @@
 		)
 	)
 	(symbol
+		(lib_id "Mechanical:MountingHole_Pad")
+		(at 306.07 293.37 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "bab473c7-4845-479e-ba8e-7e9511dc16e7")
+		(property "Reference" "H2"
+			(at 308.61 290.8299 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "MountingHole_Pad"
+			(at 308.61 293.3699 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "MountingHole:MountingHole_3.2mm_M3_Pad_Via"
+			(at 306.07 293.37 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 306.07 293.37 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Mounting Hole with connection"
+			(at 306.07 293.37 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "e9e33c67-eea9-4400-811d-449430c7f95e")
+		)
+		(instances
+			(project "connector-test-stand"
+				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
+					(reference "H2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "power:GND")
 		(at 127 313.69 0)
 		(unit 1)
@@ -19875,7 +20659,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "bbeb4f84-5158-44d4-afbc-c4f9d7584187")
-		(property "Reference" "#PWR076"
+		(property "Reference" "#PWR025"
 			(at 127 320.04 0)
 			(effects
 				(font
@@ -19925,7 +20709,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR076")
+					(reference "#PWR025")
 					(unit 1)
 				)
 			)
@@ -19957,7 +20741,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Fuse:Fuseholder_Clip-5x20mm_Schurter_CQM_Inline_P20.60x5.00mm_D1.00mm_Horizontal"
 			(at 182.88 344.678 90)
 			(effects
 				(font
@@ -20009,7 +20793,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "c0791143-3510-4c52-9ee1-2f1a00f5f236")
-		(property "Reference" "#PWR011"
+		(property "Reference" "#PWR06"
 			(at 63.5 240.03 0)
 			(effects
 				(font
@@ -20059,7 +20843,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR011")
+					(reference "#PWR06")
 					(unit 1)
 				)
 			)
@@ -20075,7 +20859,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "c2917114-5258-4eaa-b419-f8453ed455cd")
-		(property "Reference" "#PWR032"
+		(property "Reference" "#PWR050"
 			(at 189.23 339.09 0)
 			(effects
 				(font
@@ -20125,7 +20909,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR032")
+					(reference "#PWR050")
 					(unit 1)
 				)
 			)
@@ -20141,7 +20925,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "c2be3902-3fce-416f-bbf7-49e908802cad")
-		(property "Reference" "C5"
+		(property "Reference" "C8"
 			(at 154.051 162.6178 0)
 			(effects
 				(font
@@ -20159,7 +20943,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
 			(at 152.0952 167.64 0)
 			(effects
 				(font
@@ -20195,7 +20979,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "C5")
+					(reference "C8")
 					(unit 1)
 				)
 			)
@@ -20211,7 +20995,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "c436abbf-510a-447c-ad25-26c9d942476d")
-		(property "Reference" "FB1"
+		(property "Reference" "FB3"
 			(at 476.1992 47.8239 90)
 			(effects
 				(font
@@ -20227,7 +21011,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Inductor_SMD:L_0805_2012Metric"
 			(at 476.25 56.388 90)
 			(effects
 				(font
@@ -20263,7 +21047,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "FB1")
+					(reference "FB3")
 					(unit 1)
 				)
 			)
@@ -20279,7 +21063,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "c5eca9d3-442f-48d8-8318-11af18773f51")
-		(property "Reference" "C9"
+		(property "Reference" "C4"
 			(at 124.841 323.9078 0)
 			(effects
 				(font
@@ -20297,7 +21081,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
 			(at 122.8852 328.93 0)
 			(effects
 				(font
@@ -20333,7 +21117,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "C9")
+					(reference "C4")
 					(unit 1)
 				)
 			)
@@ -20349,7 +21133,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "c623a52e-41cf-4de0-b76e-ef1d79ad1362")
-		(property "Reference" "J8"
+		(property "Reference" "J10"
 			(at 236.22 61.8955 0)
 			(effects
 				(font
@@ -20365,7 +21149,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Connector_JST:JST_PH_S4B-PH-SM4-TB_1x04-1MP_P2.00mm_Horizontal"
 			(at 236.22 69.85 0)
 			(effects
 				(font
@@ -20410,7 +21194,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "J8")
+					(reference "J10")
 					(unit 1)
 				)
 			)
@@ -20426,7 +21210,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "c788f7d7-5a77-4a10-8fed-d70518dd65ec")
-		(property "Reference" "#PWR038"
+		(property "Reference" "#PWR04"
 			(at 58.42 200.66 0)
 			(effects
 				(font
@@ -20476,7 +21260,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR038")
+					(reference "#PWR04")
 					(unit 1)
 				)
 			)
@@ -20492,7 +21276,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "c8b2b32f-42f4-4928-af33-0cf2bf85c494")
-		(property "Reference" "RV4"
+		(property "Reference" "RV1"
 			(at 69.342 152.4578 0)
 			(effects
 				(font
@@ -20510,7 +21294,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Potentiometer_THT:Potentiometer_Bourns_3266W_Vertical"
 			(at 71.12 153.67 0)
 			(effects
 				(font
@@ -20549,7 +21333,73 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "RV4")
+					(reference "RV1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 280.67 295.91 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "ca1f2aba-3ac9-4b35-b847-0dd76bb8924f")
+		(property "Reference" "#PWR077"
+			(at 280.67 302.26 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 280.67 300.99 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 280.67 295.91 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 280.67 295.91 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
+			(at 280.67 295.91 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "05a1b783-a80a-4dc8-b613-7427bf5d3116")
+		)
+		(instances
+			(project ""
+				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
+					(reference "#PWR077")
 					(unit 1)
 				)
 			)
@@ -20565,7 +21415,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "ca339400-ba1d-4922-849b-7ed012e37d33")
-		(property "Reference" "D3"
+		(property "Reference" "D1"
 			(at 109.22 261.2855 0)
 			(effects
 				(font
@@ -20581,7 +21431,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Diode_SMD:D_SMB"
 			(at 109.22 266.7 0)
 			(effects
 				(font
@@ -20635,7 +21485,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "D3")
+					(reference "D1")
 					(unit 1)
 				)
 			)
@@ -20650,7 +21500,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "ca92e18f-675f-4a29-b8fb-9fc96ee26ff9")
-		(property "Reference" "R1"
+		(property "Reference" "R8"
 			(at 104.394 103.124 90)
 			(effects
 				(font
@@ -20666,7 +21516,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
 			(at 104.14 102.108 90)
 			(effects
 				(font
@@ -20702,7 +21552,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "R1")
+					(reference "R8")
 					(unit 1)
 				)
 			)
@@ -20718,7 +21568,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "cba829a0-d521-4808-9143-f9d2ab840deb")
-		(property "Reference" "J6"
+		(property "Reference" "J7"
 			(at 194.31 298.1155 0)
 			(effects
 				(font
@@ -20734,7 +21584,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "TerminalBlock:TerminalBlock_Altech_AK300-3_P5.00mm"
 			(at 194.31 306.07 0)
 			(effects
 				(font
@@ -20773,7 +21623,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "J6")
+					(reference "J7")
 					(unit 1)
 				)
 			)
@@ -20789,7 +21639,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "cc39b2ab-26ee-43ac-aff4-8b0a6b21b641")
-		(property "Reference" "#PWR068"
+		(property "Reference" "#PWR055"
 			(at 233.68 106.68 0)
 			(effects
 				(font
@@ -20839,7 +21689,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR068")
+					(reference "#PWR055")
 					(unit 1)
 				)
 			)
@@ -20855,7 +21705,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "cc9d9d5b-32f0-4556-afd9-da3858fdb37d")
-		(property "Reference" "#PWR026"
+		(property "Reference" "#PWR030"
 			(at 129.54 336.55 0)
 			(effects
 				(font
@@ -20905,7 +21755,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR026")
+					(reference "#PWR030")
 					(unit 1)
 				)
 			)
@@ -20939,7 +21789,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Package_SO:SOP-18_7x12.5mm_P1.27mm"
 			(at 163.83 361.95 0)
 			(effects
 				(font
@@ -21039,7 +21889,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "cf533d73-de33-46d2-80ea-c59cdd34a312")
-		(property "Reference" "#PWR070"
+		(property "Reference" "#PWR024"
 			(at 123.19 146.05 0)
 			(effects
 				(font
@@ -21089,7 +21939,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR070")
+					(reference "#PWR024")
 					(unit 1)
 				)
 			)
@@ -21105,7 +21955,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "cf569fab-8ed1-4dc6-a40f-b018d98f24a7")
-		(property "Reference" "U8"
+		(property "Reference" "U4"
 			(at 131.6833 333.6755 0)
 			(effects
 				(font
@@ -21123,7 +21973,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Package_SO:SO-20_12.8x7.5mm_P1.27mm"
 			(at 129.54 353.06 0)
 			(effects
 				(font
@@ -21213,7 +22063,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "U8")
+					(reference "U4")
 					(unit 1)
 				)
 			)
@@ -21229,7 +22079,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "d0d0d72c-4a06-4e73-8133-352ff97e7326")
-		(property "Reference" "U9"
+		(property "Reference" "U8"
 			(at 262.6443 116.9434 0)
 			(effects
 				(font
@@ -21290,7 +22140,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "U9")
+					(reference "U8")
 					(unit 1)
 				)
 			)
@@ -21306,7 +22156,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "d1f469fc-7d77-45d9-aa1c-70d51ded7fc3")
-		(property "Reference" "R12"
+		(property "Reference" "R14"
 			(at 433.578 221.0378 0)
 			(effects
 				(font
@@ -21324,7 +22174,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
 			(at 430.022 222.25 90)
 			(effects
 				(font
@@ -21360,7 +22210,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "R12")
+					(reference "R14")
 					(unit 1)
 				)
 			)
@@ -21392,7 +22242,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Fuse:Fuseholder_Clip-5x20mm_Schurter_CQM_Inline_P20.60x5.00mm_D1.00mm_Horizontal"
 			(at 182.88 354.838 90)
 			(effects
 				(font
@@ -21444,7 +22294,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "d65a96fe-3467-438b-9e53-923fb07864bb")
-		(property "Reference" "#PWR058"
+		(property "Reference" "#PWR032"
 			(at 130.81 119.38 0)
 			(effects
 				(font
@@ -21494,7 +22344,73 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR058")
+					(reference "#PWR032")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 306.07 295.91 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "d939ea3c-753d-4a8b-b322-05db0c9dd91a")
+		(property "Reference" "#PWR078"
+			(at 306.07 302.26 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 306.07 300.99 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 306.07 295.91 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 306.07 295.91 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
+			(at 306.07 295.91 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "68f8d092-df52-4dde-bddd-26f971af9f05")
+		)
+		(instances
+			(project "connector-test-stand"
+				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
+					(reference "#PWR078")
 					(unit 1)
 				)
 			)
@@ -21510,7 +22426,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "dbe6e429-4e58-455e-af55-280826cc17c7")
-		(property "Reference" "U10"
+		(property "Reference" "U6"
 			(at 158.5043 297.2834 0)
 			(effects
 				(font
@@ -21571,7 +22487,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "U10")
+					(reference "U6")
 					(unit 1)
 				)
 			)
@@ -21587,7 +22503,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "dcd4ed8e-9680-4fa1-9fbb-a6499debd4a6")
-		(property "Reference" "#PWR059"
+		(property "Reference" "#PWR014"
 			(at 91.44 318.77 0)
 			(effects
 				(font
@@ -21637,7 +22553,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR059")
+					(reference "#PWR014")
 					(unit 1)
 				)
 			)
@@ -21653,7 +22569,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "ddc3d7df-8266-4b06-b833-cefae9a9856b")
-		(property "Reference" "R10"
+		(property "Reference" "R3"
 			(at 44.958 345.4978 0)
 			(effects
 				(font
@@ -21707,7 +22623,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "R10")
+					(reference "R3")
 					(unit 1)
 				)
 			)
@@ -21723,7 +22639,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "ddf4cf8c-4e1e-4367-a5e2-e603b290a84e")
-		(property "Reference" "C1"
+		(property "Reference" "C7"
 			(at 138.811 95.3078 0)
 			(effects
 				(font
@@ -21741,7 +22657,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
 			(at 136.8552 100.33 0)
 			(effects
 				(font
@@ -21777,7 +22693,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "C1")
+					(reference "C7")
 					(unit 1)
 				)
 			)
@@ -21793,7 +22709,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "de10e475-e92e-44db-a2f6-c08ba6535a1a")
-		(property "Reference" "C3"
+		(property "Reference" "C12"
 			(at 481.711 209.6078 0)
 			(effects
 				(font
@@ -21811,7 +22727,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
 			(at 479.7552 214.63 0)
 			(effects
 				(font
@@ -21847,7 +22763,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "C3")
+					(reference "C12")
 					(unit 1)
 				)
 			)
@@ -21863,7 +22779,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "e0974b4a-c458-4da5-bb79-9e1ae69364ea")
-		(property "Reference" "#PWR03"
+		(property "Reference" "#PWR016"
 			(at 95.25 123.19 0)
 			(effects
 				(font
@@ -21913,7 +22829,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR03")
+					(reference "#PWR016")
 					(unit 1)
 				)
 			)
@@ -21929,7 +22845,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "e0e6f318-a70e-4018-814b-f68e9112c2cb")
-		(property "Reference" "#PWR075"
+		(property "Reference" "#PWR029"
 			(at 129.54 303.53 0)
 			(effects
 				(font
@@ -21979,7 +22895,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR075")
+					(reference "#PWR029")
 					(unit 1)
 				)
 			)
@@ -21995,7 +22911,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "e91546de-b1cb-4662-858b-23a620f17e0c")
-		(property "Reference" "#PWR030"
+		(property "Reference" "#PWR061"
 			(at 439.42 217.17 0)
 			(effects
 				(font
@@ -22045,7 +22961,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR030")
+					(reference "#PWR061")
 					(unit 1)
 				)
 			)
@@ -22061,7 +22977,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "e98e40ee-a29a-4938-9082-19da366972da")
-		(property "Reference" "#PWR052"
+		(property "Reference" "#PWR064"
 			(at 478.79 210.82 0)
 			(effects
 				(font
@@ -22111,7 +23027,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR052")
+					(reference "#PWR064")
 					(unit 1)
 				)
 			)
@@ -22127,7 +23043,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "e9ffd799-4a12-4488-92e3-d62aa362ebe6")
-		(property "Reference" "#PWR042"
+		(property "Reference" "#PWR058"
 			(at 242.57 102.87 0)
 			(effects
 				(font
@@ -22177,7 +23093,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR042")
+					(reference "#PWR058")
 					(unit 1)
 				)
 			)
@@ -22193,7 +23109,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "ea4fb6a6-017d-4484-ab2c-d507da41da6a")
-		(property "Reference" "#PWR012"
+		(property "Reference" "#PWR040"
 			(at 151.13 173.99 0)
 			(effects
 				(font
@@ -22243,7 +23159,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR012")
+					(reference "#PWR040")
 					(unit 1)
 				)
 			)
@@ -22259,7 +23175,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "ec577677-0b46-459f-a99d-4606977741cf")
-		(property "Reference" "#PWR047"
+		(property "Reference" "#PWR073"
 			(at 497.84 217.17 0)
 			(effects
 				(font
@@ -22309,7 +23225,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR047")
+					(reference "#PWR073")
 					(unit 1)
 				)
 			)
@@ -22325,7 +23241,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "ed2615e8-e2f9-495e-ad0c-37dc80d5f4b0")
-		(property "Reference" "RV1"
+		(property "Reference" "RV2"
 			(at 93.472 99.1178 0)
 			(effects
 				(font
@@ -22343,7 +23259,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Potentiometer_THT:Potentiometer_Bourns_3266W_Vertical"
 			(at 95.25 100.33 0)
 			(effects
 				(font
@@ -22382,7 +23298,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "RV1")
+					(reference "RV2")
 					(unit 1)
 				)
 			)
@@ -22398,7 +23314,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "f24031d9-58ac-4147-be11-adeccff245d0")
-		(property "Reference" "FB4"
+		(property "Reference" "FB6"
 			(at 476.1992 68.1439 90)
 			(effects
 				(font
@@ -22414,7 +23330,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Inductor_SMD:L_0805_2012Metric"
 			(at 476.25 76.708 90)
 			(effects
 				(font
@@ -22450,7 +23366,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "FB4")
+					(reference "FB6")
 					(unit 1)
 				)
 			)
@@ -22466,7 +23382,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "f4e5e042-8552-4983-8969-c82eef2a2193")
-		(property "Reference" "D1"
+		(property "Reference" "D2"
 			(at 499.872 248.6603 90)
 			(effects
 				(font
@@ -22523,7 +23439,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "D1")
+					(reference "D2")
 					(unit 1)
 				)
 			)
@@ -22539,7 +23455,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "f5de688a-1f86-4982-94e3-52af36a6b7ca")
-		(property "Reference" "#PWR041"
+		(property "Reference" "#PWR059"
 			(at 242.57 153.67 0)
 			(effects
 				(font
@@ -22589,7 +23505,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR041")
+					(reference "#PWR059")
 					(unit 1)
 				)
 			)
@@ -22605,7 +23521,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "f710ace3-e989-467e-8ef7-812980642110")
-		(property "Reference" "#PWR045"
+		(property "Reference" "#PWR074"
 			(at 497.84 260.35 0)
 			(effects
 				(font
@@ -22655,7 +23571,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR045")
+					(reference "#PWR074")
 					(unit 1)
 				)
 			)
@@ -22671,7 +23587,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "f7f22ff7-07fb-4514-ac9d-26438af4c5c0")
-		(property "Reference" "#PWR069"
+		(property "Reference" "#PWR023"
 			(at 123.19 135.89 0)
 			(effects
 				(font
@@ -22721,7 +23637,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR069")
+					(reference "#PWR023")
 					(unit 1)
 				)
 			)
@@ -22737,7 +23653,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "fb67bf0d-257d-4370-bd23-89fdec51e49e")
-		(property "Reference" "FB3"
+		(property "Reference" "FB5"
 			(at 476.1992 63.0639 90)
 			(effects
 				(font
@@ -22753,7 +23669,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Inductor_SMD:L_0805_2012Metric"
 			(at 476.25 71.628 90)
 			(effects
 				(font
@@ -22789,7 +23705,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "FB3")
+					(reference "FB5")
 					(unit 1)
 				)
 			)
@@ -22805,7 +23721,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "fbb002bc-7a0f-481a-bd51-e76182abb884")
-		(property "Reference" "#PWR010"
+		(property "Reference" "#PWR043"
 			(at 160.02 175.26 0)
 			(effects
 				(font
@@ -22855,7 +23771,7 @@
 		(instances
 			(project ""
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR010")
+					(reference "#PWR043")
 					(unit 1)
 				)
 			)
@@ -22889,7 +23805,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
 			(at 234.6452 100.33 0)
 			(effects
 				(font
@@ -22941,7 +23857,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "fc0ff3a1-5fea-436e-9778-c78c10602467")
-		(property "Reference" "#PWR051"
+		(property "Reference" "#PWR065"
 			(at 478.79 220.98 0)
 			(effects
 				(font
@@ -22991,7 +23907,7 @@
 		(instances
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
-					(reference "#PWR051")
+					(reference "#PWR065")
 					(unit 1)
 				)
 			)
