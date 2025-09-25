@@ -4379,6 +4379,17 @@
 		)
 		(uuid "7aab30ed-c9de-4f43-9b02-05b455bd07c8")
 	)
+	(text "FIX: Cross RX/TX and flip enable?"
+		(exclude_from_sim no)
+		(at 48.514 317.246 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+				(color 255 20 3 1)
+			)
+		)
+		(uuid "7bf622a9-12ca-413f-b9a0-5c4078d2eadc")
+	)
 	(text "I2C bus connector"
 		(exclude_from_sim no)
 		(at 214.884 26.416 0)
@@ -4562,6 +4573,12 @@
 		(uuid "5e9c0eb9-2b94-401a-a16a-c4eea990f511")
 	)
 	(junction
+		(at 447.04 162.56)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "6854555c-e056-4d19-9edb-be56396cc6b3")
+	)
+	(junction
 		(at 447.04 210.82)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -4614,12 +4631,6 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "ac659f2c-787b-428c-9ea5-5c6b2fbbba42")
-	)
-	(junction
-		(at 452.12 144.78)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "b77fa5e3-68e3-4ac2-af0e-f55e928cb12a")
 	)
 	(junction
 		(at 447.04 175.26)
@@ -4923,6 +4934,16 @@
 	)
 	(wire
 		(pts
+			(xy 447.04 144.78) (xy 447.04 162.56)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "232e6e58-a8e6-4f34-a337-dfbb1d99a5eb")
+	)
+	(wire
+		(pts
 			(xy 445.77 160.02) (xy 463.55 160.02)
 		)
 		(stroke
@@ -5010,16 +5031,6 @@
 			(type default)
 		)
 		(uuid "33ef1fca-79ad-47fe-99e7-d5fc2f7a0cc9")
-	)
-	(wire
-		(pts
-			(xy 452.12 144.78) (xy 463.55 144.78)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "340eae30-416c-4cd3-a8a6-27a3f46dab66")
 	)
 	(wire
 		(pts
@@ -5453,6 +5464,16 @@
 	)
 	(wire
 		(pts
+			(xy 463.55 144.78) (xy 447.04 144.78)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "66144930-0a91-48de-902b-2ad43168cd54")
+	)
+	(wire
+		(pts
 			(xy 226.06 34.29) (xy 226.06 49.53)
 		)
 		(stroke
@@ -5600,16 +5621,6 @@
 			(type default)
 		)
 		(uuid "7d9db735-2e99-40b4-bc51-c0def1218214")
-	)
-	(wire
-		(pts
-			(xy 452.12 139.7) (xy 452.12 144.78)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "8349746f-2957-4ac2-8631-9f4a83192059")
 	)
 	(wire
 		(pts
@@ -6293,7 +6304,7 @@
 	)
 	(wire
 		(pts
-			(xy 452.12 144.78) (xy 452.12 154.94)
+			(xy 452.12 139.7) (xy 452.12 154.94)
 		)
 		(stroke
 			(width 0)
