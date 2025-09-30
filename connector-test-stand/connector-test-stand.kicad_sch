@@ -8929,16 +8929,6 @@
 	)
 	(wire
 		(pts
-			(xy 270.51 123.19) (xy 292.1 123.19)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "0a5fb3cd-93bc-46d0-bfeb-24330cee695a")
-	)
-	(wire
-		(pts
 			(xy 505.46 125.73) (xy 505.46 128.27)
 		)
 		(stroke
@@ -10006,6 +9996,16 @@
 			(type default)
 		)
 		(uuid "67d2fc28-ff36-4990-a46f-8f7c625ead30")
+	)
+	(wire
+		(pts
+			(xy 270.51 123.19) (xy 273.05 123.19)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "67e42097-f696-4198-88d9-98d6ed640faa")
 	)
 	(wire
 		(pts
@@ -11546,6 +11546,16 @@
 			(type default)
 		)
 		(uuid "f7d3ea81-af6a-4534-88a9-a2da9e74c036")
+	)
+	(wire
+		(pts
+			(xy 280.67 123.19) (xy 292.1 123.19)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f8e63be2-0db8-43af-8cca-4c77ba3f3c37")
 	)
 	(wire
 		(pts
@@ -13800,7 +13810,7 @@
 				)
 			)
 		)
-		(property "Value" "R"
+		(property "Value" "100R"
 			(at 227.33 136.9638 90)
 			(effects
 				(font
@@ -16927,7 +16937,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "R"
+		(property "Value" "4K1"
 			(at 272.288 115.5121 0)
 			(effects
 				(font
@@ -20616,6 +20626,74 @@
 			(project "connector-test-stand"
 				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
 					(reference "D3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 276.86 123.19 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "b29387f1-d362-42a9-9cc5-b925325a6f6b")
+		(property "Reference" "R19"
+			(at 276.86 118.0295 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "10R"
+			(at 276.86 120.4538 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
+			(at 276.86 124.968 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 276.86 123.19 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Resistor"
+			(at 276.86 123.19 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "b854cf2e-200b-4f0f-b247-2eb77b91c7a9")
+		)
+		(pin "2"
+			(uuid "ce3229d8-0a1f-4865-b2ce-c26f1cb360a4")
+		)
+		(instances
+			(project "connector-test-stand"
+				(path "/6efdf98c-bc7d-454c-9186-483ddeb32201"
+					(reference "R19")
 					(unit 1)
 				)
 			)
