@@ -6397,7 +6397,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "R_Network08"
+		(property "Value" "10K"
 			(at 170.942 218.1281 0)
 			(effects
 				(font
@@ -6477,10 +6477,9 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(fields_autoplaced yes)
 		(uuid "0e1e738e-7ec0-4c85-ac71-ff893db6c087")
 		(property "Reference" "C10"
-			(at 252.73 87.6299 0)
+			(at 242.57 84.836 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6488,8 +6487,8 @@
 				(justify left)
 			)
 		)
-		(property "Value" "C"
-			(at 252.73 90.1699 0)
+		(property "Value" "100nF"
+			(at 239.014 89.154 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6558,7 +6557,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "R"
+		(property "Value" "10K"
 			(at 166.878 74.8721 0)
 			(effects
 				(font
@@ -6694,7 +6693,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "C_Polarized"
+		(property "Value" "6.8uF"
 			(at 259.08 89.2809 0)
 			(effects
 				(font
@@ -7585,7 +7584,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "C"
+		(property "Value" "100nF"
 			(at 160.02 50.7999 0)
 			(effects
 				(font
@@ -7789,8 +7788,8 @@
 				)
 			)
 		)
-		(property "Value" "R"
-			(at 259.08 106.68 90)
+		(property "Value" "2-10R"
+			(at 259.334 113.538 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7858,7 +7857,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "R"
+		(property "Value" "10K"
 			(at 231.648 105.3521 0)
 			(effects
 				(font
@@ -8797,7 +8796,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "D_Zener"
+		(property "Value" "5V zener"
 			(at 221.742 119.3221 90)
 			(effects
 				(font
@@ -9859,7 +9858,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "R"
+		(property "Value" "10K"
 			(at 217.678 105.3521 0)
 			(effects
 				(font
@@ -10259,7 +10258,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "D_Zener"
+		(property "Value" "3.3V zener"
 			(at 167.132 90.1121 90)
 			(effects
 				(font
@@ -10600,7 +10599,6 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(fields_autoplaced yes)
 		(uuid "ba70fe0f-764a-4033-ba17-d6b948a44df8")
 		(property "Reference" "U5"
 			(at 258.411 104.2434 0)
@@ -10611,7 +10609,7 @@
 			)
 		)
 		(property "Value" "MCP14A1201xMNY"
-			(at 258.411 106.6677 0)
+			(at 257.81 100.838 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10832,7 +10830,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "C"
+		(property "Value" "100nF"
 			(at 181.991 120.5921 0)
 			(effects
 				(font
@@ -11107,7 +11105,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "C"
+		(property "Value" "100nF"
 			(at 137.541 112.9721 0)
 			(effects
 				(font
