@@ -1,0 +1,5 @@
+(fp_lib_table
+  (version 7)
+  (lib (name "local")(type "KiCad")(uri "${KIPRJMOD}/lib")(options "")(descr ""))
+  (lib (name "shared")(type "KiCad")(uri "/Users/arturpuzio/repos/rakieta/shared")(options "")(descr ""))
+)
