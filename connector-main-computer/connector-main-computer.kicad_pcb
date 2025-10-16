@@ -19013,6 +19013,175 @@
 		(layer "Edge.Cuts")
 		(uuid "d22df77e-d4e0-4caf-8a0c-81a46bfd7294")
 	)
+	(gr_text "Strain\nGauge"
+		(at 133 98.6 90)
+		(layer "B.SilkS")
+		(uuid "40adc58a-b9f0-41aa-9fdd-e4e8759458b3")
+		(effects
+			(font
+				(size 1.5 1.5)
+				(thickness 0.3)
+				(bold yes)
+			)
+			(justify left bottom mirror)
+		)
+	)
+	(gr_text "Safety\nSwitch"
+		(at 41 84.2 270)
+		(layer "B.SilkS")
+		(uuid "4683e083-c382-41bb-bfe7-658730bb9710")
+		(effects
+			(font
+				(size 1.5 1.5)
+				(thickness 0.3)
+				(bold yes)
+			)
+			(justify left bottom mirror)
+		)
+	)
+	(gr_text "Preasure 1"
+		(at 131.8 65.3 90)
+		(layer "B.SilkS")
+		(uuid "66e46fa3-eb3d-4bce-a763-655f5a0b8ee9")
+		(effects
+			(font
+				(size 1.5 1.5)
+				(thickness 0.3)
+				(bold yes)
+			)
+			(justify left bottom mirror)
+		)
+	)
+	(gr_text "SMAAART\nTransmit"
+		(at 41.4 117 270)
+		(layer "B.SilkS")
+		(uuid "723bbfc0-b2c2-4ef9-b971-9d7385455944")
+		(effects
+			(font
+				(size 1.5 1.5)
+				(thickness 0.3)
+				(bold yes)
+			)
+			(justify left bottom mirror)
+		)
+	)
+	(gr_text "Preasure 2"
+		(at 131.8 80.9 90)
+		(layer "B.SilkS")
+		(uuid "73eead47-1981-4dc4-9903-7d1211a583d5")
+		(effects
+			(font
+				(size 1.5 1.5)
+				(thickness 0.3)
+				(bold yes)
+			)
+			(justify left bottom mirror)
+		)
+	)
+	(gr_text "I2C"
+		(at 110.2 143.9 0)
+		(layer "B.SilkS")
+		(uuid "77892686-eee1-4c57-9e76-e89c1805f8c4")
+		(effects
+			(font
+				(size 1.5 1.5)
+				(thickness 0.3)
+				(bold yes)
+			)
+			(justify left bottom mirror)
+		)
+	)
+	(gr_text "Starter\nSense"
+		(at 133.5 127.2 90)
+		(layer "B.SilkS")
+		(uuid "79bcbd90-8f7c-482b-8a8c-b6df81cf220f")
+		(effects
+			(font
+				(size 1.5 1.5)
+				(thickness 0.3)
+				(bold yes)
+			)
+			(justify left bottom mirror)
+		)
+	)
+	(gr_text "Big Fucking \nConnector"
+		(at 78.4 58.6 180)
+		(layer "B.SilkS")
+		(uuid "841d03b8-db11-477f-9ee9-d2c2abf37a17")
+		(effects
+			(font
+				(size 1.5 1.5)
+				(thickness 0.3)
+				(bold yes)
+			)
+			(justify left bottom mirror)
+		)
+	)
+	(gr_text "Servo\nPWM"
+		(at 41.7 133 270)
+		(layer "B.SilkS")
+		(uuid "9ff8f274-0938-4969-b0e6-27c002a6f4f4")
+		(effects
+			(font
+				(size 1.5 1.5)
+				(thickness 0.3)
+				(bold yes)
+			)
+			(justify left bottom mirror)
+		)
+	)
+	(gr_text "Safety\nSwitch\nSense"
+		(at 40.5 98.5 270)
+		(layer "B.SilkS")
+		(uuid "ae6b4c21-f3a7-4b82-8b97-072023e831eb")
+		(effects
+			(font
+				(size 1.5 1.5)
+				(thickness 0.3)
+				(bold yes)
+			)
+			(justify left bottom mirror)
+		)
+	)
+	(gr_text "UART"
+		(at 75.9 143.6 0)
+		(layer "B.SilkS")
+		(uuid "cb537fa8-976c-40ac-8754-1b0cc1ea7683")
+		(effects
+			(font
+				(size 1.5 1.5)
+				(thickness 0.3)
+				(bold yes)
+			)
+			(justify left bottom mirror)
+		)
+	)
+	(gr_text "I2C"
+		(at 95.1 143.9 0)
+		(layer "B.SilkS")
+		(uuid "e074f6d2-039f-4eae-8346-7bcfdfb96096")
+		(effects
+			(font
+				(size 1.5 1.5)
+				(thickness 0.3)
+				(bold yes)
+			)
+			(justify left bottom mirror)
+		)
+	)
+	(gr_text "Battery\nSense"
+		(at 132.9 113.1 90)
+		(layer "B.SilkS")
+		(uuid "e36c7566-1b14-4a64-ade0-87e595a105de")
+		(effects
+			(font
+				(size 1.5 1.5)
+				(thickness 0.3)
+				(bold yes)
+			)
+			(justify left bottom mirror)
+		)
+	)
 	(gr_text_box "${PROJECTNAME} ${CURRENT_DATE}"
 		(start 103.632 50.292)
 		(end 125.984 54.864)
