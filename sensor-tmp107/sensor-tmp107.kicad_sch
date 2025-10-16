@@ -1685,6 +1685,16 @@
 			(embedded_fonts no)
 		)
 	)
+	(text "https://www.tme.eu/pl/details/dhp9-09f/wtyki-i-gniazda-d-sub/connfly/ds1037-01-09fnaksi74/\n"
+		(exclude_from_sim no)
+		(at 229.362 112.776 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "d7248158-ba9f-4697-88ff-de19bf461427")
+	)
 	(junction
 		(at 149.86 63.5)
 		(diameter 0)
@@ -2765,7 +2775,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Connector_Dsub:DSUB-9_Socket_Horizontal_P2.77x2.84mm_EdgePinOffset4.94mm_Housed_MountingHolesOffset4.94mm"
+		(property "Footprint" "Connector_Dsub:DSUB-9_Socket_Horizontal_P2.77x2.84mm_EdgePinOffset9.90mm_Housed_MountingHolesOffset11.32mm"
 			(at 41.91 99.06 0)
 			(effects
 				(font
@@ -3674,7 +3684,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Connector_Dsub:DSUB-9_Socket_Horizontal_P2.77x2.84mm_EdgePinOffset4.94mm_Housed_MountingHolesOffset4.94mm"
+		(property "Footprint" "Connector_Dsub:DSUB-9_Socket_Horizontal_P2.77x2.84mm_EdgePinOffset9.90mm_Housed_MountingHolesOffset11.32mm"
 			(at 203.2 93.98 0)
 			(effects
 				(font
@@ -3693,6 +3703,15 @@
 			)
 		)
 		(property "Description" "9-pin D-SUB connector, socket (female), Mounting Hole"
+			(at 203.2 93.98 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "tme" "https://www.tme.eu/pl/details/dhp9-09f/wtyki-i-gniazda-d-sub/connfly/ds1037-01-09fnaksi74/"
 			(at 203.2 93.98 0)
 			(effects
 				(font
