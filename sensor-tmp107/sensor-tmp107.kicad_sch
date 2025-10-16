@@ -3005,7 +3005,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
 			(at 165.862 69.85 90)
 			(effects
 				(font
@@ -3075,7 +3075,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
 			(at 155.702 93.98 90)
 			(effects
 				(font
@@ -3378,7 +3378,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Diode_SMD:D_MiniMELF_Handsoldering"
+		(property "Footprint" "LED_SMD:LED_0805_2012Metric"
 			(at 167.64 77.47 0)
 			(effects
 				(font
@@ -3457,7 +3457,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
 			(at 148.082 69.85 90)
 			(effects
 				(font
@@ -3595,7 +3595,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Diode_SMD:D_MiniMELF_Handsoldering"
+		(property "Footprint" "LED_SMD:LED_0805_2012Metric"
 			(at 149.86 77.47 0)
 			(effects
 				(font
@@ -3766,7 +3766,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
 			(at 138.43 88.138 90)
 			(effects
 				(font
