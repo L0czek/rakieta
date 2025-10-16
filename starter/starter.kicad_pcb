@@ -15772,8 +15772,8 @@
 				(type solid)
 			)
 			(fill yes)
-			(layer "Eco1.User")
-			(uuid "51deafab-88c6-477c-84c7-f1260beb1c0b")
+			(layer "F.SilkS")
+			(uuid "eb3be6c8-7e24-4236-9929-d2d878f96e62")
 		)
 		(fp_poly
 			(pts
@@ -15787,8 +15787,8 @@
 				(type solid)
 			)
 			(fill yes)
-			(layer "Eco1.User")
-			(uuid "eac76a9f-bf4e-4836-a452-4a4a9d129328")
+			(layer "F.SilkS")
+			(uuid "1b28175c-f3dc-4db7-8459-712e9871cd6d")
 		)
 		(fp_poly
 			(pts
@@ -15802,8 +15802,8 @@
 				(type solid)
 			)
 			(fill yes)
-			(layer "Eco1.User")
-			(uuid "c49b1a70-6671-4b37-a436-0628b253bd36")
+			(layer "F.SilkS")
+			(uuid "b7608ba8-dd91-4e19-8d6b-79f1673b6bbc")
 		)
 		(fp_poly
 			(pts
@@ -15817,8 +15817,8 @@
 				(type solid)
 			)
 			(fill yes)
-			(layer "Eco1.User")
-			(uuid "08089be2-e5a7-478d-9aca-b12bcd423451")
+			(layer "F.SilkS")
+			(uuid "1d489010-0573-4b04-b763-5fb9ee5929e6")
 		)
 		(fp_poly
 			(pts
@@ -15839,8 +15839,8 @@
 				(type solid)
 			)
 			(fill yes)
-			(layer "Eco1.User")
-			(uuid "a24f2fee-4386-4892-857e-4f5e45a59a94")
+			(layer "F.SilkS")
+			(uuid "5a2f3345-f739-446f-8806-207bafaf8369")
 		)
 		(fp_poly
 			(pts
@@ -15862,8 +15862,8 @@
 				(type solid)
 			)
 			(fill yes)
-			(layer "Eco1.User")
-			(uuid "00b69ef3-978d-40cd-9439-67778df1fea8")
+			(layer "F.SilkS")
+			(uuid "ecd70a02-2ef2-4f2d-b8f8-67427ead766d")
 		)
 		(fp_poly
 			(pts
@@ -15885,8 +15885,8 @@
 				(type solid)
 			)
 			(fill yes)
-			(layer "Eco1.User")
-			(uuid "6f254987-9f12-4364-8177-9b5146ae72ee")
+			(layer "F.SilkS")
+			(uuid "2148cdb9-330a-4509-a96e-49b96248e228")
 		)
 		(fp_poly
 			(pts
@@ -15909,8 +15909,8 @@
 				(type solid)
 			)
 			(fill yes)
-			(layer "Eco1.User")
-			(uuid "a7c4cde5-1ef6-4aaf-8e0f-c61f20139b89")
+			(layer "F.SilkS")
+			(uuid "d8e02796-8f53-4262-a38f-3e7832c4ec55")
 		)
 		(fp_poly
 			(pts
@@ -15933,8 +15933,8 @@
 				(type solid)
 			)
 			(fill yes)
-			(layer "Eco1.User")
-			(uuid "908ec49e-5732-4d25-9dad-d12633517649")
+			(layer "F.SilkS")
+			(uuid "866c40cb-f319-4974-8997-0cef75a3d0b7")
 		)
 		(fp_poly
 			(pts
@@ -15957,8 +15957,8 @@
 				(type solid)
 			)
 			(fill yes)
-			(layer "Eco1.User")
-			(uuid "ccd369b6-fa74-4a5a-918c-c158f891fc97")
+			(layer "F.SilkS")
+			(uuid "0cc82d43-a7dd-4a9a-93ed-c1c8efe50351")
 		)
 		(fp_poly
 			(pts
@@ -15981,8 +15981,8 @@
 				(type solid)
 			)
 			(fill yes)
-			(layer "Eco1.User")
-			(uuid "79e02065-e485-4390-b1ac-2538914eceb6")
+			(layer "F.SilkS")
+			(uuid "08cacd3c-7a79-4a26-9f9e-0cb5fef450e5")
 		)
 		(fp_poly
 			(pts
@@ -16005,8 +16005,8 @@
 				(type solid)
 			)
 			(fill yes)
-			(layer "Eco1.User")
-			(uuid "b554baac-27c1-496b-910a-e16ca5a18c49")
+			(layer "F.SilkS")
+			(uuid "e2b981a9-8b0e-4da8-878b-e2ff1e224049")
 		)
 		(fp_poly
 			(pts
@@ -16034,8 +16034,8 @@
 				(type solid)
 			)
 			(fill yes)
-			(layer "Eco1.User")
-			(uuid "34ddf85c-8a49-4f4e-8903-9447c67d22c5")
+			(layer "F.SilkS")
+			(uuid "9a735455-d578-4bd2-9475-0f077bbad63d")
 		)
 		(fp_poly
 			(pts
@@ -16062,8 +16062,8 @@
 				(type solid)
 			)
 			(fill yes)
-			(layer "Eco1.User")
-			(uuid "5dafedb0-d6fd-4d66-b53e-e21b1b7347ac")
+			(layer "F.SilkS")
+			(uuid "3b0f5cf7-2231-44be-a52d-651ce31e3029")
 		)
 		(fp_poly
 			(pts
@@ -16090,8 +16090,8 @@
 				(type solid)
 			)
 			(fill yes)
-			(layer "Eco1.User")
-			(uuid "06a050fc-05c0-47ae-85d5-bf1155d4eb93")
+			(layer "F.SilkS")
+			(uuid "5cb84f8b-2cd8-41a4-8c66-5af6c2e3118a")
 		)
 		(fp_poly
 			(pts
@@ -16122,8 +16122,8 @@
 				(type solid)
 			)
 			(fill yes)
-			(layer "Eco1.User")
-			(uuid "c5f32019-4652-4249-94a2-ec505e8ce6b7")
+			(layer "F.SilkS")
+			(uuid "21b49f8f-4887-41c4-bdd3-d61fc012bdc8")
 		)
 		(fp_poly
 			(pts
@@ -16154,8 +16154,8 @@
 				(type solid)
 			)
 			(fill yes)
-			(layer "Eco1.User")
-			(uuid "de97251d-5af8-47e3-a3db-432644c4c0cc")
+			(layer "F.SilkS")
+			(uuid "e27b99b2-7976-4a41-bc8a-03c1ea5c78a6")
 		)
 		(fp_poly
 			(pts
@@ -16212,8 +16212,8 @@
 				(type solid)
 			)
 			(fill yes)
-			(layer "Eco1.User")
-			(uuid "25cfd1c4-8037-493e-b678-59e4ba6d7a3d")
+			(layer "F.SilkS")
+			(uuid "6449a9c0-29b9-4faf-9c98-f8140faa2df5")
 		)
 		(fp_poly
 			(pts
@@ -16474,8 +16474,8 @@
 				(type solid)
 			)
 			(fill yes)
-			(layer "Eco1.User")
-			(uuid "ed4d3095-545b-48b3-ae8b-708b9a4d1671")
+			(layer "F.SilkS")
+			(uuid "c7a0a20f-c298-455b-8cf6-923d1d8ca9ef")
 		)
 		(embedded_fonts no)
 	)
@@ -27924,7 +27924,7 @@
 		(descr "4-bit rotary coded switch, J-hook, https://www.nidec-copal-electronics.com/e/catalog/switch/sh-7000.pdf")
 		(tags "rotary switch bcd")
 		(property "Reference" "SW1"
-			(at -5.842 -1.905 0)
+			(at -6.4956 -0.081 0)
 			(layer "F.SilkS")
 			(uuid "3def42a3-27e7-416f-a9e6-6ff5850bbe4d")
 			(effects
@@ -29149,9 +29149,9 @@
 	)
 	(gr_text_box "${PROJECTNAME} ${CURRENT_DATE}"
 		(start 44.704 148.336)
-		(end 66.04 151.384)
+		(end 63.24 151.384)
 		(margins 1.0025 1.0025 1.0025 1.0025)
-		(layer "Eco1.User")
+		(layer "F.SilkS")
 		(uuid "f83183bc-b3f1-483a-9d02-c281989c6c23")
 		(effects
 			(font
