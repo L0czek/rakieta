@@ -18027,7 +18027,7 @@
 		(descr "TO-92L leads in-line (large body variant of TO-92), also known as TO-226, wide, drill 0.75mm (see https://www.diodes.com/assets/Package-Files/TO92L.pdf and http://www.ti.com/lit/an/snoa059/snoa059.pdf)")
 		(tags "TO-92L Inline Wide transistor")
 		(property "Reference" "U1"
-			(at 1.19 -3.56 90)
+			(at -2.33 0 180)
 			(layer "F.SilkS")
 			(uuid "376aad0d-3ace-43e1-8df1-2d4a6a2f7ae0")
 			(effects
@@ -18409,7 +18409,7 @@
 		(descr "Resistor SMD 0805 (2012 Metric), square (rectangular) end terminal, IPC-7351 nominal, (Body size source: IPC-SM-782 page 72, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf), generated with kicad-footprint-generator")
 		(tags "resistor")
 		(property "Reference" "R11"
-			(at -3.2785 0 0)
+			(at 0.0015 1.7292 0)
 			(layer "F.SilkS")
 			(uuid "10622277-d013-4b62-b005-9acfcb250a50")
 			(effects
@@ -22461,7 +22461,7 @@
 			(net 5 "+3.3V")
 			(pinfunction "C")
 			(pintype "passive")
-			(uuid "5b93f4f4-4515-452d-bc3f-595612a04b1d")
+			(uuid "786ff464-2e11-4f2a-85fe-6ae0cd062341")
 		)
 		(embedded_fonts no)
 		(model "${KICAD9_3DMODEL_DIR}/Button_Switch_SMD.3dshapes/Nidec_Copal_SH-7010A.step"
@@ -28247,7 +28247,7 @@
 			(net 5 "+3.3V")
 			(pinfunction "C")
 			(pintype "passive")
-			(uuid "fa1e8570-6d90-4955-a644-55dacbb2ff22")
+			(uuid "57d9f9d5-c3bf-4b8b-ad5d-23e5d776c455")
 		)
 		(embedded_fonts no)
 		(model "${KICAD9_3DMODEL_DIR}/Button_Switch_SMD.3dshapes/Nidec_Copal_SH-7010A.step"
