@@ -3006,7 +3006,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "160"
+		(property "Value" "200"
 			(at 170.18 71.1199 0)
 			(effects
 				(font
@@ -3379,7 +3379,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "LED"
+		(property "Value" "LED czerwony"
 			(at 171.45 80.3274 90)
 			(effects
 				(font
@@ -3458,7 +3458,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "160"
+		(property "Value" "200"
 			(at 152.4 71.1199 0)
 			(effects
 				(font
@@ -3596,7 +3596,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "LED"
+		(property "Value" "LED żółtozielony"
 			(at 153.67 80.264 90)
 			(effects
 				(font
