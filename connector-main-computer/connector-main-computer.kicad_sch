@@ -11140,7 +11140,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
+		(property "Value" "13,7k"
 			(at 97.79 177.7999 0)
 			(effects
 				(font
@@ -11534,7 +11534,7 @@
 		(fields_autoplaced yes)
 		(uuid "392720e8-d9e6-4aaf-9387-569f8743abce")
 		(property "Reference" "U4"
-			(at 97.3933 307.0055 0)
+			(at 97.3933 306.07 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11542,8 +11542,8 @@
 				(justify left)
 			)
 		)
-		(property "Value" "SN65HVD11HD"
-			(at 97.3933 309.4298 0)
+		(property "Value" "SN65HVD485E"
+			(at 97.3933 308.61 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13740,7 +13740,7 @@
 		(fields_autoplaced yes)
 		(uuid "69d35c44-1eea-4028-ae59-a22421af3bea")
 		(property "Reference" "U1"
-			(at 97.0981 37.7655 0)
+			(at 97.0981 36.83 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13748,8 +13748,8 @@
 				(justify right)
 			)
 		)
-		(property "Value" "INA199xxDCK"
-			(at 97.0981 40.1898 0)
+		(property "Value" "INA210"
+			(at 97.0981 39.37 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -18870,7 +18870,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "14K"
+		(property "Value" "1K"
 			(at 97.79 186.6899 0)
 			(effects
 				(font

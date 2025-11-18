@@ -15191,7 +15191,7 @@
 		(fields_autoplaced yes)
 		(uuid "2c111c9f-26eb-4880-99ec-5daf3b2dc9c7")
 		(property "Reference" "R2"
-			(at 38.608 365.8178 0)
+			(at 39.37 365.7599 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -15199,8 +15199,8 @@
 				(justify left)
 			)
 		)
-		(property "Value" "R"
-			(at 38.608 368.2421 0)
+		(property "Value" "0"
+			(at 39.37 368.2999 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -15529,7 +15529,7 @@
 		(fields_autoplaced yes)
 		(uuid "392720e8-d9e6-4aaf-9387-569f8743abce")
 		(property "Reference" "U10"
-			(at 353.9333 276.5255 0)
+			(at 353.9333 275.59 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -15537,8 +15537,8 @@
 				(justify left)
 			)
 		)
-		(property "Value" "SN65HVD11HD"
-			(at 353.9333 278.9498 0)
+		(property "Value" "SN65HVD485E"
+			(at 353.9333 278.13 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -15751,7 +15751,7 @@
 		(fields_autoplaced yes)
 		(uuid "39ebf4cc-54fe-42d6-9194-3e7cbca53f73")
 		(property "Reference" "R6"
-			(at 51.308 365.8178 0)
+			(at 52.07 365.7599 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -15759,8 +15759,8 @@
 				(justify left)
 			)
 		)
-		(property "Value" "R"
-			(at 51.308 368.2421 0)
+		(property "Value" "0"
+			(at 52.07 368.2999 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -18651,7 +18651,7 @@
 		(fields_autoplaced yes)
 		(uuid "7c187b05-11ff-42b9-a8cc-9e6b74e9236e")
 		(property "Reference" "R1"
-			(at 38.608 345.4978 0)
+			(at 39.37 345.4399 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -18659,8 +18659,8 @@
 				(justify left)
 			)
 		)
-		(property "Value" "R"
-			(at 38.608 347.9221 0)
+		(property "Value" "0"
+			(at 39.37 347.9799 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -19052,7 +19052,7 @@
 		(fields_autoplaced yes)
 		(uuid "84619971-db6e-44cb-b7e6-2d2cf46f8d65")
 		(property "Reference" "R4"
-			(at 44.958 365.8178 0)
+			(at 45.72 365.7599 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -19060,8 +19060,8 @@
 				(justify left)
 			)
 		)
-		(property "Value" "R"
-			(at 44.958 368.2421 0)
+		(property "Value" "0"
+			(at 45.72 368.2999 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -19320,7 +19320,7 @@
 		(fields_autoplaced yes)
 		(uuid "896f4b9e-a6f7-4870-bae2-0aa41040a782")
 		(property "Reference" "R5"
-			(at 51.308 345.4978 0)
+			(at 52.07 345.4399 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -19328,8 +19328,8 @@
 				(justify left)
 			)
 		)
-		(property "Value" "R"
-			(at 51.308 347.9221 0)
+		(property "Value" "0"
+			(at 52.07 347.9799 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -24590,7 +24590,7 @@
 		(fields_autoplaced yes)
 		(uuid "ddc3d7df-8266-4b06-b833-cefae9a9856b")
 		(property "Reference" "R3"
-			(at 44.958 345.4978 0)
+			(at 45.72 345.4399 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -24598,8 +24598,8 @@
 				(justify left)
 			)
 		)
-		(property "Value" "R"
-			(at 44.958 347.9221 0)
+		(property "Value" "0"
+			(at 45.72 347.9799 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -25740,7 +25740,7 @@
 		(fields_autoplaced yes)
 		(uuid "fbb903ab-fac0-468c-8011-409aa3ef228f")
 		(property "Reference" "C11"
-			(at 236.601 95.3078 0)
+			(at 237.49 95.2499 0)
 			(effects
 				(font
 					(size 1.27 1.27)
