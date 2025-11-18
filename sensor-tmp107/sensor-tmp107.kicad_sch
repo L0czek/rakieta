@@ -3458,11 +3458,7 @@
 				(justify left)
 			)
 		)
-<<<<<<< Updated upstream
 		(property "Value" "200"
-=======
-		(property "Value" "150"
->>>>>>> Stashed changes
 			(at 152.4 71.1199 0)
 			(effects
 				(font
