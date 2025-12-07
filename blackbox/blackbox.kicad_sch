@@ -1439,6 +1439,187 @@
 			)
 			(embedded_fonts no)
 		)
+		(symbol "Connector_Generic_MountingPin:Conn_01x02_MountingPin"
+			(pin_names
+				(offset 1.016)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "J"
+				(at 0 2.54 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "Conn_01x02_MountingPin"
+				(at 1.27 -5.08 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Generic connectable mounting pin connector, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "connector"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_fp_filters" "Connector*:*_1x??-1MP*"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "Conn_01x02_MountingPin_1_1"
+				(rectangle
+					(start -1.27 1.27)
+					(end 1.27 -3.81)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+				(rectangle
+					(start -1.27 0.127)
+					(end 0 -0.127)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start -1.27 -2.413)
+					(end 0 -2.667)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -1.016 -4.572) (xy 1.016 -4.572)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(text "Mounting"
+					(at 0 -4.191 0)
+					(effects
+						(font
+							(size 0.381 0.381)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 0 0)
+					(length 3.81)
+					(name "Pin_1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 -2.54 0)
+					(length 3.81)
+					(name "Pin_2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 0 -7.62 90)
+					(length 3.048)
+					(name "MountPin"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "MP"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 		(symbol "Connector_Generic_MountingPin:Conn_01x04_MountingPin"
 			(pin_names
 				(offset 1.016)
@@ -4587,6 +4768,249 @@
 			)
 			(embedded_fonts no)
 		)
+		(symbol "Switch:SW_DPDT_x2"
+			(pin_names
+				(offset 0)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "SW"
+				(at 0 5.08 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "SW_DPDT_x2"
+				(at 0 -5.08 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Switch, dual pole double throw, separate symbols"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "switch dual-pole double-throw DPDT spdt ON-ON"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_fp_filters" "SW*DPDT*"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "SW_DPDT_x2_0_0"
+				(circle
+					(center -2.032 0)
+					(radius 0.508)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(circle
+					(center 2.032 -2.54)
+					(radius 0.508)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "SW_DPDT_x2_0_1"
+				(rectangle
+					(start -3.175 3.81)
+					(end 3.175 -3.81)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+				(polyline
+					(pts
+						(xy -1.524 0.254) (xy 1.5748 2.286)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(circle
+					(center 2.032 2.54)
+					(radius 0.508)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "SW_DPDT_x2_1_1"
+				(pin passive line
+					(at -5.08 0 0)
+					(length 2.54)
+					(name "B"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 5.08 2.54 180)
+					(length 2.54)
+					(name "A"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 5.08 -2.54 180)
+					(length 2.54)
+					(name "C"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(symbol "SW_DPDT_x2_2_1"
+				(pin passive line
+					(at -5.08 0 0)
+					(length 2.54)
+					(name "B"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "5"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 5.08 2.54 180)
+					(length 2.54)
+					(name "A"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 5.08 -2.54 180)
+					(length 2.54)
+					(name "C"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "6"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 		(symbol "Switch:SW_SPST"
 			(pin_names
 				(offset 0)
@@ -4716,325 +5140,6 @@
 						(effects
 							(font
 								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-			(embedded_fonts no)
-		)
-		(symbol "keys1051:1051"
-			(pin_names
-				(offset 1.016)
-			)
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(property "Reference" "BT"
-				(at -3.81 3.81 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify left bottom)
-				)
-			)
-			(property "Value" "1051"
-				(at -3.81 -5.08 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify left bottom)
-				)
-			)
-			(property "Footprint" "1051:BAT_1051"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify bottom)
-					(hide yes)
-				)
-			)
-			(property "Datasheet" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Description" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "MF" "Keystone Electronics"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify bottom)
-					(hide yes)
-				)
-			)
-			(property "MAXIMUM_PACKAGE_HEIGHT" "15.49mm"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify bottom)
-					(hide yes)
-				)
-			)
-			(property "Package" "NON STANDARD-3 Keystone"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify bottom)
-					(hide yes)
-				)
-			)
-			(property "Price" "None"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify bottom)
-					(hide yes)
-				)
-			)
-			(property "Check_prices" "https://www.snapeda.com/parts/1051/Keystone/view-part/?ref=eda"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify bottom)
-					(hide yes)
-				)
-			)
-			(property "STANDARD" "Manufacturer Recommendations"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify bottom)
-					(hide yes)
-				)
-			)
-			(property "PARTREV" "A"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify bottom)
-					(hide yes)
-				)
-			)
-			(property "SnapEDA_Link" "https://www.snapeda.com/parts/1051/Keystone/view-part/?ref=snap"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify bottom)
-					(hide yes)
-				)
-			)
-			(property "MP" "1051"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify bottom)
-					(hide yes)
-				)
-			)
-			(property "Description_1" "THM Battery Holder for CR123A Cell | Keystone Electronics 1051"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify bottom)
-					(hide yes)
-				)
-			)
-			(property "MANUFACTURER" "Keystone"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify bottom)
-					(hide yes)
-				)
-			)
-			(property "Availability" "In Stock"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify bottom)
-					(hide yes)
-				)
-			)
-			(property "SNAPEDA_PN" "1129"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify bottom)
-					(hide yes)
-				)
-			)
-			(symbol "1051_0_0"
-				(polyline
-					(pts
-						(xy -3.81 1.905) (xy -2.54 1.905)
-					)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -3.175 2.54) (xy -3.175 1.27)
-					)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -1.27 2.54) (xy -1.27 0)
-					)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -1.27 0) (xy -2.54 0)
-					)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -1.27 0) (xy -1.27 -2.54)
-					)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 1.27 1.27) (xy 1.27 0)
-					)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 1.27 0) (xy 1.27 -1.27)
-					)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 1.27 0) (xy 2.54 0)
-					)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(pin passive line
-					(at -7.62 0 0)
-					(length 5.08)
-					(name "~"
-						(effects
-							(font
-								(size 1.016 1.016)
-							)
-						)
-					)
-					(number "P"
-						(effects
-							(font
-								(size 1.016 1.016)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 7.62 0 180)
-					(length 5.08)
-					(name "~"
-						(effects
-							(font
-								(size 1.016 1.016)
-							)
-						)
-					)
-					(number "N"
-						(effects
-							(font
-								(size 1.016 1.016)
 							)
 						)
 					)
@@ -5806,6 +5911,12 @@
 		(uuid "2b6b361a-1f4b-472e-8ba1-525eb8ba490d")
 	)
 	(junction
+		(at 331.47 168.91)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "2e543259-c6a6-4f8f-b3db-157999da7f4d")
+	)
+	(junction
 		(at 262.89 212.09)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -5908,7 +6019,7 @@
 		(uuid "a87de7fb-852f-4f63-801b-3404cccb8bf1")
 	)
 	(junction
-		(at 351.79 154.94)
+		(at 372.11 154.94)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "c45b4014-4b58-49d1-bbd5-8428dc8ce8c9")
@@ -5948,6 +6059,10 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "fa6b192b-0217-40ae-a20a-f677d724d3f8")
+	)
+	(no_connect
+		(at 334.01 146.05)
+		(uuid "000c9a1c-b18f-4cac-a269-1b7c8a0e75eb")
 	)
 	(no_connect
 		(at 46.99 154.94)
@@ -6075,13 +6190,23 @@
 	)
 	(wire
 		(pts
-			(xy 351.79 142.24) (xy 351.79 146.05)
+			(xy 372.11 142.24) (xy 372.11 146.05)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
 		(uuid "1e223983-643a-4ce1-be0a-9f86bc06c759")
+	)
+	(wire
+		(pts
+			(xy 331.47 168.91) (xy 339.09 168.91)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1ee195af-26dd-4fc4-8920-1f7eb15fb494")
 	)
 	(wire
 		(pts
@@ -6355,6 +6480,16 @@
 	)
 	(wire
 		(pts
+			(xy 334.01 161.29) (xy 331.47 161.29)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "47fb4a34-e78b-48ad-a460-e822a5e5ac07")
+	)
+	(wire
+		(pts
 			(xy 229.87 212.09) (xy 241.3 212.09)
 		)
 		(stroke
@@ -6525,7 +6660,7 @@
 	)
 	(wire
 		(pts
-			(xy 342.9 154.94) (xy 351.79 154.94)
+			(xy 363.22 154.94) (xy 372.11 154.94)
 		)
 		(stroke
 			(width 0)
@@ -6582,6 +6717,16 @@
 			(type default)
 		)
 		(uuid "6272234a-4c83-49e8-904b-307bc7cc4751")
+	)
+	(wire
+		(pts
+			(xy 331.47 163.83) (xy 334.01 163.83)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "6325ce2c-7622-42d4-8a5e-15f4c5c60142")
 	)
 	(wire
 		(pts
@@ -6675,17 +6820,7 @@
 	)
 	(wire
 		(pts
-			(xy 328.93 161.29) (xy 328.93 166.37)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "74f0cc71-45b2-42eb-8f48-614bcea6cd34")
-	)
-	(wire
-		(pts
-			(xy 342.9 157.48) (xy 342.9 154.94)
+			(xy 363.22 157.48) (xy 363.22 154.94)
 		)
 		(stroke
 			(width 0)
@@ -6755,7 +6890,7 @@
 	)
 	(wire
 		(pts
-			(xy 328.93 142.24) (xy 351.79 142.24)
+			(xy 328.93 142.24) (xy 372.11 142.24)
 		)
 		(stroke
 			(width 0)
@@ -6805,7 +6940,7 @@
 	)
 	(wire
 		(pts
-			(xy 351.79 154.94) (xy 358.14 154.94)
+			(xy 372.11 154.94) (xy 378.46 154.94)
 		)
 		(stroke
 			(width 0)
@@ -7215,6 +7350,16 @@
 	)
 	(wire
 		(pts
+			(xy 331.47 163.83) (xy 331.47 168.91)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "cd491462-f85e-4d02-9fcc-81a401eb4ddc")
+	)
+	(wire
+		(pts
 			(xy 274.32 147.32) (xy 311.15 147.32)
 		)
 		(stroke
@@ -7245,7 +7390,7 @@
 	)
 	(wire
 		(pts
-			(xy 351.79 154.94) (xy 351.79 157.48)
+			(xy 372.11 154.94) (xy 372.11 157.48)
 		)
 		(stroke
 			(width 0)
@@ -7322,6 +7467,16 @@
 			(type default)
 		)
 		(uuid "de2372a1-d46f-4815-a36d-35ea0bc755c3")
+	)
+	(wire
+		(pts
+			(xy 331.47 161.29) (xy 331.47 156.21)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e2085ba2-a551-44d7-a80f-9f1e375940d2")
 	)
 	(wire
 		(pts
@@ -7415,7 +7570,7 @@
 	)
 	(wire
 		(pts
-			(xy 351.79 165.1) (xy 351.79 166.37)
+			(xy 372.11 165.1) (xy 372.11 166.37)
 		)
 		(stroke
 			(width 0)
@@ -7475,13 +7630,23 @@
 	)
 	(wire
 		(pts
-			(xy 351.79 153.67) (xy 351.79 154.94)
+			(xy 372.11 153.67) (xy 372.11 154.94)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
 		(uuid "f57ac228-7f01-4841-85d9-79cbf0c0dc50")
+	)
+	(wire
+		(pts
+			(xy 331.47 168.91) (xy 331.47 173.99)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f589813a-ddb7-495d-8f7f-f915c2027cad")
 	)
 	(wire
 		(pts
@@ -7515,7 +7680,7 @@
 	)
 	(wire
 		(pts
-			(xy 342.9 165.1) (xy 342.9 166.37)
+			(xy 363.22 165.1) (xy 363.22 166.37)
 		)
 		(stroke
 			(width 0)
@@ -8117,7 +8282,7 @@
 	)
 	(global_label "BATTERY_VOLTAGE_SENSE"
 		(shape input)
-		(at 358.14 154.94 0)
+		(at 378.46 154.94 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -8127,7 +8292,7 @@
 		)
 		(uuid "f25ba45e-1d01-42be-8af5-96763a0dddbd")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 384.8317 154.94 0)
+			(at 405.1517 154.94 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8273,7 +8438,7 @@
 	)
 	(symbol
 		(lib_id "Device:C")
-		(at 342.9 161.29 180)
+		(at 363.22 161.29 180)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -8281,7 +8446,7 @@
 		(dnp no)
 		(uuid "053b2baf-6648-4046-b882-314d8a574946")
 		(property "Reference" "C13"
-			(at 336.55 159.766 0)
+			(at 356.87 159.766 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8290,7 +8455,7 @@
 			)
 		)
 		(property "Value" "100nF"
-			(at 334.264 162.306 0)
+			(at 354.584 162.306 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8299,7 +8464,7 @@
 			)
 		)
 		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
-			(at 341.9348 157.48 0)
+			(at 362.2548 157.48 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8308,7 +8473,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 342.9 161.29 0)
+			(at 363.22 161.29 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8317,7 +8482,7 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor"
-			(at 342.9 161.29 0)
+			(at 363.22 161.29 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9105,7 +9270,7 @@
 	)
 	(symbol
 		(lib_id "Device:R")
-		(at 351.79 161.29 0)
+		(at 372.11 161.29 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -9114,7 +9279,7 @@
 		(fields_autoplaced yes)
 		(uuid "226a06e3-8478-460f-a2bf-fd97f7b09c8e")
 		(property "Reference" "R11"
-			(at 354.33 160.0199 0)
+			(at 374.65 160.0199 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9123,7 +9288,7 @@
 			)
 		)
 		(property "Value" "10K"
-			(at 354.33 162.5599 0)
+			(at 374.65 162.5599 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9132,7 +9297,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
-			(at 350.012 161.29 90)
+			(at 370.332 161.29 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9141,7 +9306,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 351.79 161.29 0)
+			(at 372.11 161.29 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9150,7 +9315,7 @@
 			)
 		)
 		(property "Description" "Resistor"
-			(at 351.79 161.29 0)
+			(at 372.11 161.29 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9924,6 +10089,78 @@
 			(project ""
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "#PWR03")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Connector_Generic_MountingPin:Conn_01x02_MountingPin")
+		(at 339.09 161.29 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "3b43bddd-222d-4bc5-b4c8-161f4ae3482f")
+		(property "Reference" "J5"
+			(at 337.312 154.686 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "Conn_01x02_MountingPin"
+			(at 337.312 157.226 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Connector_JST:JST_PH_S2B-PH-SM4-TB_1x02-1MP_P2.00mm_Horizontal"
+			(at 339.09 161.29 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 339.09 161.29 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Generic connectable mounting pin connector, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(at 339.09 161.29 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "c55785aa-1f6a-4fe9-b59f-ce2320537ee1")
+		)
+		(pin "2"
+			(uuid "ceb0889f-2bff-4a84-9f98-e851d7882d55")
+		)
+		(pin "MP"
+			(uuid "bbd08a21-9dbb-4c94-a16d-50febf653627")
+		)
+		(instances
+			(project ""
+				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
+					(reference "J5")
 					(unit 1)
 				)
 			)
@@ -11992,7 +12229,7 @@
 	)
 	(symbol
 		(lib_id "Device:R")
-		(at 351.79 149.86 0)
+		(at 372.11 149.86 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -12001,7 +12238,7 @@
 		(fields_autoplaced yes)
 		(uuid "769dd835-379e-49b6-9008-3e8bf0c87466")
 		(property "Reference" "R10"
-			(at 354.33 148.5899 0)
+			(at 374.65 148.5899 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12010,7 +12247,7 @@
 			)
 		)
 		(property "Value" "50K"
-			(at 354.33 151.1299 0)
+			(at 374.65 151.1299 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12019,7 +12256,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
-			(at 350.012 149.86 90)
+			(at 370.332 149.86 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12028,7 +12265,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 351.79 149.86 0)
+			(at 372.11 149.86 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12037,7 +12274,7 @@
 			)
 		)
 		(property "Description" "Resistor"
-			(at 351.79 149.86 0)
+			(at 372.11 149.86 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13386,7 +13623,7 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 328.93 166.37 0)
+		(at 331.47 173.99 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -13395,7 +13632,7 @@
 		(fields_autoplaced yes)
 		(uuid "a9d134eb-1994-497b-9567-7197c3379e7b")
 		(property "Reference" "#PWR039"
-			(at 328.93 172.72 0)
+			(at 331.47 180.34 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13404,7 +13641,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 328.93 171.45 0)
+			(at 331.47 179.07 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13412,7 +13649,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 328.93 166.37 0)
+			(at 331.47 173.99 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13421,7 +13658,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 328.93 166.37 0)
+			(at 331.47 173.99 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13430,7 +13667,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 328.93 166.37 0)
+			(at 331.47 173.99 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13815,7 +14052,7 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 351.79 166.37 0)
+		(at 372.11 166.37 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -13824,7 +14061,7 @@
 		(fields_autoplaced yes)
 		(uuid "b2b75bbb-f544-4a7a-8fae-b5901c00cdbf")
 		(property "Reference" "#PWR044"
-			(at 351.79 172.72 0)
+			(at 372.11 172.72 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13833,7 +14070,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 351.79 171.45 0)
+			(at 372.11 171.45 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13841,7 +14078,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 351.79 166.37 0)
+			(at 372.11 166.37 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13850,7 +14087,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 351.79 166.37 0)
+			(at 372.11 166.37 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13859,7 +14096,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 351.79 166.37 0)
+			(at 372.11 166.37 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -14245,7 +14482,7 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 342.9 166.37 0)
+		(at 363.22 166.37 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -14254,7 +14491,7 @@
 		(fields_autoplaced yes)
 		(uuid "c3dac4dc-d1af-4e72-a7af-9493abf1fd30")
 		(property "Reference" "#PWR049"
-			(at 342.9 172.72 0)
+			(at 363.22 172.72 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -14263,7 +14500,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 342.9 171.45 0)
+			(at 363.22 171.45 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -14271,7 +14508,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 342.9 166.37 0)
+			(at 363.22 166.37 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -14280,7 +14517,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 342.9 166.37 0)
+			(at 363.22 166.37 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -14289,7 +14526,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 342.9 166.37 0)
+			(at 363.22 166.37 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -16088,207 +16325,6 @@
 		)
 	)
 	(symbol
-		(lib_id "keys1051:1051")
-		(at 328.93 153.67 270)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "f2dfe2dd-88a7-47fa-8440-b9f82908a39c")
-		(property "Reference" "BT1"
-			(at 332.74 151.7649 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "1051"
-			(at 332.74 154.3049 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "keys1051:BAT_1051"
-			(at 328.93 153.67 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify bottom)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 328.93 153.67 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 328.93 153.67 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "MF" "Keystone Electronics"
-			(at 328.93 153.67 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify bottom)
-				(hide yes)
-			)
-		)
-		(property "MAXIMUM_PACKAGE_HEIGHT" "15.49mm"
-			(at 328.93 153.67 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify bottom)
-				(hide yes)
-			)
-		)
-		(property "Package" "NON STANDARD-3 Keystone"
-			(at 328.93 153.67 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify bottom)
-				(hide yes)
-			)
-		)
-		(property "Price" "None"
-			(at 328.93 153.67 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify bottom)
-				(hide yes)
-			)
-		)
-		(property "Check_prices" "https://www.snapeda.com/parts/1051/Keystone/view-part/?ref=eda"
-			(at 328.93 153.67 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify bottom)
-				(hide yes)
-			)
-		)
-		(property "STANDARD" "Manufacturer Recommendations"
-			(at 328.93 153.67 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify bottom)
-				(hide yes)
-			)
-		)
-		(property "PARTREV" "A"
-			(at 328.93 153.67 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify bottom)
-				(hide yes)
-			)
-		)
-		(property "SnapEDA_Link" "https://www.snapeda.com/parts/1051/Keystone/view-part/?ref=snap"
-			(at 328.93 153.67 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify bottom)
-				(hide yes)
-			)
-		)
-		(property "MP" "1051"
-			(at 328.93 153.67 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify bottom)
-				(hide yes)
-			)
-		)
-		(property "Description_1" "THM Battery Holder for CR123A Cell | Keystone Electronics 1051"
-			(at 328.93 153.67 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify bottom)
-				(hide yes)
-			)
-		)
-		(property "MANUFACTURER" "Keystone"
-			(at 328.93 153.67 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify bottom)
-				(hide yes)
-			)
-		)
-		(property "Availability" "In Stock"
-			(at 328.93 153.67 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify bottom)
-				(hide yes)
-			)
-		)
-		(property "SNAPEDA_PN" "1129"
-			(at 328.93 153.67 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify bottom)
-				(hide yes)
-			)
-		)
-		(pin "P"
-			(uuid "d910d7ef-ea4d-4372-9194-f651910d0a6b")
-		)
-		(pin "N"
-			(uuid "c6f1cb0e-8ab8-42ce-a7d7-6a1b8f494439")
-		)
-		(instances
-			(project ""
-				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
-					(reference "BT1")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "Device:R")
 		(at 222.25 165.1 0)
 		(unit 1)
@@ -16488,6 +16524,88 @@
 			(project ""
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "#PWR013")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Switch:SW_DPDT_x2")
+		(at 331.47 151.13 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "fd63af2a-e5c4-4321-b635-93722727701a")
+		(property "Reference" "SW3"
+			(at 336.55 149.8599 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Value" "SW_DPDT_x2"
+			(at 336.55 152.3999 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" "Button_Switch_SMD:SW_DPDT_CK_JS202011JCQN"
+			(at 331.47 151.13 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 331.47 151.13 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Switch, dual pole double throw, separate symbols"
+			(at 331.47 151.13 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "5"
+			(uuid "4762cb91-3685-451e-aced-a2f5d5923829")
+		)
+		(pin "1"
+			(uuid "3225bd16-8a43-48d2-9b44-02483da86421")
+		)
+		(pin "4"
+			(uuid "62247560-c396-4024-99a5-68bb3ed40e01")
+		)
+		(pin "6"
+			(uuid "5b3035d6-8b77-469b-a9cc-285c33fa5844")
+		)
+		(pin "2"
+			(uuid "64e9cc36-44ad-4068-8149-da312d30ac50")
+		)
+		(pin "3"
+			(uuid "b5e1a468-6de9-42f9-87da-13280fd2e5ba")
+		)
+		(instances
+			(project "blackbox"
+				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
+					(reference "SW3")
 					(unit 1)
 				)
 			)

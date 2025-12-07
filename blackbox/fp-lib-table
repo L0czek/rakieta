@@ -2,4 +2,5 @@
   (version 7)
   (lib (name "keys1051")(type "KiCad")(uri "${KIPRJMOD}/thirdparty/keys1051")(options "")(descr ""))
   (lib (name "bq24090dgq")(type "KiCad")(uri "${KIPRJMOD}/thirdparty/bq24090dgq")(options "")(descr ""))
+  (lib (name "shared")(type "KiCad")(uri "/Users/arturpuzio/repos/rakieta/shared")(options "")(descr ""))
 )
