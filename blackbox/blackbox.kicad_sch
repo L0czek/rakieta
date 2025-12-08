@@ -5,6 +5,161 @@
 	(uuid "2e56890d-f60c-4e7a-9c20-d68c88d207cf")
 	(paper "A3")
 	(lib_symbols
+		(symbol "74xGxx:74AHCT1G04"
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "U"
+				(at -2.54 3.81 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "74AHCT1G04"
+				(at 0 -3.81 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "http://www.ti.com/lit/sg/scyt129e/scyt129e.pdf"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Single NOT Gate, Low-Voltage CMOS"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "Single Gate NOT LVC CMOS"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_fp_filters" "SOT* SG-*"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "74AHCT1G04_0_1"
+				(polyline
+					(pts
+						(xy -7.62 6.35) (xy -7.62 -6.35) (xy 5.08 0) (xy -7.62 6.35)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+			)
+			(symbol "74AHCT1G04_1_1"
+				(pin input line
+					(at -15.24 0 0)
+					(length 7.62)
+					(name "~"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_in line
+					(at -5.08 10.16 270)
+					(length 5.08)
+					(name "VCC"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "5"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_in line
+					(at -5.08 -10.16 90)
+					(length 5.08)
+					(name "GND"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin output inverted
+					(at 12.7 0 180)
+					(length 7.62)
+					(name "~"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 		(symbol "74xGxx:74LVC1G126"
 			(exclude_from_sim no)
 			(in_bom yes)
@@ -5852,7 +6007,7 @@
 	)
 	(rectangle
 		(start 22.86 116.84)
-		(end 180.34 236.22)
+		(end 203.2 236.22)
 		(stroke
 			(width 0)
 			(type default)
@@ -7150,6 +7305,16 @@
 	)
 	(wire
 		(pts
+			(xy 142.24 152.4) (xy 152.4 152.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a7320fb8-750d-48a8-8203-15658abba2df")
+	)
+	(wire
+		(pts
 			(xy 46.99 152.4) (xy 58.42 152.4)
 		)
 		(stroke
@@ -7657,6 +7822,16 @@
 			(type default)
 		)
 		(uuid "f63a3fd6-21eb-4f57-acde-269f7fbbe2f1")
+	)
+	(wire
+		(pts
+			(xy 180.34 152.4) (xy 191.77 152.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f67111bb-97b8-441e-8782-e52f697cfe6b")
 	)
 	(wire
 		(pts
@@ -8348,7 +8523,7 @@
 	)
 	(global_label "ESP_TX"
 		(shape input)
-		(at 142.24 152.4 0)
+		(at 191.77 152.4 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -8358,7 +8533,7 @@
 		)
 		(uuid "fbf15889-4e64-402d-a945-2f9f64e55fcc")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 151.9984 152.4 0)
+			(at 201.5284 152.4 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11946,6 +12121,80 @@
 		)
 	)
 	(symbol
+		(lib_id "74xGxx:74AHCT1G04")
+		(at 167.64 152.4 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "6a6efc6d-5cfa-4e88-85f6-7f9ada4f3fba")
+		(property "Reference" "U7"
+			(at 153.1597 146.1534 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "74AHCT1G04"
+			(at 153.1597 148.5777 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Package_TO_SOT_SMD:SOT-23-5"
+			(at 167.64 152.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "http://www.ti.com/lit/sg/scyt129e/scyt129e.pdf"
+			(at 167.64 152.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Single NOT Gate, Low-Voltage CMOS"
+			(at 167.64 152.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "5"
+			(uuid "7664df49-230a-4863-b3e4-5fca92403c05")
+		)
+		(pin "4"
+			(uuid "93ab3798-434c-4f5e-bbc0-8902c39cbfc9")
+		)
+		(pin "3"
+			(uuid "ddfd92d5-930a-47ef-861d-6039b67803f7")
+		)
+		(pin "2"
+			(uuid "68ba5a8b-9892-41da-aba8-deef924bd9ac")
+		)
+		(instances
+			(project "blackbox"
+				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
+					(reference "U7")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "power:GND")
 		(at 232.41 74.93 0)
 		(unit 1)
@@ -12150,6 +12399,73 @@
 		)
 	)
 	(symbol
+		(lib_id "power:+3.3V")
+		(at 176.53 133.35 0)
+		(mirror y)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "6ead0b48-613f-4828-bb0b-786c4bb67c2b")
+		(property "Reference" "#PWR062"
+			(at 176.53 137.16 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "+3.3V"
+			(at 176.53 129.2169 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 176.53 133.35 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 176.53 133.35 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+3.3V\""
+			(at 176.53 133.35 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "1c988fb1-50b5-44b1-99c8-092d8ed6f4a7")
+		)
+		(instances
+			(project "blackbox"
+				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
+					(reference "#PWR062")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Device:LED")
 		(at 287.02 157.48 0)
 		(unit 1)
@@ -12222,6 +12538,73 @@
 			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "D4")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 162.56 162.56 0)
+		(mirror y)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "72551a65-e9d0-400a-a346-063b24d51b6a")
+		(property "Reference" "#PWR060"
+			(at 162.56 168.91 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 162.56 166.6931 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 162.56 162.56 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 162.56 162.56 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
+			(at 162.56 162.56 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "10b1020a-7578-4751-9826-66b6d7d50777")
+		)
+		(instances
+			(project "blackbox"
+				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
+					(reference "#PWR060")
 					(unit 1)
 				)
 			)
@@ -12716,6 +13099,77 @@
 			(project ""
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "#PWR011")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:C")
+		(at 176.53 137.16 0)
+		(mirror y)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "89c1a17d-1e32-4dd2-90a3-62fb3fa489e2")
+		(property "Reference" "C18"
+			(at 173.609 135.9478 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "100nF"
+			(at 173.609 138.3721 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
+			(at 175.5648 140.97 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 176.53 137.16 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Unpolarized capacitor"
+			(at 176.53 137.16 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "2"
+			(uuid "715e173d-2f2e-4f1d-ab0c-c4cbff8e09cb")
+		)
+		(pin "1"
+			(uuid "8f42771c-16bf-454c-89d6-5607ff7d7dd4")
+		)
+		(instances
+			(project "blackbox"
+				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
+					(reference "C18")
 					(unit 1)
 				)
 			)
@@ -13279,6 +13733,73 @@
 			(project ""
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "#PWR037")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 176.53 140.97 0)
+		(mirror y)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "9e0b1bce-1341-40d0-8755-491d89eb10be")
+		(property "Reference" "#PWR063"
+			(at 176.53 147.32 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 176.53 145.1031 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 176.53 140.97 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 176.53 140.97 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
+			(at 176.53 140.97 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "812fefd0-147f-4f41-9655-add5294ffcd0")
+		)
+		(instances
+			(project "blackbox"
+				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
+					(reference "#PWR063")
 					(unit 1)
 				)
 			)
@@ -16458,6 +16979,73 @@
 			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "SW2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+3.3V")
+		(at 162.56 142.24 0)
+		(mirror y)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "f84495bc-7b48-4c95-9044-2905634b48a0")
+		(property "Reference" "#PWR061"
+			(at 162.56 146.05 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "+3.3V"
+			(at 162.56 138.1069 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 162.56 142.24 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 162.56 142.24 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+3.3V\""
+			(at 162.56 142.24 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "c19ba316-ab1b-4988-99e9-82e3c49668e7")
+		)
+		(instances
+			(project "blackbox"
+				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
+					(reference "#PWR061")
 					(unit 1)
 				)
 			)
