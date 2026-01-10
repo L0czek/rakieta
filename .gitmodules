@@ -1,0 +1,3 @@
+[submodule "blackbox-firmware/lib/stm32-spi-dma-sdcard"]
+	path = blackbox-firmware/lib/stm32-spi-dma-sdcard
+	url = git@github.com:L0czek/stm32-spi-dma-sdcard.git
