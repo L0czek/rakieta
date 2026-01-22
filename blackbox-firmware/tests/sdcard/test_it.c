@@ -4,10 +4,12 @@
  */
 
 #include "stm32c0xx_hal.h"
+#include "sd_functions.h"
 
 extern DMA_HandleTypeDef hdma_spi1_tx;
 extern DMA_HandleTypeDef hdma_spi1_rx;
 extern SPI_HandleTypeDef hspi1;
+extern SD_Context sd_ctx;
 
 void NMI_Handler(void)
 {
@@ -30,6 +32,7 @@ void PendSV_Handler(void)
 void SysTick_Handler(void)
 {
     HAL_IncTick();
+    SD_timer_tick(&sd_ctx);
 }
 
 void DMA1_Channel1_IRQHandler(void)
