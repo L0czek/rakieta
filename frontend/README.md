@@ -82,6 +82,8 @@ Published commands:
 ## Notes
 
 - Data is retained in browser IndexedDB database `rocket_telemetry_db` until reset.
+- IndexedDB storage is chunked by sensor and time window (`1000ms` chunks) rather than
+  one-record-per-point, which reduces write amplification under high-rate telemetry.
 - `Reset` in critical modal clears IndexedDB and in-memory telemetry.
 - `vite.config.ts` exposes `GEMINI_API_KEY` defines, but this frontend currently does not use Gemini APIs.
 

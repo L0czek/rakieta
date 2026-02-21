@@ -12,6 +12,7 @@ This is a single-page React+TypeScript application built on Vite. The architectu
 6. Read IndexedDB ranges on demand in Analysis mode
 7. Downsample plotted series to max 1000 points using min-max bucketing
    to preserve spikes while keeping charts responsive
+8. Persist telemetry in 1000ms sensor chunks in IndexedDB to reduce write overhead
 
 ## Project structure
 
@@ -52,7 +53,7 @@ This is a single-page React+TypeScript application built on Vite. The architectu
 - `utils/simulator.ts`
   - Deterministic-ish telemetry generator + command handling state machine.
 - `utils/db.ts`
-  - IndexedDB storage adapter (`measurements`, `meta` stores).
+  - IndexedDB storage adapter with chunked time-series rows (`measurements`, `meta` stores).
 - `index.html`
   - Tailwind CDN injection + global SCADA CSS effects.
 - `vite.config.ts`
@@ -76,8 +77,9 @@ This is a single-page React+TypeScript application built on Vite. The architectu
 ### [3] Persistence
 
 - Buffered writes by sensor key in memory.
-- Flush timer every 500 ms bulk writes to IndexedDB.
-- `meta.lastTimestamp` and earliest measurement timestamp used for timeline bounds.
+- Active sensor chunks are sealed at `MAX_CHUNK_DURATION_MS = 1000` or inactivity timeout.
+- Flush timer every 500 ms bulk writes sealed chunks to IndexedDB.
+- `meta.lastTimestamp` and earliest chunk start timestamp are used for timeline bounds.
 
 ### [4] Analysis mode retrieval
 

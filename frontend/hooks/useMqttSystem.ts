@@ -41,8 +41,18 @@ const DEFAULT_TELEMETRY: SystemTelemetry = {
 
 // Reduced to 2500 to hold 5 seconds of data at 500Hz
 const MAX_LIVE_POINTS = 2500;
+const FLUSH_INTERVAL_MS = 500;
+const STALE_CHUNK_FLUSH_MS = 500;
 
 const cloneTelemetry = (t: SystemTelemetry): SystemTelemetry => JSON.parse(JSON.stringify(t));
+
+interface ActiveChunkBuffer {
+  chunkStart: number;
+  chunkEnd: number;
+  timestamps: number[];
+  values: number[];
+  lastUpdateAt: number;
+}
 
 export const useMqttSystem = () => {
   const [connectionStatus, setConnectionStatus] = useState<ConnectionState>(ConnectionState.DISCONNECTED);
@@ -60,7 +70,8 @@ export const useMqttSystem = () => {
   const handleMessageRef = useRef<(topic: string, message: any) => void>(null);
 
   // DB Buffer
-  const writeBufferRef = useRef<Record<string, SensorDataPoint[]>>({});
+  const activeChunksRef = useRef<Record<string, ActiveChunkBuffer>>({});
+  const sealedChunksRef = useRef<DB.MeasurementChunk[]>([]);
   const flushIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Load initial state from DB
@@ -79,35 +90,94 @@ export const useMqttSystem = () => {
     loadState();
   }, []);
 
+  const sealActiveChunk = (sensorId: string, chunk: ActiveChunkBuffer) => {
+      if (chunk.timestamps.length === 0) return;
+      sealedChunksRef.current.push({
+          sensorId,
+          chunkStart: chunk.chunkStart,
+          chunkEnd: chunk.chunkEnd,
+          timestamps: Uint32Array.from(chunk.timestamps),
+          values: Float32Array.from(chunk.values),
+      });
+  };
+
+  const appendPointToChunk = (sensorId: string, point: SensorDataPoint) => {
+      const now = performance.now();
+      const current = activeChunksRef.current[sensorId];
+      if (!current) {
+          activeChunksRef.current[sensorId] = {
+              chunkStart: point.timestamp,
+              chunkEnd: point.timestamp,
+              timestamps: [0],
+              values: [point.value],
+              lastUpdateAt: now,
+          };
+          return;
+      }
+
+      if (point.timestamp < current.chunkStart) {
+          sealActiveChunk(sensorId, current);
+          activeChunksRef.current[sensorId] = {
+              chunkStart: point.timestamp,
+              chunkEnd: point.timestamp,
+              timestamps: [0],
+              values: [point.value],
+              lastUpdateAt: now,
+          };
+          return;
+      }
+
+      current.timestamps.push(Math.max(0, Math.round(point.timestamp - current.chunkStart)));
+      current.values.push(point.value);
+      current.chunkEnd = point.timestamp;
+      current.lastUpdateAt = now;
+
+      if (point.timestamp - current.chunkStart >= DB.MAX_CHUNK_DURATION_MS) {
+          sealActiveChunk(sensorId, current);
+          delete activeChunksRef.current[sensorId];
+      }
+  };
+
+  const appendPointsToChunk = (sensorId: string, points: SensorDataPoint[]) => {
+      for (const point of points) appendPointToChunk(sensorId, point);
+  };
+
   // Flush buffer to DB periodically
   useEffect(() => {
       flushIntervalRef.current = setInterval(async () => {
-          const buffer = writeBufferRef.current;
-          const sensors = Object.keys(buffer);
-          if (sensors.length === 0) return;
-
           const flushStart = performance.now();
-          const toWrite = { ...buffer };
-          writeBufferRef.current = {};
-          const pointsToFlush = sensors.reduce((sum, key) => sum + (toWrite[key]?.length || 0), 0);
+          const now = performance.now();
+
+          for (const [sensorId, chunk] of Object.entries(activeChunksRef.current)) {
+              if (now - chunk.lastUpdateAt > STALE_CHUNK_FLUSH_MS) {
+                  sealActiveChunk(sensorId, chunk);
+                  delete activeChunksRef.current[sensorId];
+              }
+          }
+
+          const chunks = sealedChunksRef.current;
+          if (chunks.length === 0) return;
+
+          sealedChunksRef.current = [];
+          const sensors = new Set(chunks.map(chunk => chunk.sensorId));
+          const pointsToFlush = chunks.reduce(
+            (sum, chunk) => sum + Math.min(chunk.timestamps.length, chunk.values.length),
+            0
+          );
 
           try {
-              const promises = sensors.map(key => DB.addMeasurements(key, toWrite[key]));
-              await Promise.all(promises);
+              await DB.addChunks(chunks);
               
-              const maxTs = Math.max(...sensors.map(k => {
-                  const arr = toWrite[k];
-                  return arr.length > 0 ? arr[arr.length-1].timestamp : 0;
-              }));
+              const maxTs = Math.max(...chunks.map(chunk => chunk.chunkEnd));
               if (maxTs > 0) await DB.setLastTimestamp(maxTs);
-              probeCount('db.flush.sensors', sensors.length);
+              probeCount('db.flush.sensors', sensors.size);
               probeCount('db.flush.points', pointsToFlush);
               probeDuration('db.flush.ms', performance.now() - flushStart);
 
           } catch (e) {
               console.error("DB Flush Error", e);
           }
-      }, 500); 
+      }, FLUSH_INTERVAL_MS); 
       return () => clearInterval(flushIntervalRef.current!);
   }, []);
 
@@ -140,8 +210,8 @@ export const useMqttSystem = () => {
     await DB.clearDB();
     setCriticalError(null);
     
-    // Clear Write Buffer
-    writeBufferRef.current = {};
+    activeChunksRef.current = {};
+    sealedChunksRef.current = [];
 
     // Reset Telemetry
     telemetryRef.current = cloneTelemetry(DEFAULT_TELEMETRY);
@@ -153,11 +223,6 @@ export const useMqttSystem = () => {
         simulatorRef.current.setTime(0);
     }
   }, []);
-
-  const addToBuffer = (key: string, points: SensorDataPoint[]) => {
-      if (!writeBufferRef.current[key]) writeBufferRef.current[key] = [];
-      writeBufferRef.current[key].push(...points);
-  };
 
   const handleMessage = (topic: string, message: any) => {
     if (connectionStatus === ConnectionState.ERROR) return;
@@ -196,7 +261,7 @@ export const useMqttSystem = () => {
       const points = values.map((v, i) => ({ timestamp: tStart + (i * step), value: v }));
       probeCount('mqtt.fast.points', points.length);
       
-      addToBuffer(dbKey, points);
+      appendPointsToChunk(dbKey, points);
 
       // @ts-ignore
       const currentHistory: SensorDataPoint[] = current[key];
@@ -222,7 +287,7 @@ export const useMqttSystem = () => {
         // @ts-ignore
         current[valKey] = value;
         const pt = { timestamp, value };
-        addToBuffer(dbKey, [pt]);
+        appendPointToChunk(dbKey, pt);
 
         // @ts-ignore
         const curHist = current[histKey] as SensorDataPoint[];
@@ -274,7 +339,7 @@ export const useMqttSystem = () => {
             current.temperatures = { ...current.temperatures, [sensorId]: tempVal };
             
             const pt = { timestamp, value: tempVal };
-            addToBuffer(sensorId, [pt]);
+            appendPointToChunk(sensorId, pt);
 
             const oldHist = current.temperatureHist[sensorId] || [];
             current.temperatureHist = {
@@ -295,7 +360,7 @@ export const useMqttSystem = () => {
         
         const percent = Converters.rawServoToPercent(value);
         const pt = { timestamp, value: percent };
-        addToBuffer('servo', [pt]);
+        appendPointToChunk('servo', pt);
         current.servoPositionHist = withProbe(
           'telemetry.servo.concat_slice.ms',
           () => [...current.servoPositionHist, pt].slice(-MAX_LIVE_POINTS)
