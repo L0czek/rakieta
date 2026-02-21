@@ -1,0 +1,5 @@
+{
+  "name": "Rocket Test Stand SCADA",
+  "description": "High-performance telemetry and control dashboard for rocket engine testing using MQTT over WebSockets.",
+  "requestFramePermissions": []
+}

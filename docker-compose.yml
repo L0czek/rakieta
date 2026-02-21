@@ -1,0 +1,21 @@
+services:
+  mqtt:
+    image: eclipse-mosquitto:2
+    restart: unless-stopped
+    ports:
+      - "1883:1883"
+      - "8000:8000"
+    volumes:
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+  frontend:
+    image: node:20-alpine
+    restart: unless-stopped
+    user: "1000:1000"
+    volumes:
+      - ./frontend:/app
+    working_dir: /app
+    command: /bin/sh -c "npm install && npm run dev -- --host"
+    ports:
+      - "3000:3000"
+    stdin_open: true
+    tty: true
