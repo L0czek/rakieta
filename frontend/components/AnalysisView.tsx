@@ -208,7 +208,19 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({ telemetry, actions }
       probeCount('analysis.live.out_points', outPoints);
       probeDuration('analysis.live.downsample.ms', performance.now() - downsampleStart);
       return next;
-  }, [isLive, telemetry, visibleLines]);
+  }, [
+    isLive,
+    visibleLines,
+    telemetry.tensometer,
+    telemetry.pressureTank,
+    telemetry.pressureCombustion,
+    telemetry.batteryStandHist,
+    telemetry.batteryComputerHist,
+    telemetry.boostVoltageHist,
+    telemetry.starterSenseHist,
+    telemetry.servoPositionHist,
+    telemetry.temperatureHist,
+  ]);
 
   const historySeriesData = React.useMemo(() => {
       if (isLive || !chartData) return {};

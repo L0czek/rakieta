@@ -52,6 +52,8 @@ export const useMqttSystem = () => {
   
   const clientRef = useRef<mqtt.MqttClient | null>(null);
   const telemetryRef = useRef<SystemTelemetry>(cloneTelemetry(DEFAULT_TELEMETRY));
+  const telemetryVersionRef = useRef(0);
+  const publishedTelemetryVersionRef = useRef(-1);
   const simulatorRef = useRef<RocketSimulator | null>(null);
   
   // Ref to handleMessage to avoid stale closures in simulator callback
@@ -143,6 +145,7 @@ export const useMqttSystem = () => {
 
     // Reset Telemetry
     telemetryRef.current = cloneTelemetry(DEFAULT_TELEMETRY);
+    telemetryVersionRef.current += 1;
     setTelemetry(cloneTelemetry(DEFAULT_TELEMETRY));
     
     // Reset Simulator Time if running
@@ -316,6 +319,8 @@ export const useMqttSystem = () => {
     else if (topic === 'status/cmd') {
         current.lastCmdStatus = message.toString();
     }
+
+    telemetryVersionRef.current += 1;
   };
 
   // Keep ref up to date
@@ -407,7 +412,12 @@ export const useMqttSystem = () => {
     const interval = setInterval(() => {
       // Only update state if not in critical error
       if (connectionStatus !== ConnectionState.ERROR) {
+          if (publishedTelemetryVersionRef.current === telemetryVersionRef.current) {
+              return;
+          }
+
           const publishStart = performance.now();
+          publishedTelemetryVersionRef.current = telemetryVersionRef.current;
           setTelemetry({ ...telemetryRef.current });
           probeCount('react.telemetry_publish.count');
           probeDuration('react.telemetry_publish.call_ms', performance.now() - publishStart);
