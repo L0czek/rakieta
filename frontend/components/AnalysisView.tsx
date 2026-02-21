@@ -7,6 +7,7 @@ import { ServoPanel } from './ServoPanel';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, Legend } from 'recharts';
 import { Pause, Play, ZoomIn, ZoomOut } from 'lucide-react';
 import * as DB from '../utils/db';
+import { downsampleMinMax, MAX_RENDER_POINTS } from '@/utils/downsampling';
 
 interface AnalysisViewProps {
     telemetry: SystemTelemetry;
@@ -167,22 +168,40 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({ telemetry, actions }
     starter: telemetry.starterSense.toFixed(2)
   };
 
-  const getLineData = (key: string) => {
-    if (isLive) {
-        if (key === 'tensometer') return telemetry.tensometer;
-        if (key === 'pressureTank') return telemetry.pressureTank;
-        if (key === 'pressureCombustion') return telemetry.pressureCombustion;
-        if (key === 'batteryStand') return telemetry.batteryStandHist;
-        if (key === 'batteryComputer') return telemetry.batteryComputerHist;
-        if (key === 'boostVoltage') return telemetry.boostVoltageHist;
-        if (key === 'starterSense') return telemetry.starterSenseHist;
-        if (key === 'servo') return telemetry.servoPositionHist;
-        if (telemetry.temperatureHist[key]) return telemetry.temperatureHist[key];
-        return [];
-    } else {
-        return chartData?.[key] || [];
-    }
-  };
+  const liveSeriesData = React.useMemo(() => {
+      if (!isLive) return {};
+
+      const rawSeries: Record<string, SensorDataPoint[]> = {
+          tensometer: telemetry.tensometer,
+          pressureTank: telemetry.pressureTank,
+          pressureCombustion: telemetry.pressureCombustion,
+          batteryStand: telemetry.batteryStandHist,
+          batteryComputer: telemetry.batteryComputerHist,
+          boostVoltage: telemetry.boostVoltageHist,
+          starterSense: telemetry.starterSenseHist,
+          servo: telemetry.servoPositionHist,
+          ...telemetry.temperatureHist,
+      };
+
+      const next: Record<string, SensorDataPoint[]> = {};
+      for (const [key, visible] of Object.entries(visibleLines)) {
+          if (!visible) continue;
+          next[key] = downsampleMinMax(rawSeries[key] || [], MAX_RENDER_POINTS);
+      }
+      return next;
+  }, [isLive, telemetry, visibleLines]);
+
+  const historySeriesData = React.useMemo(() => {
+      if (isLive || !chartData) return {};
+      const next: Record<string, SensorDataPoint[]> = {};
+      for (const [key, visible] of Object.entries(visibleLines)) {
+          if (!visible) continue;
+          next[key] = downsampleMinMax(chartData[key] || [], MAX_RENDER_POINTS);
+      }
+      return next;
+  }, [isLive, chartData, visibleLines]);
+
+  const displayedSeriesData = isLive ? liveSeriesData : historySeriesData;
 
   const handleScroll = (e: React.ChangeEvent<HTMLInputElement>) => {
       setViewStart(Number(e.target.value));
@@ -240,20 +259,20 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({ telemetry, actions }
                     <Tooltip contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', fontSize: '12px' }} labelFormatter={(val) => `T+${val}`} />
                     <Legend />
                     
-                    {visibleLines.tensometer && <Line type="linear" yAxisId="thrust" dataKey="value" data={getLineData('tensometer')} name="Thrust (kg)" stroke={SENSOR_COLORS.tensometer} dot={false} strokeWidth={2} isAnimationActive={false} />}
-                    {visibleLines.pressureTank && <Line type="linear" yAxisId="pressure" dataKey="value" data={getLineData('pressureTank')} name="Tank Press (bar)" stroke={SENSOR_COLORS.pressureTank} dot={false} strokeWidth={2} isAnimationActive={false} />}
-                    {visibleLines.pressureCombustion && <Line type="linear" yAxisId="pressure" dataKey="value" data={getLineData('pressureCombustion')} name="Comb Press (bar)" stroke={SENSOR_COLORS.pressureCombustion} dot={false} strokeWidth={2} isAnimationActive={false} />}
+                    {visibleLines.tensometer && <Line type="linear" yAxisId="thrust" dataKey="value" data={displayedSeriesData.tensometer || []} name="Thrust (kg)" stroke={SENSOR_COLORS.tensometer} dot={false} strokeWidth={2} isAnimationActive={false} />}
+                    {visibleLines.pressureTank && <Line type="linear" yAxisId="pressure" dataKey="value" data={displayedSeriesData.pressureTank || []} name="Tank Press (bar)" stroke={SENSOR_COLORS.pressureTank} dot={false} strokeWidth={2} isAnimationActive={false} />}
+                    {visibleLines.pressureCombustion && <Line type="linear" yAxisId="pressure" dataKey="value" data={displayedSeriesData.pressureCombustion || []} name="Comb Press (bar)" stroke={SENSOR_COLORS.pressureCombustion} dot={false} strokeWidth={2} isAnimationActive={false} />}
                     
-                    {visibleLines.batteryStand && <Line type="linear" yAxisId="voltage" dataKey="value" data={getLineData('batteryStand')} name="Bat Stand" stroke={SENSOR_COLORS.batteryStand} dot={false} strokeWidth={2} isAnimationActive={false} />}
-                    {visibleLines.batteryComputer && <Line type="linear" yAxisId="voltage" dataKey="value" data={getLineData('batteryComputer')} name="Bat Comp" stroke={SENSOR_COLORS.batteryComputer} dot={false} strokeWidth={2} isAnimationActive={false} />}
-                    {visibleLines.boostVoltage && <Line type="linear" yAxisId="voltage" dataKey="value" data={getLineData('boostVoltage')} name="Boost V" stroke={SENSOR_COLORS.boostVoltage} dot={false} strokeWidth={2} isAnimationActive={false} />}
+                    {visibleLines.batteryStand && <Line type="linear" yAxisId="voltage" dataKey="value" data={displayedSeriesData.batteryStand || []} name="Bat Stand" stroke={SENSOR_COLORS.batteryStand} dot={false} strokeWidth={2} isAnimationActive={false} />}
+                    {visibleLines.batteryComputer && <Line type="linear" yAxisId="voltage" dataKey="value" data={displayedSeriesData.batteryComputer || []} name="Bat Comp" stroke={SENSOR_COLORS.batteryComputer} dot={false} strokeWidth={2} isAnimationActive={false} />}
+                    {visibleLines.boostVoltage && <Line type="linear" yAxisId="voltage" dataKey="value" data={displayedSeriesData.boostVoltage || []} name="Boost V" stroke={SENSOR_COLORS.boostVoltage} dot={false} strokeWidth={2} isAnimationActive={false} />}
                     
-                    {visibleLines.starterSense && <Line type="linear" yAxisId="starter" dataKey="value" data={getLineData('starterSense')} name="Starter" stroke={SENSOR_COLORS.starterSense} dot={false} strokeWidth={2} isAnimationActive={false} />}
-                    {visibleLines.servo && <Line type="linear" yAxisId="servo" dataKey="value" data={getLineData('servo')} name="Servo" stroke={SENSOR_COLORS.servo} dot={false} strokeWidth={2} isAnimationActive={false} />}
+                    {visibleLines.starterSense && <Line type="linear" yAxisId="starter" dataKey="value" data={displayedSeriesData.starterSense || []} name="Starter" stroke={SENSOR_COLORS.starterSense} dot={false} strokeWidth={2} isAnimationActive={false} />}
+                    {visibleLines.servo && <Line type="linear" yAxisId="servo" dataKey="value" data={displayedSeriesData.servo || []} name="Servo" stroke={SENSOR_COLORS.servo} dot={false} strokeWidth={2} isAnimationActive={false} />}
 
                     {knownSensors.map((key, idx) => (
                         visibleLines[key] && (
-                            <Line key={key} type="linear" yAxisId="temp" dataKey="value" data={getLineData(key)} name={`T: ${key}`} stroke={TEMP_COLORS[idx % TEMP_COLORS.length]} dot={false} strokeWidth={2} isAnimationActive={false} />
+                            <Line key={key} type="linear" yAxisId="temp" dataKey="value" data={displayedSeriesData[key] || []} name={`T: ${key}`} stroke={TEMP_COLORS[idx % TEMP_COLORS.length]} dot={false} strokeWidth={2} isAnimationActive={false} />
                         )
                     ))}
                 </LineChart>

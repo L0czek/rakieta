@@ -2,6 +2,7 @@
 import React, { useMemo } from 'react';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import { SensorDataPoint } from '../types';
+import { downsampleMinMax, MAX_RENDER_POINTS } from '@/utils/downsampling';
 
 export const SENSOR_COLORS: Record<string, string> = {
     tensometer: '#c084fc', 
@@ -37,8 +38,15 @@ export const FastChart = ({ data, color, domain = [0, 4096] }: { data: SensorDat
   // Performance optimization: only render if data exists
   if (!data || data.length === 0) return <div className="w-full h-full flex items-center justify-center text-slate-500 text-xs">NO SIGNAL</div>;
 
-  // Create a shallow copy to prevent Recharts from mutating frozen StrictMode objects
-  const safeData = useMemo(() => [...data], [data]);
+  const sampledData = useMemo(
+    () => downsampleMinMax(data, MAX_RENDER_POINTS),
+    [data]
+  );
+  // Recharts may mutate data points in some paths; keep chart input detached.
+  const safeData = useMemo(
+    () => sampledData.map((point) => ({ timestamp: point.timestamp, value: point.value })),
+    [sampledData]
+  );
 
   return (
     <ResponsiveContainer width="100%" height="100%">
