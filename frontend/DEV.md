@@ -133,3 +133,12 @@ This is a single-page React+TypeScript application built on Vite. The architectu
 2. Add `index.css` or remove stale reference.
 3. Add integration tests for packet parser/conversions and simulator command gating.
 4. Expand broker config with protocol/TLS/credentials UX where needed.
+
+## Debug instrumentation
+
+- `utils/perfProbe.ts` provides opt-in, aggregated performance probes.
+- Enable with `localStorage.setItem('scada.probe', '1')` and page reload.
+- Probes currently instrument:
+  - telemetry ingress and DB flush timing,
+  - App/Analysis/FastChart render and commit frequency,
+  - downsampling input/output cardinality and timing.

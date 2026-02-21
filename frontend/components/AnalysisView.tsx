@@ -8,6 +8,7 @@ import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianG
 import { Pause, Play, ZoomIn, ZoomOut } from 'lucide-react';
 import * as DB from '../utils/db';
 import { downsampleMinMax, MAX_RENDER_POINTS } from '@/utils/downsampling';
+import { probeCount, probeDuration } from '@/utils/perfProbe';
 
 interface AnalysisViewProps {
     telemetry: SystemTelemetry;
@@ -15,6 +16,7 @@ interface AnalysisViewProps {
 }
 
 export const AnalysisView: React.FC<AnalysisViewProps> = ({ telemetry, actions }) => {
+  probeCount('render.AnalysisView');
   // View State
   const [isLive, setIsLive] = useState(true);
   const [windowSize, setWindowSize] = useState(30000); // 30 seconds default
@@ -154,6 +156,10 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({ telemetry, actions }
       }
   }, [viewStart, windowSize, isLive, visibleLines]);
 
+  useEffect(() => {
+      probeCount('effect.AnalysisView.commit');
+  });
+
   // --- HELPERS ---
 
   const getLatestValue = (data: {value: number}[]) => data.length > 0 ? data[data.length - 1].value : 0;
@@ -171,6 +177,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({ telemetry, actions }
   const liveSeriesData = React.useMemo(() => {
       if (!isLive) return {};
 
+      const downsampleStart = performance.now();
       const rawSeries: Record<string, SensorDataPoint[]> = {
           tensometer: telemetry.tensometer,
           pressureTank: telemetry.pressureTank,
@@ -184,20 +191,45 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({ telemetry, actions }
       };
 
       const next: Record<string, SensorDataPoint[]> = {};
+      let inPoints = 0;
+      let outPoints = 0;
+      let lineCount = 0;
       for (const [key, visible] of Object.entries(visibleLines)) {
           if (!visible) continue;
-          next[key] = downsampleMinMax(rawSeries[key] || [], MAX_RENDER_POINTS);
+          const raw = rawSeries[key] || [];
+          const sampled = downsampleMinMax(raw, MAX_RENDER_POINTS);
+          inPoints += raw.length;
+          outPoints += sampled.length;
+          lineCount += 1;
+          next[key] = sampled;
       }
+      probeCount('analysis.live.visible_lines', lineCount);
+      probeCount('analysis.live.in_points', inPoints);
+      probeCount('analysis.live.out_points', outPoints);
+      probeDuration('analysis.live.downsample.ms', performance.now() - downsampleStart);
       return next;
   }, [isLive, telemetry, visibleLines]);
 
   const historySeriesData = React.useMemo(() => {
       if (isLive || !chartData) return {};
+      const downsampleStart = performance.now();
       const next: Record<string, SensorDataPoint[]> = {};
+      let inPoints = 0;
+      let outPoints = 0;
+      let lineCount = 0;
       for (const [key, visible] of Object.entries(visibleLines)) {
           if (!visible) continue;
-          next[key] = downsampleMinMax(chartData[key] || [], MAX_RENDER_POINTS);
+          const raw = chartData[key] || [];
+          const sampled = downsampleMinMax(raw, MAX_RENDER_POINTS);
+          inPoints += raw.length;
+          outPoints += sampled.length;
+          lineCount += 1;
+          next[key] = sampled;
       }
+      probeCount('analysis.history.visible_lines', lineCount);
+      probeCount('analysis.history.in_points', inPoints);
+      probeCount('analysis.history.out_points', outPoints);
+      probeDuration('analysis.history.downsample.ms', performance.now() - downsampleStart);
       return next;
   }, [isLive, chartData, visibleLines]);
 

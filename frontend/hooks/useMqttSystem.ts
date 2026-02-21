@@ -13,6 +13,7 @@ import * as Parser from '../utils/parser';
 import * as Converters from '../utils/conversions';
 import * as DB from '../utils/db';
 import { RocketSimulator, PacketEmit } from '../utils/simulator';
+import { probeCount, probeDuration, withProbe } from '@/utils/perfProbe';
 
 const DEFAULT_TELEMETRY: SystemTelemetry = {
   startTime: 0,
@@ -83,8 +84,10 @@ export const useMqttSystem = () => {
           const sensors = Object.keys(buffer);
           if (sensors.length === 0) return;
 
+          const flushStart = performance.now();
           const toWrite = { ...buffer };
           writeBufferRef.current = {};
+          const pointsToFlush = sensors.reduce((sum, key) => sum + (toWrite[key]?.length || 0), 0);
 
           try {
               const promises = sensors.map(key => DB.addMeasurements(key, toWrite[key]));
@@ -95,6 +98,9 @@ export const useMqttSystem = () => {
                   return arr.length > 0 ? arr[arr.length-1].timestamp : 0;
               }));
               if (maxTs > 0) await DB.setLastTimestamp(maxTs);
+              probeCount('db.flush.sensors', sensors.length);
+              probeCount('db.flush.points', pointsToFlush);
+              probeDuration('db.flush.ms', performance.now() - flushStart);
 
           } catch (e) {
               console.error("DB Flush Error", e);
@@ -152,6 +158,7 @@ export const useMqttSystem = () => {
 
   const handleMessage = (topic: string, message: any) => {
     if (connectionStatus === ConnectionState.ERROR) return;
+    probeCount('mqtt.message.total');
 
     // Convert message to Uint8Array if it's a string/buffer
     let buffer: Uint8Array;
@@ -184,13 +191,17 @@ export const useMqttSystem = () => {
       const count = values.length;
       let step = count > 1 ? (tEnd - tStart) / (count - 1) : 0;
       const points = values.map((v, i) => ({ timestamp: tStart + (i * step), value: v }));
+      probeCount('mqtt.fast.points', points.length);
       
       addToBuffer(dbKey, points);
 
       // @ts-ignore
       const currentHistory: SensorDataPoint[] = current[key];
       // @ts-ignore
-      current[key] = [...currentHistory, ...points].slice(-MAX_LIVE_POINTS);
+      current[key] = withProbe(
+        'telemetry.fast.concat_slice.ms',
+        () => [...currentHistory, ...points].slice(-MAX_LIVE_POINTS)
+      );
     };
 
     const updateSlowSensor = (
@@ -213,22 +224,29 @@ export const useMqttSystem = () => {
         // @ts-ignore
         const curHist = current[histKey] as SensorDataPoint[];
         // @ts-ignore
-        current[histKey] = [...curHist, pt].slice(-MAX_LIVE_POINTS);
+        current[histKey] = withProbe(
+          'telemetry.slow.concat_slice.ms',
+          () => [...curHist, pt].slice(-MAX_LIVE_POINTS)
+        );
     };
 
     if (topic === 'sensor/adc/fast/tensometer') {
+      probeCount('mqtt.message.fast.tensometer');
       const { timestampStart, timestampEnd, values } = Parser.parseFastAdc(buffer);
       updateFastSensor('tensometer', 'tensometer', timestampStart, timestampEnd, values.map(v => Converters.rawToThrustKg(v)));
     } 
     else if (topic === 'sensor/adc/fast/pressure/tank') {
+      probeCount('mqtt.message.fast.pressure_tank');
       const { timestampStart, timestampEnd, values } = Parser.parseFastAdc(buffer);
       updateFastSensor('pressureTank', 'pressureTank', timestampStart, timestampEnd, values.map(v => Converters.rawToPressureBar(v)));
     }
     else if (topic === 'sensor/adc/fast/pressure/combustion') {
+      probeCount('mqtt.message.fast.pressure_combustion');
       const { timestampStart, timestampEnd, values } = Parser.parseFastAdc(buffer);
       updateFastSensor('pressureCombustion', 'pressureCombustion', timestampStart, timestampEnd, values.map(v => Converters.rawToPressureBar(v)));
     }
     else if (topic.startsWith('sensor/adc/slow/')) {
+        probeCount('mqtt.message.slow');
         const { timestamp, value: raw } = Parser.parseSlowAdc(buffer);
         if (topic.includes('battery/stand')) updateSlowSensor('batteryStand', 'batteryStandHist', 'batteryStand', timestamp, Converters.rawToBatteryVoltage(raw));
         if (topic.includes('battery/computer')) updateSlowSensor('batteryComputer', 'batteryComputerHist', 'batteryComputer', timestamp, Converters.rawToBatteryVoltage(raw));
@@ -236,12 +254,14 @@ export const useMqttSystem = () => {
         if (topic.includes('starter_sense')) updateSlowSensor('starterSense', 'starterSenseHist', 'starterSense', timestamp, Converters.rawToGenericVoltage(raw));
     }
     else if (topic === 'sensor/digital/armed') {
+        probeCount('mqtt.message.digital.armed');
         const { timestamp, value } = Parser.parseDigital(buffer);
         checkTime(timestamp);
         current.lastPacketTimestamp = Math.max(current.lastPacketTimestamp, timestamp);
         current.isUnsafe = value !== 0; 
     }
     else if (topic.startsWith('sensor/temp/')) {
+        probeCount('mqtt.message.temp');
         const { timestamp, values } = Parser.parseTemp(buffer);
         checkTime(timestamp);
         current.lastPacketTimestamp = Math.max(current.lastPacketTimestamp, timestamp);
@@ -256,11 +276,15 @@ export const useMqttSystem = () => {
             const oldHist = current.temperatureHist[sensorId] || [];
             current.temperatureHist = {
                 ...current.temperatureHist,
-                [sensorId]: [...oldHist, pt].slice(-MAX_LIVE_POINTS)
+                [sensorId]: withProbe(
+                  'telemetry.temp.concat_slice.ms',
+                  () => [...oldHist, pt].slice(-MAX_LIVE_POINTS)
+                )
             };
         }
     }
     else if (topic === 'sensor/servo') {
+        probeCount('mqtt.message.servo');
         const { timestamp, value } = Parser.parseServo(buffer);
         checkTime(timestamp);
         current.lastPacketTimestamp = Math.max(current.lastPacketTimestamp, timestamp);
@@ -269,7 +293,10 @@ export const useMqttSystem = () => {
         const percent = Converters.rawServoToPercent(value);
         const pt = { timestamp, value: percent };
         addToBuffer('servo', [pt]);
-        current.servoPositionHist = [...current.servoPositionHist, pt].slice(-MAX_LIVE_POINTS);
+        current.servoPositionHist = withProbe(
+          'telemetry.servo.concat_slice.ms',
+          () => [...current.servoPositionHist, pt].slice(-MAX_LIVE_POINTS)
+        );
     }
     else if (topic === 'status/state') {
         const val = message.toString();
@@ -380,7 +407,10 @@ export const useMqttSystem = () => {
     const interval = setInterval(() => {
       // Only update state if not in critical error
       if (connectionStatus !== ConnectionState.ERROR) {
+          const publishStart = performance.now();
           setTelemetry({ ...telemetryRef.current });
+          probeCount('react.telemetry_publish.count');
+          probeDuration('react.telemetry_publish.call_ms', performance.now() - publishStart);
       }
     }, 33);
     return () => clearInterval(interval);

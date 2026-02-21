@@ -84,3 +84,21 @@ Published commands:
 - Data is retained in browser IndexedDB database `rocket_telemetry_db` until reset.
 - `Reset` in critical modal clears IndexedDB and in-memory telemetry.
 - `vite.config.ts` exposes `GEMINI_API_KEY` defines, but this frontend currently does not use Gemini APIs.
+
+## Performance probes
+
+Enable probes in browser console:
+
+```js
+localStorage.setItem('scada.probe', '1');
+location.reload();
+```
+
+Disable probes:
+
+```js
+localStorage.setItem('scada.probe', '0');
+location.reload();
+```
+
+Probes print aggregated tables every 2s under `[SCADA probe]` in DevTools console.

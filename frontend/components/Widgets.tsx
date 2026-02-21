@@ -1,8 +1,9 @@
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef, useEffect } from 'react';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import { SensorDataPoint } from '../types';
 import { downsampleMinMax, MAX_RENDER_POINTS } from '@/utils/downsampling';
+import { probeCount, probeDuration } from '@/utils/perfProbe';
 
 export const SENSOR_COLORS: Record<string, string> = {
     tensometer: '#c084fc', 
@@ -35,18 +36,34 @@ export const ScadaPanel = ({ title, children, className = "", danger = false, he
 );
 
 export const FastChart = ({ data, color, domain = [0, 4096] }: { data: SensorDataPoint[], color: string, domain?: [number | string, number | string] }) => {
+  probeCount('render.FastChart');
   // Performance optimization: only render if data exists
   if (!data || data.length === 0) return <div className="w-full h-full flex items-center justify-center text-slate-500 text-xs">NO SIGNAL</div>;
 
-  const sampledData = useMemo(
-    () => downsampleMinMax(data, MAX_RENDER_POINTS),
-    [data]
-  );
+  const prevDataRef = useRef<SensorDataPoint[] | null>(null);
+  if (prevDataRef.current !== data) {
+    probeCount('render.FastChart.data_identity_changes');
+    prevDataRef.current = data;
+  }
+
+  const sampledData = useMemo(() => {
+    const start = performance.now();
+    const sampled = downsampleMinMax(data, MAX_RENDER_POINTS);
+    probeCount('chart.fast.in_points', data.length);
+    probeCount('chart.fast.out_points', sampled.length);
+    probeDuration('chart.fast.downsample.ms', performance.now() - start);
+    return sampled;
+  }, [data]);
+
   // Recharts may mutate data points in some paths; keep chart input detached.
   const safeData = useMemo(
     () => sampledData.map((point) => ({ timestamp: point.timestamp, value: point.value })),
     [sampledData]
   );
+
+  useEffect(() => {
+    probeCount('effect.FastChart.commit');
+  });
 
   return (
     <ResponsiveContainer width="100%" height="100%">

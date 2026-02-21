@@ -1,12 +1,14 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useMqttSystem } from './hooks/useMqttSystem';
 import { DashboardView } from './components/DashboardView';
 import { AnalysisView } from './components/AnalysisView';
 import { ConnectionState } from './types';
 import { Settings, Wifi, WifiOff, Activity, LayoutDashboard, LineChart as LineChartIcon, Lock, AlertOctagon, ShieldAlert, Trash2, Beaker } from 'lucide-react';
+import { probeCount } from '@/utils/perfProbe';
 
 const App = () => {
+  probeCount('render.App');
   const { connectionStatus, isSimulating, criticalError, telemetry, connect, toggleSimulation, resetData, actions } = useMqttSystem();
   
   // Configuration & View State
@@ -22,6 +24,10 @@ const App = () => {
   const handleSimToggle = () => {
       toggleSimulation(!isSimulating);
   };
+
+  useEffect(() => {
+    probeCount('effect.App.commit');
+  });
 
   return (
     <div className="w-screen h-screen overflow-hidden bg-slate-900 flex flex-col relative">
