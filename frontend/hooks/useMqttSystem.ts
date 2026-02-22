@@ -14,6 +14,12 @@ import * as Converters from '../utils/conversions';
 import * as DB from '../utils/db';
 import { RocketSimulator, PacketEmit } from '../utils/simulator';
 import { probeCount, probeDuration, withProbe } from '@/utils/perfProbe';
+import {
+  ChecklistContextValue,
+  ChecklistPointRuntimeState,
+  ChecklistTopicUpdate,
+} from '@/types/checklist';
+import { buildChecklistPointTopic, parseChecklistPointTopic } from '@/utils/checklistTopics';
 
 const DEFAULT_TELEMETRY: SystemTelemetry = {
   startTime: 0,
@@ -54,17 +60,75 @@ interface ActiveChunkBuffer {
   lastUpdateAt: number;
 }
 
+const buildChecklistPointStateKey = (checklistId: string, pointId: string): string =>
+  `${checklistId}/${pointId}`;
+
+const toMessageText = (message: any): string => {
+  if (typeof message === 'string') return message;
+  if (message instanceof Uint8Array) return new TextDecoder().decode(message);
+  return String(message);
+};
+
+const isChecklistContextValue = (value: unknown): value is ChecklistContextValue => {
+  return (
+    value === null ||
+    typeof value === 'string' ||
+    typeof value === 'number' ||
+    typeof value === 'boolean'
+  );
+};
+
+export const parseChecklistPointStatePayload = (
+  payload: string,
+): ChecklistPointRuntimeState | null => {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(payload);
+  } catch {
+    return null;
+  }
+
+  if (!parsed || typeof parsed !== 'object') return null;
+  const record = parsed as Record<string, unknown>;
+
+  if (typeof record.completed !== 'boolean') return null;
+  if (record.completedAtWall !== null && typeof record.completedAtWall !== 'number') return null;
+  if (record.completedAtTelemetry !== null && typeof record.completedAtTelemetry !== 'number') {
+    return null;
+  }
+  if (!record.context || typeof record.context !== 'object' || Array.isArray(record.context)) {
+    return null;
+  }
+
+  const context: Record<string, ChecklistContextValue> = {};
+  for (const [key, value] of Object.entries(record.context as Record<string, unknown>)) {
+    if (!isChecklistContextValue(value)) return null;
+    context[key] = value;
+  }
+
+  return {
+    completed: record.completed,
+    completedAtWall: record.completedAtWall as number | null,
+    completedAtTelemetry: record.completedAtTelemetry as number | null,
+    context,
+  };
+};
+
 export const useMqttSystem = () => {
   const [connectionStatus, setConnectionStatus] = useState<ConnectionState>(ConnectionState.DISCONNECTED);
   const [isSimulating, setIsSimulating] = useState(false);
   const [criticalError, setCriticalError] = useState<string | null>(null);
   const [telemetry, setTelemetry] = useState<SystemTelemetry>(cloneTelemetry(DEFAULT_TELEMETRY));
+  const [checklistPointStates, setChecklistPointStates] = useState<
+    Record<string, ChecklistPointRuntimeState>
+  >({});
   
   const clientRef = useRef<mqtt.MqttClient | null>(null);
   const telemetryRef = useRef<SystemTelemetry>(cloneTelemetry(DEFAULT_TELEMETRY));
   const telemetryVersionRef = useRef(0);
   const publishedTelemetryVersionRef = useRef(-1);
   const simulatorRef = useRef<RocketSimulator | null>(null);
+  const checklistPointStatesRef = useRef<Record<string, ChecklistPointRuntimeState>>({});
   
   // Ref to handleMessage to avoid stale closures in simulator callback
   const handleMessageRef = useRef<(topic: string, message: any) => void>(null);
@@ -148,7 +212,10 @@ export const useMqttSystem = () => {
           const flushStart = performance.now();
           const now = performance.now();
 
-          for (const [sensorId, chunk] of Object.entries(activeChunksRef.current)) {
+          for (const [sensorId, chunk] of Object.entries(activeChunksRef.current) as [
+            string,
+            ActiveChunkBuffer,
+          ][]) {
               if (now - chunk.lastUpdateAt > STALE_CHUNK_FLUSH_MS) {
                   sealActiveChunk(sensorId, chunk);
                   delete activeChunksRef.current[sensorId];
@@ -224,9 +291,34 @@ export const useMqttSystem = () => {
     }
   }, []);
 
+  const applyChecklistTopicUpdate = useCallback((update: ChecklistTopicUpdate) => {
+    const key = buildChecklistPointStateKey(update.checklistId, update.pointId);
+    checklistPointStatesRef.current = {
+      ...checklistPointStatesRef.current,
+      [key]: update.state,
+    };
+    setChecklistPointStates(checklistPointStatesRef.current);
+  }, []);
+
   const handleMessage = (topic: string, message: any) => {
     if (connectionStatus === ConnectionState.ERROR) return;
     probeCount('mqtt.message.total');
+
+    const checklistTopicParts = parseChecklistPointTopic(topic);
+    if (checklistTopicParts) {
+      const parsedState = parseChecklistPointStatePayload(toMessageText(message));
+      if (!parsedState) {
+        console.warn(`Invalid checklist state payload on topic: ${topic}`);
+        return;
+      }
+
+      applyChecklistTopicUpdate({
+        checklistId: checklistTopicParts.checklistId,
+        pointId: checklistTopicParts.pointId,
+        state: parsedState,
+      });
+      return;
+    }
 
     // Convert message to Uint8Array if it's a string/buffer
     let buffer: Uint8Array;
@@ -418,7 +510,8 @@ export const useMqttSystem = () => {
             'sensor/digital/armed',
             'sensor/temp/#',
             'sensor/servo',
-            'cmd/state', 'cmd/servo', 'status/#'
+            'cmd/state', 'cmd/servo', 'status/#',
+            'checklist/+/points/+/state'
         ];
         client.subscribe(topics);
     });
@@ -503,6 +596,30 @@ export const useMqttSystem = () => {
     }
   };
 
+  const publishChecklistPointState = useCallback(
+    async (checklistId: string, pointId: string, state: ChecklistPointRuntimeState): Promise<void> => {
+      applyChecklistTopicUpdate({ checklistId, pointId, state });
+
+      const client = clientRef.current;
+      if (!client || !client.connected) {
+        return;
+      }
+
+      const topic = buildChecklistPointTopic(checklistId, pointId);
+      const payload = JSON.stringify(state);
+      await new Promise<void>((resolve, reject) => {
+        client.publish(topic, payload, { qos: 1, retain: true }, (error) => {
+          if (error) {
+            reject(error);
+            return;
+          }
+          resolve();
+        });
+      });
+    },
+    [applyChecklistTopicUpdate],
+  );
+
   const setFireState = (cmd: 'FIRE' | 'FIRE_END' | 'FIRE_RESET') => sendCommand('cmd/state', cmd);
   const setServoCmd = (cmd: 'OPEN' | 'CLOSE') => {
     if (telemetry.state === SystemState.FIRE) return;
@@ -520,9 +637,11 @@ export const useMqttSystem = () => {
     isSimulating,
     criticalError,
     telemetry,
+    checklistPointStates,
     connect,
     disconnect,
     toggleSimulation,
+    publishChecklistPointState,
     resetData,
     actions: { setFireState, setServoCmd, toggleSimSafety }
   };

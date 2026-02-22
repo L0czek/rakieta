@@ -94,14 +94,20 @@ export const FastChart = ({ data, color, domain = [0, 4096] }: { data: SensorDat
   );
 };
 
-export const ValueDisplay = ({ label, value, unit, color = "text-cyan-400" }: { label: string, value: string | number, unit?: string, color?: string }) => (
-  <div className="flex justify-between items-end border-b border-slate-700 pb-1 mb-1 last:border-0">
-    <span className="text-slate-400 text-xs uppercase">{label}</span>
-    <span className={`text-xl font-mono font-bold ${color}`}>
-      {value}<span className="text-xs text-slate-500 ml-1">{unit}</span>
-    </span>
-  </div>
-);
+export const ValueDisplay: React.FC<{
+  label: string;
+  value: string | number;
+  unit?: string;
+  color?: string;
+}> = ({ label, value, unit, color = "text-cyan-400" }) => (
+    <div className="flex justify-between items-end border-b border-slate-700 pb-1 mb-1 last:border-0">
+      <span className="text-slate-400 text-xs uppercase">{label}</span>
+      <span className={`text-xl font-mono font-bold ${color}`}>
+        {value}
+        <span className="text-xs text-slate-500 ml-1">{unit}</span>
+      </span>
+    </div>
+  );
 
 export const DigitalIndicator = ({ active, label, color = "bg-green-500" }: { active: boolean, label: string, color?: string }) => (
     <div className={`flex items-center gap-2 p-2 rounded border ${active ? `border-${color.split('-')[1]}-500 bg-${color.split('-')[1]}-900/20` : 'border-slate-700 bg-slate-900/50 opacity-50'}`}>

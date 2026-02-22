@@ -3,18 +3,52 @@ import React, { useState, useEffect } from 'react';
 import { useMqttSystem } from './hooks/useMqttSystem';
 import { DashboardView } from './components/DashboardView';
 import { AnalysisView } from './components/AnalysisView';
+import { ChecklistView } from './components/ChecklistView';
+import { useChecklistEngine } from './hooks/useChecklistEngine';
 import { ConnectionState } from './types';
-import { Settings, Wifi, WifiOff, Activity, LayoutDashboard, LineChart as LineChartIcon, Lock, AlertOctagon, ShieldAlert, Trash2, Beaker } from 'lucide-react';
+import {
+  Settings,
+  Wifi,
+  WifiOff,
+  Activity,
+  LayoutDashboard,
+  LineChart as LineChartIcon,
+  Lock,
+  AlertOctagon,
+  ShieldAlert,
+  Trash2,
+  Beaker,
+  ListChecks,
+} from 'lucide-react';
 import { probeCount } from '@/utils/perfProbe';
 
 const App = () => {
   probeCount('render.App');
-  const { connectionStatus, isSimulating, criticalError, telemetry, connect, toggleSimulation, resetData, actions } = useMqttSystem();
+  const {
+    connectionStatus,
+    isSimulating,
+    criticalError,
+    telemetry,
+    checklistPointStates,
+    connect,
+    toggleSimulation,
+    publishChecklistPointState,
+    resetData,
+    actions,
+  } = useMqttSystem();
   
   // Configuration & View State
   const [mqttConfig, setMqttConfig] = useState({ host: 'localhost', port: 8000, simulation: false });
   const [showConfig, setShowConfig] = useState(false);
-  const [view, setView] = useState<'DASHBOARD' | 'ANALYSIS'>('DASHBOARD');
+  const [view, setView] = useState<'DASHBOARD' | 'ANALYSIS' | 'CHECKLIST'>('DASHBOARD');
+
+  const checklistEngine = useChecklistEngine({
+    telemetry,
+    connectionStatus,
+    isSimulating,
+    pointStates: checklistPointStates,
+    publishChecklistPointState,
+  });
 
   const handleConnect = () => {
     connect(mqttConfig);
@@ -83,6 +117,12 @@ const App = () => {
             >
                 <LineChartIcon size={14}/> ANALYSIS
             </button>
+            <button
+                onClick={() => setView('CHECKLIST')}
+                className={`flex items-center gap-2 px-3 py-1 text-xs font-bold rounded transition-colors ${view === 'CHECKLIST' ? 'bg-cyan-900/50 text-cyan-400' : 'text-slate-500 hover:text-slate-300'}`}
+            >
+                <ListChecks size={14}/> CHECKLIST
+            </button>
         </div>
 
         <div className="flex items-center gap-6">
@@ -148,8 +188,23 @@ const App = () => {
 
         {view === 'DASHBOARD' ? (
              <DashboardView telemetry={telemetry} actions={actions} />
-        ) : (
+        ) : view === 'ANALYSIS' ? (
              <AnalysisView telemetry={telemetry} actions={actions} />
+        ) : (
+            <ChecklistView
+              mode={checklistEngine.mode}
+              summaries={checklistEngine.summaries}
+              selectedChecklistId={checklistEngine.selectedChecklistId}
+              onSelectChecklist={checklistEngine.setSelectedChecklistId}
+              stepStates={checklistEngine.stepStates}
+              activeStep={checklistEngine.activeStep}
+              getStepContext={checklistEngine.getStepContext}
+              setStepContextField={checklistEngine.setStepContextField}
+              onCompleteCurrentStep={checklistEngine.completeStep}
+              onResetChecklist={() => checklistEngine.resetChecklist(checklistEngine.selectedChecklistId)}
+              onResetAllChecklists={checklistEngine.resetAllChecklists}
+              isReadOnly={checklistEngine.isReadOnly}
+            />
         )}
 
       </main>
