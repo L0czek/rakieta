@@ -18,14 +18,14 @@ interface ChecklistViewProps {
   isReadOnly: boolean;
 }
 
-const getStatusView = (step: ChecklistStepState): { symbol: string; className: string } => {
+const getStatusClassName = (step: ChecklistStepState): string => {
   if (!step.validation.isAutoRule) {
-    return { symbol: 'M', className: 'text-amber-300 bg-amber-900/20 border-amber-600/40' };
+    return 'text-amber-300 bg-amber-900/20 border-amber-600/40';
   }
   if (step.validation.isValid) {
-    return { symbol: '✓', className: 'text-green-300 bg-green-900/20 border-green-600/40' };
+    return 'text-green-300 bg-green-900/20 border-green-600/40';
   }
-  return { symbol: 'X', className: 'text-red-300 bg-red-900/20 border-red-600/40' };
+  return 'text-red-300 bg-red-900/20 border-red-600/40';
 };
 
 const getRowClassName = (step: ChecklistStepState): string => {
@@ -131,7 +131,7 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
         </div>
         <div className="flex-1 min-h-0 overflow-auto">
           {stepStates.map((step) => {
-            const status = getStatusView(step);
+            const statusClassName = getStatusClassName(step);
             const rowClass = getRowClassName(step);
             const inlineContext = getStepContext(step.point.id);
 
@@ -146,10 +146,14 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
                   </div>
                   <div
                     className={`px-3 py-3 md:border-l border-t md:border-t-0 text-left md:text-right
-                      ${status.className} ${step.isLocked ? 'opacity-50' : ''}`}
+                      ${statusClassName} ${step.isLocked ? 'opacity-50' : ''}`}
                   >
                     <div className="font-bold">{step.point.response}</div>
-                    <div className="text-xs mt-1 font-bold">{status.symbol}</div>
+                    {step.isCurrent && (
+                      <div className="mt-1 text-[10px] font-bold tracking-wide text-cyan-200">
+                        📡 {step.validation.displayValue}
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -158,13 +162,6 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
                     data-testid="inline-current-step-controls"
                     className="px-3 py-3 border-t border-slate-800 bg-slate-900/30 flex flex-col gap-3"
                   >
-                    <div className="text-xs text-slate-300">
-                      Live:{' '}
-                      <span className="font-semibold text-slate-100">
-                        {step.validation.displayValue}
-                      </span>
-                    </div>
-
                     {(step.point.contextFields ?? []).map((field) => (
                       <label key={field.id} className="text-xs text-slate-300 flex flex-col gap-1">
                         {field.label}
