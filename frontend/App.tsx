@@ -5,7 +5,7 @@ import { DashboardView } from './components/DashboardView';
 import { AnalysisView } from './components/AnalysisView';
 import { ConfigurationView } from './components/ConfigurationView';
 import { ConnectionState } from './types';
-import { Settings, Wifi, WifiOff, Activity, LayoutDashboard, LineChart as LineChartIcon, Lock, AlertOctagon, ShieldAlert, Trash2, Beaker, SlidersHorizontal } from 'lucide-react';
+import { Settings, Wifi, WifiOff, LayoutDashboard, LineChart as LineChartIcon, Lock, AlertOctagon, ShieldAlert, Trash2, Beaker, SlidersHorizontal, Rocket } from 'lucide-react';
 import { probeCount } from '@/utils/perfProbe';
 
 const App = () => {
@@ -74,7 +74,7 @@ const App = () => {
       <header className="h-14 bg-slate-950 border-b border-slate-800 flex items-center px-4 justify-between shrink-0 z-10">
         <div className="flex items-center gap-4">
           <div className="w-3 h-3 bg-red-500 rounded-full animate-ping absolute opacity-20"></div>
-          <Activity className="text-cyan-400" />
+          <Rocket className="text-cyan-400" />
           <div>
             <h1 className="text-cyan-400 font-bold tracking-widest text-lg leading-none neon-text">ROCKET TEST STAND</h1>
             <span className="text-slate-500 text-[10px] tracking-[0.2em]">TELEMETRY & CONTROL LINK</span>
