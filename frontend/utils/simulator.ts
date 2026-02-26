@@ -89,9 +89,8 @@ export class RocketSimulator {
         const isFiring = this.systemState === SystemState.FIRE; 
 
         // --- PHYSICS & FAST SENSOR GENERATION ---
-        // FIRE: 500Hz -> 50 samples per 100ms
-        // IDLE: 20Hz -> 2 samples per 100ms
-        const sampleRate = isFiring ? 500 : 20;
+        // Always 1000Hz
+        const sampleRate = 1000;
         const numSamples = Math.round((dt / 1000) * sampleRate);
         const timeStep = dt / numSamples;
 

@@ -39,8 +39,8 @@ const DEFAULT_TELEMETRY: SystemTelemetry = {
   lastCmdStatus: "Waiting for connection...",
 };
 
-// Reduced to 2500 to hold 5 seconds of data at 500Hz
-const MAX_LIVE_POINTS = 2500;
+// Reduced to 5000 to hold 5 seconds of data at 1000Hz
+const MAX_LIVE_POINTS = 5000;
 const FLUSH_INTERVAL_MS = 500;
 const STALE_CHUNK_FLUSH_MS = 500;
 
