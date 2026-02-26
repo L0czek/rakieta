@@ -310,20 +310,20 @@ export const useMqttSystem = () => {
     else if (topic === 'sensor/adc/fast/pressure/tank') {
       probeCount('mqtt.message.fast.pressure_tank');
       const { timestampStart, timestampEnd, values } = Parser.parseFastAdc(buffer);
-      updateFastSensor('pressureTank', 'pressureTank', timestampStart, timestampEnd, values.map(v => Converters.rawToPressureBar(v)));
+            updateFastSensor('pressureTank', 'pressureTank', timestampStart, timestampEnd, values.map(v => Converters.rawToPressureBar(v, 'pressureTank')));
     }
     else if (topic === 'sensor/adc/fast/pressure/combustion') {
       probeCount('mqtt.message.fast.pressure_combustion');
       const { timestampStart, timestampEnd, values } = Parser.parseFastAdc(buffer);
-      updateFastSensor('pressureCombustion', 'pressureCombustion', timestampStart, timestampEnd, values.map(v => Converters.rawToPressureBar(v)));
+            updateFastSensor('pressureCombustion', 'pressureCombustion', timestampStart, timestampEnd, values.map(v => Converters.rawToPressureBar(v, 'pressureCombustion')));
     }
     else if (topic.startsWith('sensor/adc/slow/')) {
         probeCount('mqtt.message.slow');
         const { timestamp, value: raw } = Parser.parseSlowAdc(buffer);
-        if (topic.includes('battery/stand')) updateSlowSensor('batteryStand', 'batteryStandHist', 'batteryStand', timestamp, Converters.rawToBatteryVoltage(raw));
-        if (topic.includes('battery/computer')) updateSlowSensor('batteryComputer', 'batteryComputerHist', 'batteryComputer', timestamp, Converters.rawToBatteryVoltage(raw));
-        if (topic.includes('boost_voltage')) updateSlowSensor('boostVoltage', 'boostVoltageHist', 'boostVoltage', timestamp, Converters.rawToBatteryVoltage(raw));
-        if (topic.includes('starter_sense')) updateSlowSensor('starterSense', 'starterSenseHist', 'starterSense', timestamp, Converters.rawToGenericVoltage(raw));
+                if (topic.includes('battery/stand')) updateSlowSensor('batteryStand', 'batteryStandHist', 'batteryStand', timestamp, Converters.rawToVoltage(raw, 'batteryStand'));
+                if (topic.includes('battery/computer')) updateSlowSensor('batteryComputer', 'batteryComputerHist', 'batteryComputer', timestamp, Converters.rawToVoltage(raw, 'batteryComputer'));
+                if (topic.includes('boost_voltage')) updateSlowSensor('boostVoltage', 'boostVoltageHist', 'boostVoltage', timestamp, Converters.rawToVoltage(raw, 'boostVoltage'));
+                if (topic.includes('starter_sense')) updateSlowSensor('starterSense', 'starterSenseHist', 'starterSense', timestamp, Converters.rawToVoltage(raw, 'starterSense'));
     }
     else if (topic === 'sensor/digital/armed') {
         probeCount('mqtt.message.digital.armed');

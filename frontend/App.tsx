@@ -3,8 +3,9 @@ import React, { useState, useEffect } from 'react';
 import { useMqttSystem } from './hooks/useMqttSystem';
 import { DashboardView } from './components/DashboardView';
 import { AnalysisView } from './components/AnalysisView';
+import { ConfigurationView } from './components/ConfigurationView';
 import { ConnectionState } from './types';
-import { Settings, Wifi, WifiOff, Activity, LayoutDashboard, LineChart as LineChartIcon, Lock, AlertOctagon, ShieldAlert, Trash2, Beaker } from 'lucide-react';
+import { Settings, Wifi, WifiOff, Activity, LayoutDashboard, LineChart as LineChartIcon, Lock, AlertOctagon, ShieldAlert, Trash2, Beaker, SlidersHorizontal } from 'lucide-react';
 import { probeCount } from '@/utils/perfProbe';
 
 const App = () => {
@@ -14,7 +15,17 @@ const App = () => {
   // Configuration & View State
   const [mqttConfig, setMqttConfig] = useState({ host: 'localhost', port: 8000, simulation: false });
   const [showConfig, setShowConfig] = useState(false);
-  const [view, setView] = useState<'DASHBOARD' | 'ANALYSIS'>('DASHBOARD');
+    const [view, setView] = useState<'DASHBOARD' | 'ANALYSIS' | 'CONFIGURATION'>('DASHBOARD');
+    const [configHasUnsavedChanges, setConfigHasUnsavedChanges] = useState(false);
+
+    const handleViewChange = (nextView: 'DASHBOARD' | 'ANALYSIS' | 'CONFIGURATION') => {
+        if (view === 'CONFIGURATION' && nextView !== 'CONFIGURATION' && configHasUnsavedChanges) {
+            const proceed = window.confirm('You have unsaved configuration changes. Leave without saving?');
+            if (!proceed) return;
+            setConfigHasUnsavedChanges(false);
+        }
+        setView(nextView);
+    };
 
   const handleConnect = () => {
     connect(mqttConfig);
@@ -72,16 +83,22 @@ const App = () => {
 
         <div className="flex bg-slate-900 rounded border border-slate-700 p-1">
             <button 
-                onClick={() => setView('DASHBOARD')}
+                onClick={() => handleViewChange('DASHBOARD')}
                 className={`flex items-center gap-2 px-3 py-1 text-xs font-bold rounded transition-colors ${view === 'DASHBOARD' ? 'bg-cyan-900/50 text-cyan-400' : 'text-slate-500 hover:text-slate-300'}`}
             >
                 <LayoutDashboard size={14}/> DASHBOARD
             </button>
             <button 
-                onClick={() => setView('ANALYSIS')}
+                onClick={() => handleViewChange('ANALYSIS')}
                 className={`flex items-center gap-2 px-3 py-1 text-xs font-bold rounded transition-colors ${view === 'ANALYSIS' ? 'bg-cyan-900/50 text-cyan-400' : 'text-slate-500 hover:text-slate-300'}`}
             >
                 <LineChartIcon size={14}/> ANALYSIS
+            </button>
+            <button 
+                onClick={() => handleViewChange('CONFIGURATION')}
+                className={`flex items-center gap-2 px-3 py-1 text-xs font-bold rounded transition-colors ${view === 'CONFIGURATION' ? 'bg-cyan-900/50 text-cyan-400' : 'text-slate-500 hover:text-slate-300'}`}
+            >
+                <SlidersHorizontal size={14}/> CONFIGURATION
             </button>
         </div>
 
@@ -146,10 +163,12 @@ const App = () => {
              </div>
         )}
 
-        {view === 'DASHBOARD' ? (
+         {view === 'DASHBOARD' ? (
              <DashboardView telemetry={telemetry} actions={actions} />
-        ) : (
+         ) : view === 'ANALYSIS' ? (
                <AnalysisView telemetry={telemetry} actions={actions} connectionStatus={connectionStatus} isSimulating={isSimulating} />
+         ) : (
+             <ConfigurationView onDirtyChange={setConfigHasUnsavedChanges} />
         )}
 
       </main>
