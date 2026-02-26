@@ -11,29 +11,45 @@ This is a single-page React+TypeScript application built on Vite. The architectu
 5. Batch-write historical points to IndexedDB every 500 ms
 6. Read IndexedDB ranges on demand in Analysis mode
 7. Persist telemetry in 1000ms sensor chunks in IndexedDB to reduce write overhead
+8. Manage checklist execution state with strict sequencing and retained MQTT sync
 
 ## Project structure
 
 - `index.tsx`
   - App bootstrap and React root mount.
 - `App.tsx`
-  - Top-level shell, header, view switch (`DASHBOARD`/`ANALYSIS`), config modal, critical error modal.
+  - Top-level shell, header, view switch (`DASHBOARD`/`ANALYSIS`/`CHECKLIST`/`CONFIGURATION`),
+    config modal, critical error modal.
   - Owns broker host/port UI state.
 - `types.ts`
   - Core enums/interfaces for telemetry and command state.
+- `types/checklist.ts`
+  - Checklist domain types: definitions, runtime point state, rule variants, mode labels.
+- `config/checklists.ts`
+  - Static checklist templates and ordered point definitions.
 - `hooks/useMqttSystem.ts`
   - Main runtime orchestration:
     - MQTT lifecycle (`connect`, subscriptions, publish)
     - Simulator lifecycle
     - Message decoding dispatch per topic
+    - Checklist retained topic parse/publish helpers
     - Safety/time checks
     - DB write buffer + periodic flush
     - Action API exposed to UI panels
+- `hooks/useChecklistEngine.ts`
+  - Checklist runtime logic:
+    - mode derivation (`MQTT_SYNC` / `SIM_LOCAL` / `READ_ONLY_SNAPSHOT`)
+    - strict sequential gating and step completion checks
+    - telemetry/state rule evaluation
+    - per-checklist and global reset actions
 - `components/DashboardView.tsx`
   - Live operations layout with 5-second fast-signal charts and control cards.
 - `components/AnalysisView.tsx`
   - Multi-axis charting and historical navigation.
   - Toggleable series and debounced DB range fetch queue.
+- `components/ChecklistView.tsx`
+  - Aviation-style two-column checklist UI.
+  - Checklist selector with progress labels, active step panel, context inputs, completion actions.
 - `components/ControlPanel.tsx`
   - State display + FIRE/ABORT/RESET actions with gating logic.
 - `components/ServoPanel.tsx`
@@ -46,6 +62,8 @@ This is a single-page React+TypeScript application built on Vite. The architectu
   - Simulator packet generation matching parser format.
 - `utils/conversions.ts`
   - ADC correction LUT and physical conversions (pressure, thrust, voltages, temp, servo %).
+- `utils/checklistTopics.ts`
+  - Checklist MQTT topic build/parse helpers.
 - `utils/simulator.ts`
   - Deterministic-ish telemetry generator + command handling state machine.
 - `utils/db.ts`
@@ -90,6 +108,20 @@ This is a single-page React+TypeScript application built on Vite. The architectu
   - FIRE requires `ARMED` + unsafe/armed safety state
   - Servo commands denied during FIRE
 
+### [6] Checklist runtime
+
+- Definitions are frontend-only (`config/checklists.ts`), with manual and auto-validated points.
+- Runtime point state uses per-point retained topics:
+  - `checklist/<checklistId>/points/<pointId>/state`
+- `useChecklistEngine` computes current step as first incomplete point.
+- Completion is blocked unless:
+  - point is current step
+  - mode is not read-only
+  - auto-check point is green (manual points can always complete)
+- Disconnected behavior:
+  - simulation on: `SIM_LOCAL` (fully usable, local ephemeral)
+  - simulation off: `READ_ONLY_SNAPSHOT` (browse only, no writes)
+
 ## Packet formats implemented
 
 - Fast ADC: `u32 tStart` + `u32 tEnd` + packed 12-bit samples (2 samples / 3 bytes, optional trailing handling)
@@ -114,20 +146,19 @@ This is a single-page React+TypeScript application built on Vite. The architectu
   - Timeline scroll + zoom + live/pause mode
   - Fire control panel and servo diagnostics/control
   - Simulation safety override toggle
+  - Checklist tab with strict sequential aviation-style execution
 
 ## Known implementation constraints
 
 - No auth/TLS support in UI config (only ws host/port exposed directly in modal).
-- No automated tests/lint/type-check scripts defined beyond TypeScript/Vite defaults.
-- `index.html` references `/index.css`; file is currently absent.
 - Dynamic Tailwind class construction in `DigitalIndicator` may not be robust outside CDN/JIT behavior.
 - Dependency versions in `package.json` use ranges (`^`, `~`) rather than exact pins.
 
 ## Suggested next technical steps
 
-1. Add explicit quality scripts: lint, typecheck, test.
+1. Add lint script/tooling and enforce it in CI alongside `typecheck` and `test`.
 2. Add `index.css` or remove stale reference.
-3. Add integration tests for packet parser/conversions and simulator command gating.
+3. Expand checklist test coverage to include multi-client MQTT sync integration tests.
 4. Expand broker config with protocol/TLS/credentials UX where needed.
 
 ## Debug instrumentation

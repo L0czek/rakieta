@@ -10,11 +10,13 @@ Web SCADA dashboard for rocket-engine test telemetry and command/control over MQ
 - Shows:
   - `Dashboard` view for live operations
   - `Analysis` view for multi-series history and timeline navigation
+  - `Checklist` view for aviation-style sequential procedures
 - Persists telemetry in browser IndexedDB for history playback
 - Includes an internal simulator that can:
   - Loop back directly into UI (no broker required), or
   - Publish generated packets to MQTT if connected
 - Renders full telemetry series in charts while still storing raw telemetry in IndexedDB
+- Synchronizes checklist runtime state between clients through retained MQTT topics
 
 ## Tech stack
 
@@ -32,7 +34,8 @@ Web SCADA dashboard for rocket-engine test telemetry and command/control over MQ
 - `lucide-react`
 - `mqtt`
 - `idb`
-- Dev: `vite`, `@vitejs/plugin-react`, `typescript`, `@types/node`
+- Dev: `vite`, `@vitejs/plugin-react`, `typescript`, `@types/node`, `vitest`,
+  `jsdom`, `@testing-library/react`, `@testing-library/jest-dom`, `fake-indexeddb`
 
 ## Local run
 
@@ -50,6 +53,13 @@ npm run build
 npm run preview
 ```
 
+Quality checks:
+
+```bash
+npm run typecheck
+npm run test
+```
+
 ## MQTT interface (implemented topics)
 
 Subscribed:
@@ -62,11 +72,14 @@ Subscribed:
 - `status/#`
 - `cmd/state`
 - `cmd/servo`
+- `checklist/+/points/+/state`
 
 Published commands:
 
 - `cmd/state` with payloads: `FIRE`, `FIRE_END`, `FIRE_RESET`
 - `cmd/servo` with payloads: `OPEN`, `CLOSE`
+- `checklist/<checklistId>/points/<pointId>/state` (retained JSON):
+  `{"completed":boolean,"completedAtWall":number|null,"completedAtTelemetry":number|null,"context":{...}}`
 
 ## Operator UX/design
 
@@ -77,6 +90,10 @@ Published commands:
   - Critical time-travel check can force disconnect and display lockout modal
 - Live packet clock shown as `T+timestamp`
 - Config modal for broker host/port
+- Checklist modes:
+  - `MQTT SYNC`: connected, synchronized and retained
+  - `SIM LOCAL`: disconnected + simulation, local-only ephemeral state
+  - `READ ONLY SNAPSHOT`: disconnected + real mode, browsing only
 
 ## Notes
 
