@@ -126,12 +126,27 @@ const App = () => {
         </div>
 
         <div className="flex items-center gap-6">
-            <button 
-             onClick={handleSimToggle}
-             className={`flex items-center gap-2 px-3 py-1 text-xs font-bold rounded transition-colors border ${isSimulating ? 'bg-cyan-900/50 border-cyan-500 text-cyan-400' : 'border-slate-700 text-slate-500 hover:text-slate-300'}`}
-            >
-               <Beaker size={14} /> {isSimulating ? 'STOP SIM' : 'SIMULATOR'}
-            </button>
+            <div className="flex items-center gap-2">
+                <button 
+                 onClick={handleSimToggle}
+                 className={`flex items-center gap-2 px-3 py-1 text-xs font-bold rounded transition-colors border ${isSimulating ? 'bg-cyan-900/50 border-cyan-500 text-cyan-400' : 'border-slate-700 text-slate-500 hover:text-slate-300'}`}
+                >
+                   <Beaker size={14} /> {isSimulating ? 'STOP SIM' : 'SIMULATOR'}
+                </button>
+                {isSimulating && (
+                    <button
+                        onClick={actions.toggleSimSafety}
+                        className={`flex items-center gap-2 px-3 py-1 rounded text-xs font-bold border ${
+                          telemetry.isUnsafe
+                            ? 'bg-red-900/80 border-red-500 text-white'
+                            : 'bg-green-900/80 border-green-500 text-white'
+                        }`}
+                    >
+                        {telemetry.isUnsafe ? <AlertOctagon size={14}/> : <Lock size={14}/>}
+                        SIM: {telemetry.isUnsafe ? 'PHYSICAL SWITCH ARMED' : 'PHYSICAL SWITCH SAFE'}
+                    </button>
+                )}
+            </div>
 
             <div className="flex items-center gap-2 px-3 py-1 bg-slate-900 border border-slate-700 rounded">
                 <span className="text-xs text-slate-500">LAST PACKET</span>
@@ -175,17 +190,24 @@ const App = () => {
                 </div>
             </div>
         )}
-        
-        {/* Simulation Safety Override */}
-        {isSimulating && (
-             <div className="absolute top-2 left-2 z-50">
-                 <button onClick={actions.toggleSimSafety} className={`flex items-center gap-2 px-3 py-2 rounded text-xs font-bold border ${telemetry.isUnsafe ? 'bg-red-900/80 border-red-500 text-white' : 'bg-green-900/80 border-green-500 text-white'}`}>
-                    {telemetry.isUnsafe ? <AlertOctagon size={14}/> : <Lock size={14}/>}
-                    SIM: {telemetry.isUnsafe ? 'PHYSICAL SWITCH ARMED' : 'PHYSICAL SWITCH SAFE'}
-                 </button>
-             </div>
-        )}
 
+        {view === 'CHECKLIST' && checklistEngine.isReadOnly && (
+            <div
+                className="pointer-events-none absolute bottom-2 left-1/2 z-40 w-max max-w-[calc(100%-1rem)]
+                  -translate-x-1/2 rounded border-2 border-amber-400 bg-amber-900/90 px-4 py-2
+                  text-center text-xs font-bold tracking-widest text-amber-100 shadow-[0_0_24px_rgba(251,191,36,0.35)]
+                  md:bottom-4 md:px-6 md:py-3 md:text-sm"
+            >
+                <div className="flex items-center justify-center gap-2">
+                    <Lock size={14} />
+                    <span>READ ONLY SNAPSHOT</span>
+                </div>
+                <div className="mt-1 text-[10px] tracking-normal text-amber-200 md:text-xs">
+                    MQTT disconnected and simulator disabled
+                </div>
+            </div>
+        )}
+        
         {view === 'DASHBOARD' ? (
              <DashboardView telemetry={telemetry} actions={actions} />
         ) : view === 'ANALYSIS' ? (
