@@ -1,9 +1,10 @@
 
-import React, { useMemo, useRef, useEffect } from 'react';
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
+import React, { useMemo, useRef, useEffect, useState } from 'react';
+import uPlot from 'uplot';
+import UplotReact from 'uplot-react';
+import 'uplot/dist/uPlot.min.css';
 import { SensorDataPoint } from '../types';
-import { downsampleMinMax, MAX_RENDER_POINTS } from '@/utils/downsampling';
-import { probeCount, probeDuration } from '@/utils/perfProbe';
+import { probeCount } from '@/utils/perfProbe';
 
 export const SENSOR_COLORS: Record<string, string> = {
     tensometer: '#c084fc', 
@@ -17,6 +18,40 @@ export const SENSOR_COLORS: Record<string, string> = {
 };
 
 export const TEMP_COLORS = ['#f87171', '#fda4af', '#e11d48', '#be123c'];
+
+export const CHART_RANGES = {
+  thrust: [0, 700] as [number, number],
+  pressure: [0, 150] as [number, number],
+  voltage: [0, 20] as [number, number],
+  starter: [0, 2] as [number, number],
+  servo: [0, 100] as [number, number],
+  temp: [0, 200] as [number, number],
+};
+
+export const useChartSize = () => {
+  const ref = useRef<HTMLDivElement | null>(null);
+  const [size, setSize] = useState({ width: 0, height: 0 });
+
+  useEffect(() => {
+    const element = ref.current;
+    if (!element) return undefined;
+
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const next = {
+          width: Math.floor(entry.contentRect.width),
+          height: Math.floor(entry.contentRect.height),
+        };
+        setSize((prev) => (prev.width === next.width && prev.height === next.height ? prev : next));
+      }
+    });
+
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+
+  return { ref, size };
+};
 
 export const ScadaPanel = ({ title, children, className = "", danger = false, headerRight = null }: { title: string, children?: React.ReactNode, className?: string, danger?: boolean, headerRight?: React.ReactNode }) => (
   <div className={`relative flex flex-col bg-slate-800/80 border ${danger ? 'border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.2)]' : 'border-cyan-500/30'} backdrop-blur-sm rounded-sm overflow-hidden ${className}`}>
@@ -35,7 +70,7 @@ export const ScadaPanel = ({ title, children, className = "", danger = false, he
   </div>
 );
 
-export const FastChart = ({ data, color, domain = [0, 4096] }: { data: SensorDataPoint[], color: string, domain?: [number | string, number | string] }) => {
+export const FastChart = ({ data, color, domain = CHART_RANGES.pressure }: { data: SensorDataPoint[], color: string, domain?: [number, number] }) => {
   probeCount('render.FastChart');
   // Performance optimization: only render if data exists
   if (!data || data.length === 0) return <div className="w-full h-full flex items-center justify-center text-slate-500 text-xs">NO SIGNAL</div>;
@@ -46,51 +81,73 @@ export const FastChart = ({ data, color, domain = [0, 4096] }: { data: SensorDat
     prevDataRef.current = data;
   }
 
-  const sampledData = useMemo(() => {
-    const start = performance.now();
-    const sampled = downsampleMinMax(data, MAX_RENDER_POINTS);
-    probeCount('chart.fast.in_points', data.length);
-    probeCount('chart.fast.out_points', sampled.length);
-    probeDuration('chart.fast.downsample.ms', performance.now() - start);
-    return sampled;
+  const { ref, size } = useChartSize();
+
+  const chartData = useMemo(() => {
+    if (data.length === 0) return [[], []] as [number[], number[]];
+    const xVals = data.map((point) => point.timestamp);
+    const yVals = data.map((point) => point.value);
+    return [xVals, yVals] as [number[], number[]];
   }, [data]);
 
-  // Recharts may mutate data points in some paths; keep chart input detached.
-  const safeData = useMemo(
-    () => sampledData.map((point) => ({ timestamp: point.timestamp, value: point.value })),
-    [sampledData]
-  );
+  const options = useMemo<uPlot.Options>(() => {
+    return {
+      width: size.width,
+      height: size.height,
+      scales: {
+        x: { time: false },
+        y: { range: () => domain },
+      },
+      series: [
+        {},
+        {
+          label: 'Value',
+          stroke: color,
+          width: 2,
+          points: { show: false },
+        },
+      ],
+      axes: [
+        {
+          stroke: '#64748b',
+          grid: { stroke: '#334155' },
+          ticks: { stroke: '#334155' },
+          splits: (u) => {
+            const min = u.scales.x.min ?? 0;
+            const max = u.scales.x.max ?? 0;
+            const step = 100;
+            const start = Math.ceil(min / step) * step;
+            const splits: number[] = [];
+            for (let v = start; v <= max; v += step) {
+              splits.push(v);
+            }
+            return splits;
+          },
+          values: (_u, ticks) =>
+            ticks.map((val, idx) => (idx % 5 === 0 ? `${(val / 1000).toFixed(1)}s` : '')),
+        },
+        {
+          stroke: '#64748b',
+          grid: { stroke: '#334155' },
+          ticks: { stroke: '#334155' },
+          values: (_u, vals) => vals.map((val) => `${val}`),
+        },
+      ],
+      legend: { show: false },
+      cursor: { show: false },
+    };
+  }, [size.width, size.height, color, domain]);
 
   useEffect(() => {
     probeCount('effect.FastChart.commit');
   });
 
   return (
-    <ResponsiveContainer width="100%" height="100%">
-      <LineChart data={safeData}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-        <XAxis 
-            type="number" 
-            dataKey="timestamp" 
-            domain={['dataMin', 'dataMax']} 
-            hide 
-        />
-        <YAxis domain={domain} hide />
-        <Tooltip 
-            contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', fontSize: '12px' }}
-            itemStyle={{ color: color }}
-            labelStyle={{ display: 'none' }}
-        />
-        <Line 
-            type="linear" 
-            dataKey="value" 
-            stroke={color} 
-            strokeWidth={2} 
-            dot={false} 
-            isAnimationActive={false} 
-        />
-      </LineChart>
-    </ResponsiveContainer>
+    <div ref={ref} className="w-full h-full">
+      {size.width > 0 && size.height > 0 ? (
+        <UplotReact options={options} data={chartData} />
+      ) : null}
+    </div>
   );
 };
 

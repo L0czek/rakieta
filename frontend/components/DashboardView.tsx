@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { SystemTelemetry, SensorDataPoint } from '../types';
-import { ScadaPanel, FastChart, ValueDisplay, SENSOR_COLORS } from './Widgets';
+import { ScadaPanel, FastChart, ValueDisplay, SENSOR_COLORS, CHART_RANGES } from './Widgets';
 import { ControlPanel } from './ControlPanel';
 import { ServoPanel } from './ServoPanel';
 
@@ -46,7 +46,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ telemetry, actions
                     className="h-full" 
                     headerRight={<span>{vals.tank} <span className="text-slate-500 text-[10px]">BAR</span></span>}
                 >
-                    <FastChart data={getDataInTimeWindow(telemetry.pressureTank, 5000)} color={SENSOR_COLORS.pressureTank} domain={['auto', 'auto']} />
+                    <FastChart data={getDataInTimeWindow(telemetry.pressureTank, 5000)} color={SENSOR_COLORS.pressureTank} domain={CHART_RANGES.pressure} />
                 </ScadaPanel>
             </div>
             <div className="col-span-4 row-span-4 flex flex-col gap-2">
@@ -70,7 +70,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ telemetry, actions
                     className="h-full"
                     headerRight={<span>{vals.combustion} <span className="text-slate-500 text-[10px]">BAR</span></span>}
                     >
-                    <FastChart data={getDataInTimeWindow(telemetry.pressureCombustion, 5000)} color={SENSOR_COLORS.pressureCombustion} domain={['auto', 'auto']} />
+                    <FastChart data={getDataInTimeWindow(telemetry.pressureCombustion, 5000)} color={SENSOR_COLORS.pressureCombustion} domain={CHART_RANGES.pressure} />
                 </ScadaPanel>
             </div>
             <div className="col-span-4 row-span-4 flex flex-col gap-2">
@@ -97,7 +97,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ telemetry, actions
                     className="h-full"
                     headerRight={<span>{vals.thrust} <span className="text-slate-500 text-[10px]">KG</span></span>}
                     >
-                    <FastChart data={getDataInTimeWindow(telemetry.tensometer, 5000)} color={SENSOR_COLORS.tensometer} domain={['auto', 'auto']} />
+                    <FastChart data={getDataInTimeWindow(telemetry.tensometer, 5000)} color={SENSOR_COLORS.tensometer} domain={CHART_RANGES.thrust} />
                     </ScadaPanel>
             </div>
             <div className="col-span-4 row-span-4">

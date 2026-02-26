@@ -10,9 +10,7 @@ This is a single-page React+TypeScript application built on Vite. The architectu
 4. Update live in-memory telemetry state for UI refresh (~30 FPS)
 5. Batch-write historical points to IndexedDB every 500 ms
 6. Read IndexedDB ranges on demand in Analysis mode
-7. Downsample plotted series to max 1000 points using min-max bucketing
-   to preserve spikes while keeping charts responsive
-8. Persist telemetry in 1000ms sensor chunks in IndexedDB to reduce write overhead
+7. Persist telemetry in 1000ms sensor chunks in IndexedDB to reduce write overhead
 
 ## Project structure
 
@@ -48,8 +46,6 @@ This is a single-page React+TypeScript application built on Vite. The architectu
   - Simulator packet generation matching parser format.
 - `utils/conversions.ts`
   - ADC correction LUT and physical conversions (pressure, thrust, voltages, temp, servo %).
-- `utils/downsampling.ts`
-  - Shared min-max downsampling helper and render point cap (`MAX_RENDER_POINTS`).
 - `utils/simulator.ts`
   - Deterministic-ish telemetry generator + command handling state machine.
 - `utils/db.ts`
@@ -85,7 +81,6 @@ This is a single-page React+TypeScript application built on Vite. The architectu
 
 - In paused/history mode, visible line keys are fetched from IndexedDB by `[sensorId, timestamp]` range.
 - Debounced queue avoids overloading IndexedDB during rapid scrolling/zooming.
-- Visible line series are downsampled before rendering with a hard 1000-point cap.
 
 ### [5] Simulator integration
 
@@ -119,7 +114,6 @@ This is a single-page React+TypeScript application built on Vite. The architectu
   - Timeline scroll + zoom + live/pause mode
   - Fire control panel and servo diagnostics/control
   - Simulation safety override toggle
-  - Peak-preserving chart downsampling (max 1000 points per rendered line)
 
 ## Known implementation constraints
 
@@ -142,5 +136,4 @@ This is a single-page React+TypeScript application built on Vite. The architectu
 - Enable with `localStorage.setItem('scada.probe', '1')` and page reload.
 - Probes currently instrument:
   - telemetry ingress and DB flush timing,
-  - App/Analysis/FastChart render and commit frequency,
-  - downsampling input/output cardinality and timing.
+  - App/Analysis/FastChart render and commit frequency.

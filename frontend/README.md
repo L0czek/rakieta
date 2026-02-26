@@ -14,13 +14,12 @@ Web SCADA dashboard for rocket-engine test telemetry and command/control over MQ
 - Includes an internal simulator that can:
   - Loop back directly into UI (no broker required), or
   - Publish generated packets to MQTT if connected
-- Caps rendering to `1000` points per plotted line using min-max downsampling
-  (peak-preserving), while still storing raw telemetry in IndexedDB
+- Renders full telemetry series in charts while still storing raw telemetry in IndexedDB
 
 ## Tech stack
 
 - Runtime/build: `Vite` + `TypeScript` + `React`
-- Charts: `recharts`
+- Charts: `uPlot` via `uplot-react`
 - Icons: `lucide-react`
 - MQTT client: `mqtt`
 - Browser DB wrapper: `idb` (IndexedDB)
@@ -29,7 +28,7 @@ Web SCADA dashboard for rocket-engine test telemetry and command/control over MQ
 ## Libraries used
 
 - `react`, `react-dom`
-- `recharts`
+- `uplot`, `uplot-react`
 - `lucide-react`
 - `mqtt`
 - `idb`

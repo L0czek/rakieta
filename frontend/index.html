@@ -42,6 +42,24 @@
         background-size: 100% 2px, 3px 100%;
         pointer-events: none;
       }
+        .uplot {
+          font-family: 'Courier New', Courier, monospace;
+          color: #94a3b8;
+          background: transparent;
+        }
+        .uplot .u-grid line {
+          stroke: #334155;
+        }
+        .uplot .u-axis line,
+        .uplot .u-axis path,
+        .uplot .u-tick {
+          stroke: #334155;
+        }
+        .uplot .u-legend {
+          background: rgba(15, 23, 42, 0.85);
+          border: 1px solid #334155;
+          color: #cbd5f5;
+        }
     </style>
   <script type="importmap">
 {
@@ -49,7 +67,8 @@
     "react/": "https://esm.sh/react@^19.2.4/",
     "react": "https://esm.sh/react@^19.2.4",
     "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
-    "recharts": "https://esm.sh/recharts@^3.7.0",
+      "uplot": "https://esm.sh/uplot@^1.6.30",
+      "uplot-react": "https://esm.sh/uplot-react@^1.2.4",
     "lucide-react": "https://esm.sh/lucide-react@^0.563.0",
     "mqtt": "https://esm.sh/mqtt@^5.15.0",
     "idb": "https://esm.sh/idb@8.0.0"

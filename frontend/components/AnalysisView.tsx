@@ -1,14 +1,14 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { SystemTelemetry, SensorDataPoint } from '../types';
-import { ScadaPanel, ValueDisplay, SENSOR_COLORS, TEMP_COLORS } from './Widgets';
+import { ScadaPanel, ValueDisplay, SENSOR_COLORS, TEMP_COLORS, useChartSize, CHART_RANGES } from './Widgets';
 import { ControlPanel } from './ControlPanel';
 import { ServoPanel } from './ServoPanel';
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, Legend } from 'recharts';
 import { Pause, Play, ZoomIn, ZoomOut } from 'lucide-react';
+import uPlot from 'uplot';
+import UplotReact from 'uplot-react';
 import * as DB from '../utils/db';
-import { downsampleMinMax, MAX_RENDER_POINTS } from '@/utils/downsampling';
-import { probeCount, probeDuration } from '@/utils/perfProbe';
+import { probeCount } from '@/utils/perfProbe';
 
 interface AnalysisViewProps {
     telemetry: SystemTelemetry;
@@ -177,7 +177,6 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({ telemetry, actions }
   const liveSeriesData = React.useMemo(() => {
       if (!isLive) return {};
 
-      const downsampleStart = performance.now();
       const rawSeries: Record<string, SensorDataPoint[]> = {
           tensometer: telemetry.tensometer,
           pressureTank: telemetry.pressureTank,
@@ -192,21 +191,17 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({ telemetry, actions }
 
       const next: Record<string, SensorDataPoint[]> = {};
       let inPoints = 0;
-      let outPoints = 0;
       let lineCount = 0;
       for (const [key, visible] of Object.entries(visibleLines)) {
           if (!visible) continue;
           const raw = rawSeries[key] || [];
-          const sampled = downsampleMinMax(raw, MAX_RENDER_POINTS);
           inPoints += raw.length;
-          outPoints += sampled.length;
           lineCount += 1;
-          next[key] = sampled;
+          next[key] = raw;
       }
       probeCount('analysis.live.visible_lines', lineCount);
       probeCount('analysis.live.in_points', inPoints);
-      probeCount('analysis.live.out_points', outPoints);
-      probeDuration('analysis.live.downsample.ms', performance.now() - downsampleStart);
+      probeCount('analysis.live.out_points', inPoints);
       return next;
   }, [
     isLive,
@@ -224,24 +219,19 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({ telemetry, actions }
 
   const historySeriesData = React.useMemo(() => {
       if (isLive || !chartData) return {};
-      const downsampleStart = performance.now();
       const next: Record<string, SensorDataPoint[]> = {};
       let inPoints = 0;
-      let outPoints = 0;
       let lineCount = 0;
       for (const [key, visible] of Object.entries(visibleLines)) {
           if (!visible) continue;
           const raw = chartData[key] || [];
-          const sampled = downsampleMinMax(raw, MAX_RENDER_POINTS);
           inPoints += raw.length;
-          outPoints += sampled.length;
           lineCount += 1;
-          next[key] = sampled;
+          next[key] = raw;
       }
       probeCount('analysis.history.visible_lines', lineCount);
       probeCount('analysis.history.in_points', inPoints);
-      probeCount('analysis.history.out_points', outPoints);
-      probeDuration('analysis.history.downsample.ms', performance.now() - downsampleStart);
+      probeCount('analysis.history.out_points', inPoints);
       return next;
   }, [isLive, chartData, visibleLines]);
 
@@ -264,63 +254,150 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({ telemetry, actions }
   const showAxisVoltage = visibleLines.batteryStand || visibleLines.batteryComputer || visibleLines.boostVoltage;
   const showAxisTemp = knownSensors.some(k => visibleLines[k]);
 
+  const { ref: chartRef, size: chartSize } = useChartSize();
+
+  const seriesMeta = React.useMemo(() => {
+      const next: Array<{ key: string; label: string; color: string; scale: string }> = [];
+
+      if (visibleLines.tensometer) {
+          next.push({ key: 'tensometer', label: 'Thrust (kg)', color: SENSOR_COLORS.tensometer, scale: 'thrust' });
+      }
+      if (visibleLines.pressureTank) {
+          next.push({ key: 'pressureTank', label: 'Tank Press (bar)', color: SENSOR_COLORS.pressureTank, scale: 'pressure' });
+      }
+      if (visibleLines.pressureCombustion) {
+          next.push({ key: 'pressureCombustion', label: 'Comb Press (bar)', color: SENSOR_COLORS.pressureCombustion, scale: 'pressure' });
+      }
+      if (visibleLines.batteryStand) {
+          next.push({ key: 'batteryStand', label: 'Bat Stand', color: SENSOR_COLORS.batteryStand, scale: 'voltage' });
+      }
+      if (visibleLines.batteryComputer) {
+          next.push({ key: 'batteryComputer', label: 'Bat Comp', color: SENSOR_COLORS.batteryComputer, scale: 'voltage' });
+      }
+      if (visibleLines.boostVoltage) {
+          next.push({ key: 'boostVoltage', label: 'Boost V', color: SENSOR_COLORS.boostVoltage, scale: 'voltage' });
+      }
+      if (visibleLines.starterSense) {
+          next.push({ key: 'starterSense', label: 'Starter', color: SENSOR_COLORS.starterSense, scale: 'starter' });
+      }
+      if (visibleLines.servo) {
+          next.push({ key: 'servo', label: 'Servo', color: SENSOR_COLORS.servo, scale: 'servo' });
+      }
+
+      knownSensors.forEach((key, idx) => {
+          if (!visibleLines[key]) return;
+          next.push({ key, label: `T: ${key}`, color: TEMP_COLORS[idx % TEMP_COLORS.length], scale: 'temp' });
+      });
+
+      return next;
+  }, [visibleLines, knownSensors]);
+
+  const alignedData = React.useMemo(() => {
+      if (seriesMeta.length === 0) return [[]];
+
+      const windowStart = viewStart;
+      const windowEnd = viewStart + windowSize;
+      const timestampSet = new Set<number>();
+
+      for (const meta of seriesMeta) {
+          const points = displayedSeriesData[meta.key] || [];
+          for (const point of points) {
+              if (point.timestamp < windowStart || point.timestamp > windowEnd) continue;
+              timestampSet.add(point.timestamp);
+          }
+      }
+
+      const xVals = Array.from(timestampSet).sort((a, b) => a - b);
+      if (xVals.length === 0) return [[], ...seriesMeta.map(() => [])];
+
+      const indexByTimestamp = new Map<number, number>();
+      xVals.forEach((ts, idx) => indexByTimestamp.set(ts, idx));
+
+      const seriesValues = seriesMeta.map(() => new Array<number | null>(xVals.length).fill(null));
+      seriesMeta.forEach((meta, metaIndex) => {
+          const points = displayedSeriesData[meta.key] || [];
+          for (const point of points) {
+              if (point.timestamp < windowStart || point.timestamp > windowEnd) continue;
+              const idx = indexByTimestamp.get(point.timestamp);
+              if (idx === undefined) continue;
+              seriesValues[metaIndex][idx] = point.value;
+          }
+      });
+
+      return [xVals, ...seriesValues];
+  }, [displayedSeriesData, seriesMeta, viewStart, windowSize]);
+
+  const axes = React.useMemo<uPlot.Axis[]>(() => {
+      return [
+          {
+              stroke: '#64748b',
+              grid: { stroke: '#334155' },
+              ticks: { stroke: '#334155' },
+              values: (_u, ticks) => ticks.map((val) => `${(val / 1000).toFixed(0)}s`),
+          },
+          { scale: 'thrust', side: 3, stroke: SENSOR_COLORS.tensometer, show: visibleLines.tensometer, label: 'Kg' },
+          { scale: 'pressure', side: 3, stroke: SENSOR_COLORS.pressureTank, show: showAxisPressure, label: 'Bar' },
+          { scale: 'voltage', side: 1, stroke: SENSOR_COLORS.batteryStand, show: showAxisVoltage, label: 'V' },
+          { scale: 'starter', side: 1, stroke: SENSOR_COLORS.starterSense, show: visibleLines.starterSense, label: 'V(S)' },
+          { scale: 'servo', side: 1, stroke: SENSOR_COLORS.servo, show: visibleLines.servo, label: '%' },
+          { scale: 'temp', side: 1, stroke: TEMP_COLORS[0], show: showAxisTemp, label: 'C' },
+      ];
+  }, [showAxisPressure, showAxisTemp, showAxisVoltage, visibleLines]);
+
+  const chartOptions = React.useMemo<uPlot.Options>(() => {
+      return {
+          width: chartSize.width,
+          height: chartSize.height,
+          scales: {
+              x: { time: false, range: () => [viewStart, viewStart + windowSize] },
+              thrust: { range: () => CHART_RANGES.thrust },
+              pressure: { range: () => CHART_RANGES.pressure },
+              voltage: { range: () => CHART_RANGES.voltage },
+              starter: { range: () => CHART_RANGES.starter },
+              servo: { range: () => CHART_RANGES.servo },
+              temp: { range: () => CHART_RANGES.temp },
+          },
+          axes,
+          series: [
+              { label: 'T' },
+              ...seriesMeta.map((meta) => ({
+                  label: meta.label,
+                  scale: meta.scale,
+                  stroke: meta.color,
+                  width: 2,
+                  points: { show: false },
+                  spanGaps: true,
+              })),
+          ],
+          legend: { show: true },
+          cursor: { drag: { x: true, y: false } },
+      };
+  }, [axes, chartSize.width, chartSize.height, seriesMeta, viewStart, windowSize]);
+
+  const handleChartCreate = React.useCallback((chart: uPlot) => {
+      const legend = chart.root.querySelector<HTMLDivElement>('.u-legend');
+      if (!legend) return;
+      legend.style.position = 'absolute';
+      legend.style.top = '0';
+      legend.style.left = '0';
+      legend.style.right = '0';
+      legend.style.zIndex = '2';
+      legend.style.pointerEvents = 'none';
+      legend.style.margin = '0';
+  }, []);
+
   return (
     <div className="grid grid-cols-12 grid-rows-12 gap-2 h-full">
         {/* Top-Left: Big Chart (Rows 1-8, Cols 1-9) */}
         <div className="col-span-9 row-span-8">
             <ScadaPanel title="ANALYSIS" className="h-full">
-            <ResponsiveContainer width="100%" height="100%">
-                <LineChart>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                    <XAxis 
-                        type="number" 
-                        domain={[viewStart, viewStart + windowSize]} 
-                        dataKey="timestamp" 
-                        allowDataOverflow 
-                        tick={{fill: '#64748b'}} 
-                        tickFormatter={(t) => `${(t/1000).toFixed(0)}s`}
-                    />
-                    {/* Defined Axes */}
-                    {visibleLines.tensometer && (
-                        <YAxis yAxisId="thrust" orientation="left" stroke={SENSOR_COLORS.tensometer} domain={['auto', 'auto']} label={{ value: 'Kg', angle: -90, position: 'insideLeft', fill: SENSOR_COLORS.tensometer }} />
-                    )}
-                    {showAxisPressure && (
-                        <YAxis yAxisId="pressure" orientation="left" stroke={SENSOR_COLORS.pressureTank} domain={['auto', 'auto']} label={{ value: 'Bar', angle: -90, position: 'insideLeft', fill: SENSOR_COLORS.pressureTank }} />
-                    )}
-                    {showAxisVoltage && (
-                        <YAxis yAxisId="voltage" orientation="right" stroke={SENSOR_COLORS.batteryStand} domain={['auto', 'auto']} label={{ value: 'V', angle: 90, position: 'insideRight', fill: SENSOR_COLORS.batteryStand }} />
-                    )}
-                    {visibleLines.starterSense && (
-                        <YAxis yAxisId="starter" orientation="right" stroke={SENSOR_COLORS.starterSense} domain={['auto', 'auto']} label={{ value: 'V(S)', angle: 90, position: 'insideRight', fill: SENSOR_COLORS.starterSense }} />
-                    )}
-                    {visibleLines.servo && (
-                        <YAxis yAxisId="servo" orientation="right" stroke={SENSOR_COLORS.servo} domain={[0, 100]} label={{ value: '%', angle: 90, position: 'insideRight', fill: SENSOR_COLORS.servo }} />
-                    )}
-                    {showAxisTemp && (
-                        <YAxis yAxisId="temp" orientation="right" stroke={TEMP_COLORS[0]} domain={['auto', 'auto']} label={{ value: '°C', angle: 90, position: 'insideRight', fill: TEMP_COLORS[0] }} />
-                    )}
-
-                    <Tooltip contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', fontSize: '12px' }} labelFormatter={(val) => `T+${val}`} />
-                    <Legend />
-                    
-                    {visibleLines.tensometer && <Line type="linear" yAxisId="thrust" dataKey="value" data={displayedSeriesData.tensometer || []} name="Thrust (kg)" stroke={SENSOR_COLORS.tensometer} dot={false} strokeWidth={2} isAnimationActive={false} />}
-                    {visibleLines.pressureTank && <Line type="linear" yAxisId="pressure" dataKey="value" data={displayedSeriesData.pressureTank || []} name="Tank Press (bar)" stroke={SENSOR_COLORS.pressureTank} dot={false} strokeWidth={2} isAnimationActive={false} />}
-                    {visibleLines.pressureCombustion && <Line type="linear" yAxisId="pressure" dataKey="value" data={displayedSeriesData.pressureCombustion || []} name="Comb Press (bar)" stroke={SENSOR_COLORS.pressureCombustion} dot={false} strokeWidth={2} isAnimationActive={false} />}
-                    
-                    {visibleLines.batteryStand && <Line type="linear" yAxisId="voltage" dataKey="value" data={displayedSeriesData.batteryStand || []} name="Bat Stand" stroke={SENSOR_COLORS.batteryStand} dot={false} strokeWidth={2} isAnimationActive={false} />}
-                    {visibleLines.batteryComputer && <Line type="linear" yAxisId="voltage" dataKey="value" data={displayedSeriesData.batteryComputer || []} name="Bat Comp" stroke={SENSOR_COLORS.batteryComputer} dot={false} strokeWidth={2} isAnimationActive={false} />}
-                    {visibleLines.boostVoltage && <Line type="linear" yAxisId="voltage" dataKey="value" data={displayedSeriesData.boostVoltage || []} name="Boost V" stroke={SENSOR_COLORS.boostVoltage} dot={false} strokeWidth={2} isAnimationActive={false} />}
-                    
-                    {visibleLines.starterSense && <Line type="linear" yAxisId="starter" dataKey="value" data={displayedSeriesData.starterSense || []} name="Starter" stroke={SENSOR_COLORS.starterSense} dot={false} strokeWidth={2} isAnimationActive={false} />}
-                    {visibleLines.servo && <Line type="linear" yAxisId="servo" dataKey="value" data={displayedSeriesData.servo || []} name="Servo" stroke={SENSOR_COLORS.servo} dot={false} strokeWidth={2} isAnimationActive={false} />}
-
-                    {knownSensors.map((key, idx) => (
-                        visibleLines[key] && (
-                            <Line key={key} type="linear" yAxisId="temp" dataKey="value" data={displayedSeriesData[key] || []} name={`T: ${key}`} stroke={TEMP_COLORS[idx % TEMP_COLORS.length]} dot={false} strokeWidth={2} isAnimationActive={false} />
-                        )
-                    ))}
-                </LineChart>
-            </ResponsiveContainer>
+            <div ref={chartRef} className="w-full h-full relative overflow-hidden">
+                {chartSize.width > 0 && chartSize.height > 0 && seriesMeta.length > 0 ? (
+                    <UplotReact options={chartOptions} data={alignedData} resetScales={false} onCreate={handleChartCreate} />
+                ) : (
+                    <div className="w-full h-full flex items-center justify-center text-slate-500 text-xs">NO DATA</div>
+                )}
+            </div>
             </ScadaPanel>
         </div>
 
