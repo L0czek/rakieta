@@ -212,6 +212,7 @@ export const useMqttSystem = () => {
   const resetData = useCallback(async () => {
     await DB.clearDB();
     setCriticalError(null);
+        setConnectionStatus((prev) => prev === ConnectionState.ERROR ? ConnectionState.DISCONNECTED : prev);
     
     activeChunksRef.current = {};
     sealedChunksRef.current = [];
