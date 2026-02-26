@@ -82,6 +82,34 @@ export const getMeasurementsInRange = async (sensorId: string, start: number, en
   return points;
 };
 
+export const getSensorIds = async (): Promise<string[]> => {
+  const db = await initDB();
+  const keys = await db.getAllKeys('measurements');
+  const sensorIds = new Set<string>();
+
+  for (const key of keys) {
+    const sensorId = key[0];
+    if (typeof sensorId === 'string' && sensorId.length > 0) {
+      sensorIds.add(sensorId);
+    }
+  }
+
+  return Array.from(sensorIds);
+};
+
+export const getMeasurementTimeRange = async (): Promise<{ start: number; end: number }> => {
+  const db = await initDB();
+  const tx = db.transaction('measurements', 'readonly');
+  const index = tx.objectStore('measurements').index('by-chunk-start');
+  const firstCursor = await index.openCursor(null, 'next');
+  const lastCursor = await index.openCursor(null, 'prev');
+
+  const start = firstCursor ? firstCursor.value.chunkStart : 0;
+  const end = lastCursor ? lastCursor.value.chunkEnd : 0;
+
+  return { start, end };
+};
+
 export const getLastTimestamp = async (): Promise<number> => {
     const db = await initDB();
     const val = await db.get('meta', 'lastTimestamp');

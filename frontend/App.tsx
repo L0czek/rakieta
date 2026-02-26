@@ -149,7 +149,7 @@ const App = () => {
         {view === 'DASHBOARD' ? (
              <DashboardView telemetry={telemetry} actions={actions} />
         ) : (
-             <AnalysisView telemetry={telemetry} actions={actions} />
+               <AnalysisView telemetry={telemetry} actions={actions} connectionStatus={connectionStatus} isSimulating={isSimulating} />
         )}
 
       </main>

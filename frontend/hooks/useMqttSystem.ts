@@ -78,10 +78,13 @@ export const useMqttSystem = () => {
   useEffect(() => {
     const loadState = async () => {
         try {
-            const lastTs = await DB.getLastTimestamp();
-            const startTs = await DB.getFirstTimestamp();
-            telemetryRef.current.lastPacketTimestamp = lastTs;
-            telemetryRef.current.startTime = startTs || lastTs; 
+                        const [lastTsMeta, measurementRange] = await Promise.all([
+                            DB.getLastTimestamp(),
+                            DB.getMeasurementTimeRange(),
+                        ]);
+                        const lastTs = Math.max(lastTsMeta, measurementRange.end);
+                        telemetryRef.current.lastPacketTimestamp = lastTs;
+                        telemetryRef.current.startTime = measurementRange.start;
             setTelemetry({ ...telemetryRef.current });
         } catch (e) {
             console.error("Failed to load DB state", e);

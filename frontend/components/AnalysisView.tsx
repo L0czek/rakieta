@@ -9,16 +9,19 @@ import uPlot from 'uplot';
 import UplotReact from 'uplot-react';
 import * as DB from '../utils/db';
 import { probeCount } from '@/utils/perfProbe';
+import { ConnectionState } from '../types';
 
 interface AnalysisViewProps {
     telemetry: SystemTelemetry;
     actions: any;
+        connectionStatus: ConnectionState;
+        isSimulating: boolean;
 }
 
-export const AnalysisView: React.FC<AnalysisViewProps> = ({ telemetry, actions }) => {
+export const AnalysisView: React.FC<AnalysisViewProps> = ({ telemetry, actions, connectionStatus, isSimulating }) => {
   probeCount('render.AnalysisView');
   // View State
-  const [isLive, setIsLive] = useState(true);
+    const [isLive, setIsLive] = useState(() => connectionStatus === ConnectionState.CONNECTED || isSimulating);
   const [windowSize, setWindowSize] = useState(30000); // 30 seconds default
   const [viewStart, setViewStart] = useState(0); 
   const [chartData, setChartData] = useState<Record<string, SensorDataPoint[]> | null>(null);
@@ -36,6 +39,34 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({ telemetry, actions }
 
   // Dynamic sensors
   const [knownSensors, setKnownSensors] = useState<string[]>([]);
+
+  useEffect(() => {
+     const loadKnownSensors = async () => {
+         try {
+             const sensorIds = await DB.getSensorIds();
+             const baseSensors = new Set([
+                 'tensometer',
+                 'pressureTank',
+                 'pressureCombustion',
+                 'batteryStand',
+                 'batteryComputer',
+                 'starterSense',
+                 'boostVoltage',
+                 'servo'
+             ]);
+             const tempSensors = sensorIds.filter(id => !baseSensors.has(id));
+             setKnownSensors(prev => {
+                 const combined = Array.from(new Set([...prev, ...tempSensors]));
+                 if (combined.length !== prev.length) return combined;
+                 return prev;
+             });
+         } catch (error) {
+             console.error('Failed to load known sensors', error);
+         }
+     };
+
+     void loadKnownSensors();
+  }, []);
 
   useEffect(() => {
      const temps = Object.keys(telemetry.temperatures);

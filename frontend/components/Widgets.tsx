@@ -151,7 +151,7 @@ export const FastChart = ({ data, color, domain = CHART_RANGES.pressure }: { dat
   );
 };
 
-export const ValueDisplay = ({ label, value, unit, color = "text-cyan-400" }: { label: string, value: string | number, unit?: string, color?: string }) => (
+export const ValueDisplay: React.FC<{ label: string, value: string | number, unit?: string, color?: string }> = ({ label, value, unit, color = "text-cyan-400" }) => (
   <div className="flex justify-between items-end border-b border-slate-700 pb-1 mb-1 last:border-0">
     <span className="text-slate-400 text-xs uppercase">{label}</span>
     <span className={`text-xl font-mono font-bold ${color}`}>
