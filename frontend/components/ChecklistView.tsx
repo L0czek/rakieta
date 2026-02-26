@@ -1,7 +1,7 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 
 import { ChecklistStepState, ChecklistSummary } from '@/hooks/useChecklistEngine';
-import { ChecklistMode, ChecklistContextValue } from '@/types/checklist';
+import { ChecklistContextValue, ChecklistMode } from '@/types/checklist';
 
 interface ChecklistViewProps {
   mode: ChecklistMode;
@@ -61,11 +61,6 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const activeContext = useMemo(() => {
-    if (!activeStep) return {};
-    return getStepContext(activeStep.point.id);
-  }, [activeStep, getStepContext]);
-
   const runAction = async (action: () => Promise<{ ok: boolean; error?: string }>): Promise<void> => {
     setIsSubmitting(true);
     setErrorMessage(null);
@@ -124,23 +119,25 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
         </div>
       )}
 
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-2 flex-1 min-h-0">
+      <div
+        className="flex-1 min-h-0 relative flex flex-col rounded-sm overflow-hidden
+          bg-slate-800/70 border border-cyan-500/30"
+      >
         <div
-          className="xl:col-span-8 min-h-0 relative flex flex-col rounded-sm overflow-hidden
-            bg-slate-800/70 border border-cyan-500/30"
+          className="px-2 py-1 text-xs font-bold tracking-widest border-b flex justify-between
+            items-center bg-cyan-900/20 text-cyan-300 border-cyan-500/30"
         >
-          <div
-            className="px-2 py-1 text-xs font-bold tracking-widest border-b flex justify-between
-              items-center bg-cyan-900/20 text-cyan-300 border-cyan-500/30"
-          >
-            <span>CHECKLIST SEQUENCE</span>
-          </div>
-          <div className="flex-1 min-h-0 overflow-auto">
-            {stepStates.map((step) => {
-              const status = getStatusView(step);
-              const rowClass = getRowClassName(step);
-              return (
-                <div key={step.point.id} className={rowClass}>
+          <span>CHECKLIST SEQUENCE</span>
+        </div>
+        <div className="flex-1 min-h-0 overflow-auto">
+          {stepStates.map((step) => {
+            const status = getStatusView(step);
+            const rowClass = getRowClassName(step);
+            const inlineContext = getStepContext(step.point.id);
+
+            return (
+              <div key={step.point.id} className="border-b border-slate-800/90 last:border-b-0">
+                <div className={rowClass}>
                   <div className="px-3 py-3 text-slate-200">
                     <div className="font-semibold tracking-wide">{step.point.callout}</div>
                     {step.point.note && (
@@ -155,78 +152,64 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
                     <div className="text-xs mt-1 font-bold">{status.symbol}</div>
                   </div>
                 </div>
-              );
-            })}
-          </div>
-          <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-cyan-400"></div>
-          <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-cyan-400"></div>
-          <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-cyan-400"></div>
-          <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-cyan-400"></div>
-        </div>
 
-        <div
-          className="xl:col-span-4 min-h-0 relative flex flex-col rounded-sm overflow-hidden
-            bg-slate-800/70 border border-cyan-500/30"
-        >
-          <div
-            className="px-2 py-1 text-xs font-bold tracking-widest border-b flex justify-between
-              items-center bg-cyan-900/20 text-cyan-300 border-cyan-500/30"
-          >
-            <span>ACTIVE STEP</span>
-          </div>
-          <div className="flex-1 p-3 overflow-auto flex flex-col gap-3">
-            {activeStep ? (
-              <>
-                <div>
-                  <div className="text-xs uppercase tracking-widest text-cyan-300">Current Step</div>
-                  <div className="text-slate-100 font-semibold mt-1">{activeStep.point.callout}</div>
-                  <div className="text-xs text-slate-400 mt-2">
-                    Live: {activeStep.validation.displayValue}
+                {step.isCurrent && (
+                  <div
+                    data-testid="inline-current-step-controls"
+                    className="px-3 py-3 border-t border-slate-800 bg-slate-900/30 flex flex-col gap-3"
+                  >
+                    <div className="text-xs text-slate-300">
+                      Live:{' '}
+                      <span className="font-semibold text-slate-100">
+                        {step.validation.displayValue}
+                      </span>
+                    </div>
+
+                    {(step.point.contextFields ?? []).map((field) => (
+                      <label key={field.id} className="text-xs text-slate-300 flex flex-col gap-1">
+                        {field.label}
+                        <input
+                          className="bg-slate-900 border border-slate-700 rounded-sm px-2 py-1
+                            text-slate-100 focus:outline-none focus:border-cyan-500/70"
+                          type={field.type}
+                          placeholder={field.placeholder}
+                          value={String(inlineContext[field.id] ?? '')}
+                          onChange={(event) => {
+                            const raw = event.target.value;
+                            const value = field.type === 'number' && raw !== '' ? Number(raw) : raw;
+                            setStepContextField(step.point.id, field.id, value);
+                          }}
+                        />
+                      </label>
+                    ))}
+
+                    <button
+                      className="self-start px-3 py-2 rounded-sm bg-cyan-700 text-white font-bold text-sm
+                        tracking-wide border border-cyan-500/70 shadow-[0_0_10px_rgba(6,182,212,0.3)]
+                        disabled:opacity-50"
+                      disabled={
+                        isReadOnly ||
+                        isSubmitting ||
+                        (step.validation.isAutoRule && !step.validation.isValid)
+                      }
+                      onClick={() => runAction(() => onCompleteCurrentStep(step.index))}
+                    >
+                      COMPLETE STEP
+                    </button>
                   </div>
-                </div>
+                )}
+              </div>
+            );
+          })}
 
-                {(activeStep.point.contextFields ?? []).map((field) => (
-                  <label key={field.id} className="text-xs text-slate-300 flex flex-col gap-1">
-                    {field.label}
-                    <input
-                      className="bg-slate-900 border border-slate-700 rounded-sm px-2 py-1 text-slate-100
-                        focus:outline-none focus:border-cyan-500/70"
-                      type={field.type}
-                      placeholder={field.placeholder}
-                      value={String(activeContext[field.id] ?? '')}
-                      onChange={(event) => {
-                        const raw = event.target.value;
-                        const value =
-                          field.type === 'number' && raw !== '' ? Number(raw) : raw;
-                        setStepContextField(activeStep.point.id, field.id, value);
-                      }}
-                    />
-                  </label>
-                ))}
-
-                <button
-                  className="mt-auto px-3 py-2 rounded-sm bg-cyan-700 text-white font-bold text-sm
-                    tracking-wide border border-cyan-500/70 shadow-[0_0_10px_rgba(6,182,212,0.3)]
-                    disabled:opacity-50"
-                  disabled={
-                    isReadOnly ||
-                    isSubmitting ||
-                    (activeStep.validation.isAutoRule && !activeStep.validation.isValid)
-                  }
-                  onClick={() => runAction(() => onCompleteCurrentStep(activeStep.index))}
-                >
-                  COMPLETE STEP
-                </button>
-              </>
-            ) : (
-              <div className="text-sm text-green-300 font-semibold">Checklist complete.</div>
-            )}
-          </div>
-          <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-cyan-400"></div>
-          <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-cyan-400"></div>
-          <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-cyan-400"></div>
-          <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-cyan-400"></div>
+          {!activeStep && (
+            <div className="px-3 py-3 text-sm text-green-300 font-semibold">Checklist complete.</div>
+          )}
         </div>
+        <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-cyan-400"></div>
+        <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-cyan-400"></div>
+        <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-cyan-400"></div>
+        <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-cyan-400"></div>
       </div>
     </div>
   );

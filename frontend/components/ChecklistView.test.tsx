@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { ChecklistView } from '@/components/ChecklistView';
@@ -50,5 +50,68 @@ describe('ChecklistView', () => {
     expect(screen.getByText('TANK PRESSURE')).toBeInTheDocument();
     expect(screen.getByText('40-50 BAR')).toBeInTheDocument();
     expect(screen.getByRole('option', { name: 'PRE-FLIGHT (1/2)' })).toBeInTheDocument();
+  });
+
+  it('renders current step controls inline with the active checklist item', () => {
+    const mode: ChecklistMode = 'MQTT_SYNC';
+    const { container } = render(
+      <ChecklistView
+        mode={mode}
+        summaries={[{ checklistId: 'preflight', label: 'PRE-FLIGHT', done: 0, total: 1 }]}
+        selectedChecklistId="preflight"
+        onSelectChecklist={vi.fn()}
+        stepStates={[
+          {
+            index: 0,
+            point: {
+              id: 'experiment_name',
+              callout: 'Name of experiment',
+              response: 'RECORDED',
+              rule: { type: 'manual' },
+              contextFields: [{ id: 'experimentName', label: 'Experiment Name', type: 'text' }],
+            },
+            runtimeState: {
+              completed: false,
+              completedAtWall: null,
+              completedAtTelemetry: null,
+              context: {},
+            },
+            validation: { isAutoRule: false, isValid: true, displayValue: 'MANUAL' },
+            isCurrent: true,
+            isCompleted: false,
+            isLocked: false,
+          },
+        ]}
+        activeStep={{
+          index: 0,
+          point: {
+            id: 'experiment_name',
+            callout: 'Name of experiment',
+            response: 'RECORDED',
+            rule: { type: 'manual' },
+            contextFields: [{ id: 'experimentName', label: 'Experiment Name', type: 'text' }],
+          },
+          runtimeState: {
+            completed: false,
+            completedAtWall: null,
+            completedAtTelemetry: null,
+            context: {},
+          },
+          validation: { isAutoRule: false, isValid: true, displayValue: 'MANUAL' },
+          isCurrent: true,
+          isCompleted: false,
+          isLocked: false,
+        }}
+        getStepContext={() => ({})}
+        setStepContextField={vi.fn()}
+        onCompleteCurrentStep={vi.fn(async () => ({ ok: true }))}
+        onResetChecklist={vi.fn(async () => ({ ok: true }))}
+        onResetAllChecklists={vi.fn(async () => ({ ok: true }))}
+        isReadOnly={false}
+      />,
+    );
+
+    expect(within(container).getByTestId('inline-current-step-controls')).toBeInTheDocument();
+    expect(within(container).getByRole('button', { name: 'COMPLETE STEP' })).toBeInTheDocument();
   });
 });
