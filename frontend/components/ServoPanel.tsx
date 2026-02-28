@@ -3,7 +3,7 @@ import { ScadaPanel, DigitalIndicator } from './Widgets';
 import { ServoState, SystemState } from '../types';
 
 interface ServoPanelProps {
-    servoPositionPercent: number;
+    servoPositionDegrees: number;
     servoState: ServoState;
     systemState: SystemState;
     actions: {
@@ -11,10 +11,11 @@ interface ServoPanelProps {
     };
 }
 
-export const ServoPanel: React.FC<ServoPanelProps> = ({ servoPositionPercent, servoState, systemState, actions }) => {
+export const ServoPanel: React.FC<ServoPanelProps> = ({ servoPositionDegrees, servoState, systemState, actions }) => {
     
     const canServo = systemState !== SystemState.FIRE;
-    const percent = servoPositionPercent;
+    const degrees = servoPositionDegrees;
+    const percent = (Math.max(0, Math.min(180, degrees)) / 180) * 100;
 
     return (
         <ScadaPanel title="SERVO DIAGNOSTICS & CONTROL" className="h-full">
@@ -23,7 +24,7 @@ export const ServoPanel: React.FC<ServoPanelProps> = ({ servoPositionPercent, se
                 <div className="flex flex-col justify-between">
                     <div>
                         <div className="text-[10px] text-slate-500 mb-1">POSITION</div>
-                        <div className="text-3xl font-mono text-white">{percent.toFixed(0)}<span className="text-sm text-slate-500 ml-1">%</span></div>
+                        <div className="text-3xl font-mono text-white">{degrees.toFixed(0)}<span className="text-sm text-slate-500 ml-1">°</span></div>
                     </div>
                     
                     <div className="w-full bg-slate-700 h-4 rounded-full overflow-hidden border border-slate-600 relative">
@@ -32,7 +33,7 @@ export const ServoPanel: React.FC<ServoPanelProps> = ({ servoPositionPercent, se
                         <div className="absolute left-1/2 top-0 bottom-0 w-px bg-slate-500 opacity-50"></div>
                         <div className="absolute left-3/4 top-0 bottom-0 w-px bg-slate-500 opacity-30"></div>
                         
-                        <div className="bg-cyan-500 h-full transition-all duration-300" style={{ width: `${percent}%` }}></div>
+                        <div className="bg-cyan-500 h-full" style={{ width: `${percent}%` }}></div>
                     </div>
                 </div>
 

@@ -41,6 +41,7 @@ const DEFAULT_TELEMETRY: SystemTelemetry = {
 
 const MAX_FAST_LIVE_POINTS = 5000;
 const MAX_OTHER_LIVE_POINTS = 50;
+const MAX_SERVO_LIVE_POINTS = 500;
 const FLUSH_INTERVAL_MS = 500;
 const roundTimestamp = (timestamp: number): number => Math.round(timestamp);
 const STALE_CHUNK_FLUSH_MS = 500;
@@ -452,12 +453,12 @@ export const useMqttSystem = () => {
         checkTime(timestamp);
         current.lastPacketTimestamp = Math.max(current.lastPacketTimestamp, timestamp);
         
-        const percent = Converters.rawServoToPercent(value);
-        const pt = { timestamp, value: percent };
+        const degrees = Converters.rawServoToDegrees(value);
+        const pt = { timestamp, value: degrees };
         appendPointToChunk('servo', pt);
         current.servoPosition = withProbe(
           'telemetry.servo.concat_slice.ms',
-          () => [...current.servoPosition, pt].slice(-MAX_OTHER_LIVE_POINTS)
+          () => [...current.servoPosition, pt].slice(-MAX_SERVO_LIVE_POINTS)
         );
     }
     else if (topic === 'status/state') {

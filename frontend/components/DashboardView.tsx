@@ -26,7 +26,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ telemetry, actions
     const getLatestValue = (data: {value: number}[]) => data.length > 0 ? data[data.length - 1].value : 0;
     const latestTemperatures = Object.entries(telemetry.temperatures as Record<string, { value: number }[]>)
         .map(([id, points]) => ({ id, value: getLatestValue(points) }));
-    const servoPositionPercent = getLatestValue(telemetry.servoPosition);
+    const servoPositionDegrees = getLatestValue(telemetry.servoPosition);
   
     const vals = {
         tank: getLatestValue(telemetry.pressureTank).toFixed(1),
@@ -93,7 +93,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ telemetry, actions
                         </ScadaPanel>
                 </div>
                 <div className="flex-1">
-                    <ServoPanel servoPositionPercent={servoPositionPercent} servoState={telemetry.servoState} systemState={telemetry.state} actions={actions} />
+                    <ServoPanel servoPositionDegrees={servoPositionDegrees} servoState={telemetry.servoState} systemState={telemetry.state} actions={actions} />
                 </div>
             </div>
             <div className="col-span-8 row-span-4">

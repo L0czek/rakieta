@@ -15,7 +15,7 @@ export class RocketSimulator {
     // Physics State
     private systemState: SystemState = SystemState.ARMED;
     private servoState: ServoState = ServoState.CLOSED;
-    private servoPos: number = 0;
+    private servoPos: number = 500;
     private isUnsafe: boolean = false;
     
     constructor(onPacket: (packet: PacketEmit) => void) {
@@ -104,7 +104,7 @@ export class RocketSimulator {
         const toRawT = (kg: number) => mapVoltsToRaw(kg / 200.0);
 
         // Servo Movement Integration (Approximate over the step)
-        const targetServo = this.servoState === ServoState.OPEN ? 2000 : 0;
+        const targetServo = this.servoState === ServoState.OPEN ? 2500 : 500;
         const servoSpeed = 200; // units per tick (faster for 100ms)
         if (this.servoPos < targetServo) this.servoPos = Math.min(targetServo, this.servoPos + servoSpeed);
         if (this.servoPos > targetServo) this.servoPos = Math.max(targetServo, this.servoPos - servoSpeed);

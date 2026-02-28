@@ -24,7 +24,7 @@ export const CHART_RANGES = {
   pressure: [0, 150] as [number, number],
   voltage: [0, 20] as [number, number],
   starter: [0, 2] as [number, number],
-  servo: [0, 100] as [number, number],
+  servo: [0, 180] as [number, number],
   temp: [0, 200] as [number, number],
 };
 

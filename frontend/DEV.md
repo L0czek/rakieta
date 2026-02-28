@@ -61,7 +61,7 @@ This is a single-page React+TypeScript application built on Vite. The architectu
 - `utils/packetBuilder.ts`
   - Simulator packet generation matching parser format.
 - `utils/conversions.ts`
-  - ADC correction LUT and physical conversions (pressure, thrust, voltages, temp, servo %).
+  - ADC correction LUT and physical conversions (pressure, thrust, voltages, temp, servo °).
 - `utils/checklistTopics.ts`
   - Checklist MQTT topic build/parse helpers.
 - `utils/simulator.ts`

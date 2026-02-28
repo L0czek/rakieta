@@ -215,7 +215,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({ telemetry, actions, 
         boost: getLatestValue(telemetry.boostVoltage).toFixed(2),
         starter: getLatestValue(telemetry.starterSense).toFixed(2)
   };
-    const servoPositionPercent = getLatestValue(telemetry.servoPosition);
+    const servoPositionDegrees = getLatestValue(telemetry.servoPosition);
     const latestTemperatures = Object.entries(telemetry.temperatures as Record<string, { value: number }[]>)
         .map(([id, points]) => ({ id, value: getLatestValue(points) }));
 
@@ -384,7 +384,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({ telemetry, actions, 
           { scale: 'pressure', side: 3, stroke: SENSOR_COLORS.pressureTank, show: showAxisPressure, label: 'Bar' },
           { scale: 'voltage', side: 1, stroke: SENSOR_COLORS.batteryStand, show: showAxisVoltage, label: 'V' },
           { scale: 'starter', side: 1, stroke: SENSOR_COLORS.starterSense, show: visibleLines.starterSense, label: 'V(S)' },
-          { scale: 'servo', side: 1, stroke: SENSOR_COLORS.servo, show: visibleLines.servo, label: '%' },
+          { scale: 'servo', side: 1, stroke: SENSOR_COLORS.servo, show: visibleLines.servo, label: '°' },
           { scale: 'temp', side: 1, stroke: TEMP_COLORS[0], show: showAxisTemp, label: 'C' },
       ];
   }, [showAxisPressure, showAxisTemp, showAxisVoltage, visibleLines]);
@@ -538,7 +538,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({ telemetry, actions, 
         <div className="col-span-3 row-span-8 flex flex-col gap-2">
             <div className="flex-1">
                 <ServoPanel 
-                    servoPositionPercent={servoPositionPercent} 
+                    servoPositionDegrees={servoPositionDegrees} 
                     servoState={telemetry.servoState}
                     systemState={telemetry.state}
                     actions={actions}

@@ -288,11 +288,12 @@ export const rawToGenericVoltage = (raw: number, channel: AnalogChannel = 'start
     return correctAdcToVoltage(raw, channel);
 };
 
-export const rawServoToPercent = (raw: number): number => {
-    if (raw <= 0) return 0;
-    // Assuming 2000 is max open based on topic description "2000=100%"
-    if (raw >= 2000) return 100;
-    return (raw / 2000) * 100;
+export const rawServoToDegrees = (raw: number): number => {
+    const minTicks = 500;
+    const maxTicks = 2500;
+    if (raw <= minTicks) return 0;
+    if (raw >= maxTicks) return 180;
+    return ((raw - minTicks) * 180) / (maxTicks - minTicks);
 };
 
 // --- TEMPERATURE ---

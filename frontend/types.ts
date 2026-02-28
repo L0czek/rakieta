@@ -43,7 +43,7 @@ export interface SystemTelemetry {
 
   // Digital/Virtual
   isUnsafe: boolean; // sensor/digital/armed
-  servoPosition: SensorDataPoint[]; // 0-100%
+  servoPosition: SensorDataPoint[]; // 0-180°
   
   // Temperatures
   temperatures: Record<string, SensorDataPoint[]>;
