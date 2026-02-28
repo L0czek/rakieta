@@ -165,8 +165,8 @@ export class RocketSimulator {
         // Temperatures
         const t1 = 24 + tEnd / 10000 + (isFiring ? 5 : 0);
         const t2 = 35 + Math.random();
-        this.onPacket({ topic: 'sensor/temp/T1', payload: PacketBuilder.buildTempPacket(tEnd, [t1]) });
-        this.onPacket({ topic: 'sensor/temp/T2', payload: PacketBuilder.buildTempPacket(tEnd, [t2]) });
+        this.onPacket({ topic: 'sensor/temp/T1', payload: PacketBuilder.buildTempPacket(tStart, tEnd, [t1]) });
+        this.onPacket({ topic: 'sensor/temp/T2', payload: PacketBuilder.buildTempPacket(tStart, tEnd, [t2]) });
         
         // Statuses
         this.onPacket({ topic: 'status/state', payload: this.systemState });

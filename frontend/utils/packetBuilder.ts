@@ -71,15 +71,16 @@ export const buildDigitalPacket = (timestamp: number, value: boolean): Uint8Arra
     return buffer;
 };
 
-export const buildTempPacket = (timestamp: number, values: number[]): Uint8Array => {
-    // Header: 4 bytes timestamp
-    // Data: 2 bytes per value (14-bit signed)
-    const buffer = new Uint8Array(4 + values.length * 2);
+export const buildTempPacket = (timestampStart: number, timestampEnd: number, values: number[]): Uint8Array => {
+    // Header: 4 bytes timestampStart + 4 bytes timestampEnd
+    // Data: 2 bytes per value (left-aligned signed 14-bit)
+    const buffer = new Uint8Array(8 + values.length * 2);
     const view = new DataView(buffer.buffer);
-    
-    writeU32(view, 0, timestamp);
-    
-    let offset = 4;
+
+    writeU32(view, 0, timestampStart);
+    writeU32(view, 4, timestampEnd);
+
+    let offset = 8;
     for (const val of values) {
         // Convert Celsius back to Raw 14-bit
         // Factor: 1 LSB = 0.015625 °C => Raw = Celsius / 0.015625
@@ -91,11 +92,11 @@ export const buildTempPacket = (timestamp: number, values: number[]): Uint8Array
             raw = (1 << 14) + raw; // e.g. -1 becomes 0x3FFF
         }
         
-        // Mask to 14 bits just in case
+        // Mask to 14 bits and store left-aligned in 16-bit word.
         raw = raw & 0x3FFF;
-        
-        // Write as U16 (since it fits)
-        writeU16(view, offset, raw);
+        const word = (raw << 2) & 0xFFFC;
+
+        writeU16(view, offset, word);
         offset += 2;
     }
     

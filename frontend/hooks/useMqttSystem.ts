@@ -426,23 +426,31 @@ export const useMqttSystem = () => {
     }
     else if (topic.startsWith('sensor/temp/')) {
         probeCount('mqtt.message.temp');
-        const { timestamp, values } = Parser.parseTemp(buffer);
-        checkTime(timestamp);
-        current.lastPacketTimestamp = Math.max(current.lastPacketTimestamp, timestamp);
+        const { timestampStart, timestampEnd, values } = Parser.parseTemp(buffer);
+        if (!checkTime(timestampStart)) return;
+        current.lastPacketTimestamp = Math.max(current.lastPacketTimestamp, timestampEnd);
+        if (current.startTime === 0) current.startTime = timestampStart;
         const sensorId = topic.split('/').pop() || 'unknown';
         if (values.length > 0) {
-            const tempVal = Converters.rawTempToCelsius(values[values.length - 1]);
-            current.temperatures = { ...current.temperatures, [sensorId]: tempVal };
-            
-            const pt = { timestamp, value: tempVal };
-            appendPointToChunk(sensorId, pt);
+        const tempValues = values.map(v => Converters.rawTempToCelsius(v));
+        const count = tempValues.length;
+        const step = count > 1 ? (timestampEnd - timestampStart) / (count - 1) : 0;
+        const points = tempValues.map((value, i) => ({
+          timestamp: timestampStart + (i * step),
+          value,
+        }));
 
-            const oldHist = current.temperatureHist[sensorId] || [];
+        const lastTemp = tempValues[tempValues.length - 1];
+        current.temperatures = { ...current.temperatures, [sensorId]: lastTemp };
+
+        appendPointsToChunk(sensorId, points);
+
+        const oldHist = current.temperatureHist[sensorId] || [];
             current.temperatureHist = {
                 ...current.temperatureHist,
                 [sensorId]: withProbe(
                   'telemetry.temp.concat_slice.ms',
-                  () => [...oldHist, pt].slice(-MAX_LIVE_POINTS)
+                  () => [...oldHist, ...points].slice(-MAX_LIVE_POINTS)
                 )
             };
         }

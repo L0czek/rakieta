@@ -77,24 +77,25 @@ export const parseDigital = (buffer: Uint8Array): { timestamp: number, value: nu
   return { timestamp, value };
 };
 
-export const parseTemp = (buffer: Uint8Array): { timestamp: number, values: number[] } => {
-    if (buffer.length < 4) return { timestamp: 0, values: [] };
-    
-    const timestamp = readU32(buffer, 0);
+export const parseTemp = (buffer: Uint8Array): { timestampStart: number, timestampEnd: number, values: number[] } => {
+  if (buffer.length < 8) return { timestampStart: 0, timestampEnd: 0, values: [] };
+
+  const timestampStart = readU32(buffer, 0);
+  const timestampEnd = readU32(buffer, 4);
     const values: number[] = [];
     
-    // Prompt says: "Timestamp + value (u14) * n"
-    // Value is signed 14-bit integer.
+    // Format: timestampStart + timestampEnd + n * 16-bit words.
+    // Temperature value is a signed 14-bit integer left-aligned in the 16-bit word.
+    // i.e. payload bits [15:2] hold the 14-bit signed value, [1:0] are padding.
     
-    let i = 4;
+    let i = 8;
     while (i + 1 < buffer.length) {
         const raw = readU16(buffer, i);
-        
-        // Extract 14 bits
-        let val = raw & 0x3FFF;
 
-        // Check sign bit (bit 13, 0x2000) for Two's complement in 14-bit space
-        // If bit 13 is 1, it's negative. Subtract 2^14 (16384) to get negative value.
+        // Convert from left-aligned 14-bit to right-aligned 14-bit signed value.
+        let val = (raw >> 2) & 0x3FFF;
+
+        // Sign-extend from 14-bit two's complement (sign bit = bit 13).
         if (val & 0x2000) {
             val = val - 16384; 
         }
@@ -103,7 +104,7 @@ export const parseTemp = (buffer: Uint8Array): { timestamp: number, values: numb
         i += 2;
     }
 
-    return { timestamp, values };
+    return { timestampStart, timestampEnd, values };
 };
 
 export const parseServo = (buffer: Uint8Array): { timestamp: number, value: number } => {
