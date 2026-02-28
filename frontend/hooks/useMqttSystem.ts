@@ -48,6 +48,7 @@ const DEFAULT_TELEMETRY: SystemTelemetry = {
 // Reduced to 5000 to hold 5 seconds of data at 1000Hz
 const MAX_LIVE_POINTS = 5000;
 const FLUSH_INTERVAL_MS = 500;
+const roundTimestamp = (timestamp: number): number => Math.round(timestamp);
 const STALE_CHUNK_FLUSH_MS = 500;
 
 const cloneTelemetry = (t: SystemTelemetry): SystemTelemetry => JSON.parse(JSON.stringify(t));
@@ -353,8 +354,11 @@ export const useMqttSystem = () => {
       if (current.startTime === 0) current.startTime = tStart;
 
       const count = values.length;
-      let step = count > 1 ? (tEnd - tStart) / (count - 1) : 0;
-      const points = values.map((v, i) => ({ timestamp: tStart + (i * step), value: v }));
+      const step = count > 1 ? (tEnd - tStart) / (count - 1) : 0;
+      const points = values.map((v, i) => ({
+        timestamp: roundTimestamp(tStart + (i * step)),
+        value: v,
+      }));
       probeCount('mqtt.fast.points', points.length);
       
       appendPointsToChunk(dbKey, points);

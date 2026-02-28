@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { SystemTelemetry, SensorDataPoint } from '../types';
+import { SystemTelemetry } from '../types';
 import { ScadaPanel, FastChart, ValueDisplay, SENSOR_COLORS, CHART_RANGES } from './Widgets';
 import { ControlPanel } from './ControlPanel';
 import { ServoPanel } from './ServoPanel';
@@ -35,18 +35,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ telemetry, actions
         starter: telemetry.starterSense.toFixed(2)
     };
 
-    // Helper: Slice data to only show points within the last `windowMs` milliseconds
-    const getDataInTimeWindow = (data: SensorDataPoint[], windowMs: number) => {
-        if (!data || data.length === 0) return [];
-        const cutoff = telemetry.lastPacketTimestamp - windowMs;
-        
-        // Optimization: If the buffer is fully within range, return it all
-        if (data[0].timestamp >= cutoff) return data;
-        
-        // Find the start index
-        const idx = data.findIndex(p => p.timestamp >= cutoff);
-        return idx === -1 ? [] : data.slice(idx);
-    };
+    const chartWindowEnd = Math.ceil(telemetry.lastPacketTimestamp / 100) * 100;
+    const chartWindowStart = chartWindowEnd - 5000;
+    const chartXDomain: [number, number] = [chartWindowStart, chartWindowEnd];
 
     return (
         <div className="grid grid-cols-12 grid-rows-12 gap-2 h-full">
@@ -57,7 +48,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ telemetry, actions
                     className="h-full" 
                     headerRight={<span>{vals.tank} <span className="text-slate-500 text-[10px]">BAR</span></span>}
                 >
-                    <FastChart data={getDataInTimeWindow(telemetry.pressureTank, 5000)} color={SENSOR_COLORS.pressureTank} domain={CHART_RANGES.pressure} />
+                    <FastChart data={telemetry.pressureTank} color={SENSOR_COLORS.pressureTank} domain={CHART_RANGES.pressure} xDomain={chartXDomain} />
                 </ScadaPanel>
             </div>
             <div className="col-span-4 row-span-4 flex flex-col gap-2">
@@ -81,7 +72,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ telemetry, actions
                     className="h-full"
                     headerRight={<span>{vals.combustion} <span className="text-slate-500 text-[10px]">BAR</span></span>}
                     >
-                    <FastChart data={getDataInTimeWindow(telemetry.pressureCombustion, 5000)} color={SENSOR_COLORS.pressureCombustion} domain={CHART_RANGES.pressure} />
+                    <FastChart data={telemetry.pressureCombustion} color={SENSOR_COLORS.pressureCombustion} domain={CHART_RANGES.pressure} xDomain={chartXDomain} />
                 </ScadaPanel>
             </div>
             <div className="col-span-4 row-span-4 flex flex-col gap-2">
@@ -108,7 +99,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ telemetry, actions
                     className="h-full"
                     headerRight={<span>{vals.thrust} <span className="text-slate-500 text-[10px]">KG</span></span>}
                     >
-                    <FastChart data={getDataInTimeWindow(telemetry.tensometer, 5000)} color={SENSOR_COLORS.tensometer} domain={CHART_RANGES.thrust} />
+                    <FastChart data={telemetry.tensometer} color={SENSOR_COLORS.tensometer} domain={CHART_RANGES.thrust} xDomain={chartXDomain} />
                     </ScadaPanel>
             </div>
             <div className="col-span-4 row-span-4">

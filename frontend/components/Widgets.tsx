@@ -70,7 +70,17 @@ export const ScadaPanel = ({ title, children, className = "", danger = false, he
   </div>
 );
 
-export const FastChart = ({ data, color, domain = CHART_RANGES.pressure }: { data: SensorDataPoint[], color: string, domain?: [number, number] }) => {
+export const FastChart = ({
+  data,
+  color,
+  domain = CHART_RANGES.pressure,
+  xDomain,
+}: {
+  data: SensorDataPoint[];
+  color: string;
+  domain?: [number, number];
+  xDomain?: [number, number];
+}) => {
   probeCount('render.FastChart');
   // Performance optimization: only render if data exists
   if (!data || data.length === 0) return <div className="w-full h-full flex items-center justify-center text-slate-500 text-xs">NO SIGNAL</div>;
@@ -95,7 +105,7 @@ export const FastChart = ({ data, color, domain = CHART_RANGES.pressure }: { dat
       width: size.width,
       height: size.height,
       scales: {
-        x: { time: false },
+        x: { time: false, range: xDomain ? () => xDomain : undefined },
         y: { range: () => domain },
       },
       series: [
@@ -136,7 +146,7 @@ export const FastChart = ({ data, color, domain = CHART_RANGES.pressure }: { dat
       legend: { show: false },
       cursor: { show: false },
     };
-  }, [size.width, size.height, color, domain]);
+  }, [size.width, size.height, color, domain, xDomain]);
 
   useEffect(() => {
     probeCount('effect.FastChart.commit');
