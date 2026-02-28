@@ -108,6 +108,9 @@ const App = () => {
     toggleSimulation(!isSimulating);
   };
 
+  const commandsEnabled =
+    connectionStatus === ConnectionState.CONNECTED || isSimulating;
+
   useEffect(() => {
     probeCount('effect.App.commit');
   });
@@ -316,13 +319,14 @@ const App = () => {
         )}
 
         {view === 'DASHBOARD' ? (
-          <DashboardView telemetry={telemetry} actions={actions} />
+          <DashboardView telemetry={telemetry} actions={actions} commandsEnabled={commandsEnabled} />
         ) : view === 'ANALYSIS' ? (
           <AnalysisView
             telemetry={telemetry}
             actions={actions}
             connectionStatus={connectionStatus}
             isSimulating={isSimulating}
+            commandsEnabled={commandsEnabled}
           />
         ) : view === 'CHECKLIST' ? (
           <ChecklistView

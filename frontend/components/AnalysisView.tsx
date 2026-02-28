@@ -16,9 +16,16 @@ interface AnalysisViewProps {
     actions: any;
         connectionStatus: ConnectionState;
         isSimulating: boolean;
+        commandsEnabled: boolean;
 }
 
-export const AnalysisView: React.FC<AnalysisViewProps> = ({ telemetry, actions, connectionStatus, isSimulating }) => {
+export const AnalysisView: React.FC<AnalysisViewProps> = ({
+    telemetry,
+    actions,
+    connectionStatus,
+    isSimulating,
+    commandsEnabled,
+}) => {
   probeCount('render.AnalysisView');
     const sensorLabels: Record<string, string> = {
         tensometer: 'tensometer',
@@ -556,13 +563,15 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({ telemetry, actions, 
                     servoState={telemetry.servoState}
                     systemState={telemetry.state}
                     actions={actions}
+                    commandsEnabled={commandsEnabled}
                 />
             </div>
             <div className="flex-1">
                 <ControlPanel 
                     systemState={telemetry.state} 
                     isUnsafe={telemetry.isUnsafe} 
-                    actions={actions} 
+                    actions={actions}
+                    commandsEnabled={commandsEnabled}
                 />
             </div>
         </div>

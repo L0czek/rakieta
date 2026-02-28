@@ -651,6 +651,7 @@ export const useMqttSystem = () => {
   );
 
   const setFireState = (cmd: 'FIRE' | 'FIRE_END' | 'FIRE_RESET') => sendCommand('cmd/state', cmd);
+  const requestShutdown = () => sendCommand('cmd/shutdown', 'SHUTDOWN');
   const setServoCmd = (cmd: 'OPEN' | 'CLOSE') => {
     if (telemetry.state === SystemState.FIRE) return;
     sendCommand('cmd/servo', cmd);
@@ -673,6 +674,6 @@ export const useMqttSystem = () => {
     toggleSimulation,
     publishChecklistPointState,
     resetData,
-    actions: { setFireState, setServoCmd, toggleSimSafety }
+    actions: { setFireState, setServoCmd, toggleSimSafety, requestShutdown }
   };
 };

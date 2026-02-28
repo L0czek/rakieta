@@ -6,14 +6,21 @@ interface ServoPanelProps {
     servoPositionDegrees: number;
     servoState: ServoState;
     systemState: SystemState;
+    commandsEnabled: boolean;
     actions: {
         setServoCmd: (cmd: 'OPEN' | 'CLOSE') => void;
     };
 }
 
-export const ServoPanel: React.FC<ServoPanelProps> = ({ servoPositionDegrees, servoState, systemState, actions }) => {
+export const ServoPanel: React.FC<ServoPanelProps> = ({
+    servoPositionDegrees,
+    servoState,
+    systemState,
+    commandsEnabled,
+    actions,
+}) => {
     
-    const canServo = systemState !== SystemState.FIRE;
+    const canServo = systemState !== SystemState.FIRE && commandsEnabled;
     const degrees = servoPositionDegrees;
     const percent = (Math.max(0, Math.min(180, degrees)) / 180) * 100;
 

@@ -8,9 +8,10 @@ import { ServoPanel } from './ServoPanel';
 interface DashboardViewProps {
     telemetry: SystemTelemetry;
     actions: any;
+    commandsEnabled: boolean;
 }
 
-export const DashboardView: React.FC<DashboardViewProps> = ({ telemetry, actions }) => {
+export const DashboardView: React.FC<DashboardViewProps> = ({ telemetry, actions, commandsEnabled }) => {
     const sensorLabels: Record<string, string> = {
         tensometer: 'tensometer',
         pressureTank: 'tank pressure',
@@ -107,7 +108,13 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ telemetry, actions
                         </ScadaPanel>
                 </div>
                 <div className="flex-1">
-                    <ServoPanel servoPositionDegrees={servoPositionDegrees} servoState={telemetry.servoState} systemState={telemetry.state} actions={actions} />
+                    <ServoPanel
+                        servoPositionDegrees={servoPositionDegrees}
+                        servoState={telemetry.servoState}
+                        systemState={telemetry.state}
+                        actions={actions}
+                        commandsEnabled={commandsEnabled}
+                    />
                 </div>
             </div>
             <div className="col-span-8 row-span-4">
@@ -120,7 +127,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ telemetry, actions
                     </ScadaPanel>
             </div>
             <div className="col-span-4 row-span-4">
-                <ControlPanel systemState={telemetry.state} isUnsafe={telemetry.isUnsafe} actions={actions} />
+                <ControlPanel
+                    systemState={telemetry.state}
+                    isUnsafe={telemetry.isUnsafe}
+                    actions={actions}
+                    commandsEnabled={commandsEnabled}
+                />
             </div>
         </div>
     );
