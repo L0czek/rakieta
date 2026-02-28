@@ -14,22 +14,13 @@ const writeU16 = (view: DataView, offset: number, val: number) => {
 
 export const buildFastAdcPacket = (timestampStart: number, timestampEnd: number, values: number[]): Uint8Array => {
     // Header: 4 bytes start + 4 bytes end = 8 bytes
-    // Data: 
+    // Data:
     // Pairs (2 values) -> 3 bytes
-    // Odd remaining (1 value) -> 2 bytes
-    // If total count is EVEN, add 1 padding byte (0x00)
+    // Odd trailing value (1 value) -> 2 bytes
     
     const count = values.length;
-    const pairs = Math.floor(count / 2);
-    const odd = count % 2;
-    
-    let dataSize = pairs * 3;
-    if (odd) {
-        dataSize += 2;
-    } else {
-        // Spec: "padding must always exist" if even multiple
-        dataSize += 1;
-    }
+    const pairCount = Math.floor(count / 2);
+    const dataSize = (pairCount * 3) + (count % 2 === 1 ? 2 : 0);
 
     const buffer = new Uint8Array(8 + dataSize);
     const view = new DataView(buffer.buffer);
@@ -38,37 +29,27 @@ export const buildFastAdcPacket = (timestampStart: number, timestampEnd: number,
     writeU32(view, 4, timestampEnd);
 
     let offset = 8;
-    for (let i = 0; i < count - odd; i += 2) {
+    for (let i = 0; i + 1 < count; i += 2) {
         const v1 = Math.max(0, Math.min(4095, Math.floor(values[i])));
-        const v2 = (i + 1 < values.length) 
-            ? Math.max(0, Math.min(4095, Math.floor(values[i + 1]))) 
-            : 0;
+        const v2 = Math.max(0, Math.min(4095, Math.floor(values[i + 1])));
 
         // Compression:
-        // Byte 0: v1[11:4]
-        // Byte 1: v1[3:0] << 4 | v2[11:8]
-        // Byte 2: v2[7:0]
+        // Byte 0: v1[7:0]
+        // Byte 1: v1[11:8] | (v2[3:0] << 4)
+        // Byte 2: v2[11:4]
 
-        buffer[offset] = (v1 >> 4) & 0xFF;
-        buffer[offset + 1] = ((v1 & 0x0F) << 4) | ((v2 >> 8) & 0x0F);
-        buffer[offset + 2] = v2 & 0xFF;
+        buffer[offset] = v1 & 0xFF;
+        buffer[offset + 1] = ((v1 >> 8) & 0x0F) | ((v2 & 0x0F) << 4);
+        buffer[offset + 2] = (v2 >> 4) & 0xFF;
 
         offset += 3;
     }
 
-    // Handle odd value
-    if (odd) {
+    // Write trailing odd sample (if any).
+    if (count % 2 === 1) {
         const v = Math.max(0, Math.min(4095, Math.floor(values[count - 1])));
-        // 12 bits in 2 bytes
-        // B0: v[11:4]
-        // B1: v[3:0] << 4
-        buffer[offset] = (v >> 4) & 0xFF;
-        buffer[offset + 1] = (v & 0x0F) << 4;
-        offset += 2;
-    } else {
-        // Add padding byte for even count
-        buffer[offset] = 0x00;
-        offset += 1;
+        buffer[offset] = v & 0xFF;
+        buffer[offset + 1] = (v >> 8) & 0x0F;
     }
 
     return buffer;

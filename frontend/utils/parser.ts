@@ -24,45 +24,42 @@ export const parseFastAdc = (buffer: Uint8Array): { timestampStart: number, time
   const timestampStart = readU32(buffer, 0);
   const timestampEnd = readU32(buffer, 4);
   const values: number[] = [];
-  
+
   // Data starts at offset 8
-  // Structure: u12 values compressed. 
-  // 2 values -> 3 bytes
-  // 1 value -> 2 bytes (if odd remaining)
-  // If even values total, there is 1 padding byte at the end (ignored)
-  
+  // - each pair of samples is encoded in 3 bytes:
+  //   b0 = first[7:0]
+  //   b1 = first[11:8] | (second[3:0] << 4)
+  //   b2 = second[11:4]
+  // - odd trailing sample is encoded in 2 bytes:
+  //   b0 = sample[7:0]
+  //   b1 = sample[11:8]
+
   let i = 8;
-  
+
   // Process full pairs (3 bytes for 2 values)
   while (i + 3 <= buffer.length) {
     const b0 = buffer[i];
     const b1 = buffer[i + 1];
     const b2 = buffer[i + 2];
 
-    const val1 = (b0 << 4) | (b1 >> 4);
-    const val2 = ((b1 & 0x0F) << 8) | b2;
+    const val1 = b0 | ((b1 & 0x0F) << 8);
+    const val2 = ((b1 >> 4) & 0x0F) | (b2 << 4);
 
     values.push(val1);
     values.push(val2);
 
     i += 3;
   }
-  
-  // Process remaining odd value (2 bytes for 1 value)
-  // Check if exactly 2 bytes are left (or more, but logic implies only 2 or 1 byte could remain)
-  // Actually if 1 byte remains, it's padding. If 2 bytes remain, it's a value.
-  if (i + 2 <= buffer.length) {
+
+  // Decode trailing odd sample (if present).
+  if (i + 2 === buffer.length) {
       const b0 = buffer[i];
       const b1 = buffer[i + 1];
-      
-      // val = b0[7:0] << 4 | b1[7:4]
-      const val = (b0 << 4) | (b1 >> 4);
+
+      const val = b0 | ((b1 & 0x0F) << 8);
       values.push(val);
-      i += 2;
   }
-  
-  // If 1 byte remains here, it is padding, we ignore it.
-  
+
   return { timestampStart, timestampEnd, values };
 };
 
