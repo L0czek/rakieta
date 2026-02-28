@@ -318,7 +318,7 @@ export const useMqttSystem = () => {
     );
   }, []);
 
-  const handleMessage = (topic: string, message: any) => {
+  const handleMessage = (topic: string, message: any, isRetained = false) => {
     if (connectionStatus === ConnectionState.ERROR) return;
     probeCount('mqtt.message.total');
 
@@ -430,8 +430,10 @@ export const useMqttSystem = () => {
     else if (topic === 'sensor/digital/armed') {
         probeCount('mqtt.message.digital.armed');
         const { timestamp, value } = Parser.parseDigital(buffer);
-        checkTime(timestamp);
-        current.lastPacketTimestamp = Math.max(current.lastPacketTimestamp, timestamp);
+        if (!isRetained) {
+          checkTime(timestamp);
+          current.lastPacketTimestamp = Math.max(current.lastPacketTimestamp, timestamp);
+        }
         current.isUnsafe = value !== 0; 
     }
     else if (topic.startsWith('sensor/temp/')) {
@@ -465,12 +467,16 @@ export const useMqttSystem = () => {
     else if (topic === 'sensor/servo') {
         probeCount('mqtt.message.servo');
         const { timestamp, value } = Parser.parseServo(buffer);
-        checkTime(timestamp);
-        current.lastPacketTimestamp = Math.max(current.lastPacketTimestamp, timestamp);
+        if (!isRetained) {
+          checkTime(timestamp);
+          current.lastPacketTimestamp = Math.max(current.lastPacketTimestamp, timestamp);
+        }
         
         const degrees = Converters.rawServoToDegrees(value);
         const pt = { timestamp, value: degrees };
-        appendPointToChunk('servo', pt);
+        if (!isRetained) {
+          appendPointToChunk('servo', pt);
+        }
         current.servoPosition = withProbe(
           'telemetry.servo.concat_slice.ms',
           () => [...current.servoPosition, pt].slice(-MAX_SERVO_LIVE_POINTS)
@@ -549,9 +555,9 @@ export const useMqttSystem = () => {
       telemetryVersionRef.current += 1;
     });
 
-    client.on('message', (topic, message) => {
+    client.on('message', (topic, message, packet) => {
         try {
-            handleMessage(topic, message);
+        handleMessage(topic, message, packet.retain === true);
         } catch (e) {
             console.error("Error handling message", e);
         }
