@@ -8,7 +8,7 @@ import { ConfigurationView } from './components/ConfigurationView';
 import { DashboardView } from './components/DashboardView';
 import { useChecklistEngine } from './hooks/useChecklistEngine';
 import { useMqttSystem } from './hooks/useMqttSystem';
-import { ConnectionState } from './types';
+import { ConnectionState, MqttConfig } from './types';
 import {
   AlertOctagon,
   Beaker,
@@ -27,6 +27,41 @@ import {
 
 type AppView = 'DASHBOARD' | 'ANALYSIS' | 'CHECKLIST' | 'CONFIGURATION';
 
+const MQTT_CONFIG_STORAGE_KEY = 'rocket.mqtt.config';
+const DEFAULT_MQTT_PORT = 8000;
+
+const getDefaultMqttConfig = (): MqttConfig => ({
+  host: window.location.hostname,
+  port: DEFAULT_MQTT_PORT,
+  simulation: false,
+});
+
+const loadStoredMqttConfig = (): MqttConfig => {
+  const defaults = getDefaultMqttConfig();
+
+  try {
+    const raw = localStorage.getItem(MQTT_CONFIG_STORAGE_KEY);
+    if (!raw) return defaults;
+
+    const parsed = JSON.parse(raw) as Partial<MqttConfig>;
+    const host = typeof parsed.host === 'string' && parsed.host.trim().length > 0 ? parsed.host : defaults.host;
+    const port = typeof parsed.port === 'number' && Number.isFinite(parsed.port) ? parsed.port : defaults.port;
+    const username = typeof parsed.username === 'string' ? parsed.username : undefined;
+    const password = typeof parsed.password === 'string' ? parsed.password : undefined;
+
+    return {
+      ...defaults,
+      ...parsed,
+      host,
+      port,
+      username,
+      password,
+    };
+  } catch {
+    return defaults;
+  }
+};
+
 const App = () => {
   probeCount('render.App');
   const {
@@ -42,7 +77,7 @@ const App = () => {
     actions,
   } = useMqttSystem();
 
-  const [mqttConfig, setMqttConfig] = useState({ host: 'localhost', port: 8000, simulation: false });
+  const [mqttConfig, setMqttConfig] = useState<MqttConfig>(() => loadStoredMqttConfig());
   const [showConfig, setShowConfig] = useState(false);
   const [view, setView] = useState<AppView>('DASHBOARD');
   const [configHasUnsavedChanges, setConfigHasUnsavedChanges] = useState(false);
@@ -76,6 +111,12 @@ const App = () => {
   useEffect(() => {
     probeCount('effect.App.commit');
   });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(MQTT_CONFIG_STORAGE_KEY, JSON.stringify(mqttConfig));
+    } catch {}
+  }, [mqttConfig]);
 
   return (
     <div className="w-screen h-screen overflow-hidden bg-slate-900 flex flex-col relative">
@@ -224,6 +265,26 @@ const App = () => {
                     type="number"
                     value={mqttConfig.port}
                     onChange={(event) => setMqttConfig({ ...mqttConfig, port: Number(event.target.value) })}
+                    className="w-full bg-slate-900 border border-slate-700 text-white px-3 py-2 font-mono
+                      outline-none focus:border-cyan-500"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-slate-400 block mb-1">USERNAME</label>
+                  <input
+                    type="text"
+                    value={mqttConfig.username ?? ''}
+                    onChange={(event) => setMqttConfig({ ...mqttConfig, username: event.target.value })}
+                    className="w-full bg-slate-900 border border-slate-700 text-white px-3 py-2 font-mono
+                      outline-none focus:border-cyan-500"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-slate-400 block mb-1">PASSWORD</label>
+                  <input
+                    type="password"
+                    value={mqttConfig.password ?? ''}
+                    onChange={(event) => setMqttConfig({ ...mqttConfig, password: event.target.value })}
                     className="w-full bg-slate-900 border border-slate-700 text-white px-3 py-2 font-mono
                       outline-none focus:border-cyan-500"
                   />
