@@ -20,6 +20,17 @@ interface AnalysisViewProps {
 
 export const AnalysisView: React.FC<AnalysisViewProps> = ({ telemetry, actions, connectionStatus, isSimulating }) => {
   probeCount('render.AnalysisView');
+    const sensorLabels: Record<string, string> = {
+        tensometer: 'tensometer',
+        pressureTank: 'tank pressure',
+        pressureCombustion: 'comb chamber pressure',
+        batteryStand: 'test stand battery',
+        batteryComputer: 'mainboard battery',
+        boostVoltage: 'boost voltage',
+        starterSense: 'starter sense',
+    };
+    const getSeriesLabel = (key: string) => sensorLabels[key] || (knownSensors.includes(key) ? `temp ${key}` : key);
+
   // View State
     const [isLive, setIsLive] = useState(() => connectionStatus === ConnectionState.CONNECTED || isSimulating);
   const [windowSize, setWindowSize] = useState(30000); // 30 seconds default
@@ -291,25 +302,25 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({ telemetry, actions, 
       const next: Array<{ key: string; label: string; color: string; scale: string }> = [];
 
       if (visibleLines.tensometer) {
-          next.push({ key: 'tensometer', label: 'Thrust (kg)', color: SENSOR_COLORS.tensometer, scale: 'thrust' });
+          next.push({ key: 'tensometer', label: getSeriesLabel('tensometer'), color: SENSOR_COLORS.tensometer, scale: 'thrust' });
       }
       if (visibleLines.pressureTank) {
-          next.push({ key: 'pressureTank', label: 'Tank Press (bar)', color: SENSOR_COLORS.pressureTank, scale: 'pressure' });
+          next.push({ key: 'pressureTank', label: getSeriesLabel('pressureTank'), color: SENSOR_COLORS.pressureTank, scale: 'pressure' });
       }
       if (visibleLines.pressureCombustion) {
-          next.push({ key: 'pressureCombustion', label: 'Comb Press (bar)', color: SENSOR_COLORS.pressureCombustion, scale: 'pressure' });
+          next.push({ key: 'pressureCombustion', label: getSeriesLabel('pressureCombustion'), color: SENSOR_COLORS.pressureCombustion, scale: 'pressure' });
       }
       if (visibleLines.batteryStand) {
-          next.push({ key: 'batteryStand', label: 'Bat Stand', color: SENSOR_COLORS.batteryStand, scale: 'voltage' });
+          next.push({ key: 'batteryStand', label: getSeriesLabel('batteryStand'), color: SENSOR_COLORS.batteryStand, scale: 'voltage' });
       }
       if (visibleLines.batteryComputer) {
-          next.push({ key: 'batteryComputer', label: 'Bat Comp', color: SENSOR_COLORS.batteryComputer, scale: 'voltage' });
+          next.push({ key: 'batteryComputer', label: getSeriesLabel('batteryComputer'), color: SENSOR_COLORS.batteryComputer, scale: 'voltage' });
       }
       if (visibleLines.boostVoltage) {
-          next.push({ key: 'boostVoltage', label: 'Boost V', color: SENSOR_COLORS.boostVoltage, scale: 'voltage' });
+          next.push({ key: 'boostVoltage', label: getSeriesLabel('boostVoltage'), color: SENSOR_COLORS.boostVoltage, scale: 'voltage' });
       }
       if (visibleLines.starterSense) {
-          next.push({ key: 'starterSense', label: 'Starter', color: SENSOR_COLORS.starterSense, scale: 'starter' });
+          next.push({ key: 'starterSense', label: getSeriesLabel('starterSense'), color: SENSOR_COLORS.starterSense, scale: 'starter' });
       }
       if (visibleLines.servo) {
           next.push({ key: 'servo', label: 'Servo', color: SENSOR_COLORS.servo, scale: 'servo' });
@@ -317,7 +328,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({ telemetry, actions, 
 
       knownSensors.forEach((key, idx) => {
           if (!visibleLines[key]) return;
-          next.push({ key, label: `T: ${key}`, color: TEMP_COLORS[idx % TEMP_COLORS.length], scale: 'temp' });
+          next.push({ key, label: getSeriesLabel(key), color: TEMP_COLORS[idx % TEMP_COLORS.length], scale: 'temp' });
       });
 
       return next;
@@ -437,23 +448,23 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({ telemetry, actions, 
             <ScadaPanel title="LIVE VALUES" className="flex-1">
                 <div className="p-2 space-y-1 overflow-y-auto h-full pr-1 scrollbar-thin">
                     {/* Primary */}
-                    <ValueDisplay label="THRUST" value={vals.thrust} unit=" KG" color="text-purple-400" />
-                    <ValueDisplay label="TANK PRESS" value={vals.tank} unit=" BAR" color="text-cyan-400" />
-                    <ValueDisplay label="COMB PRESS" value={vals.combustion} unit=" BAR" color="text-orange-400" />
+                    <ValueDisplay label={getSeriesLabel('tensometer')} value={vals.thrust} unit=" KG" color="text-purple-400" />
+                    <ValueDisplay label={getSeriesLabel('pressureTank')} value={vals.tank} unit=" BAR" color="text-cyan-400" />
+                    <ValueDisplay label={getSeriesLabel('pressureCombustion')} value={vals.combustion} unit=" BAR" color="text-orange-400" />
                     
                     <div className="my-2 border-t border-slate-700/50"></div>
                     
                     {/* Power */}
-                    <ValueDisplay label="STAND BATTERY" value={vals.batStand} unit=" V" color="text-green-400" />
-                    <ValueDisplay label="CPU BATTERY" value={vals.batComp} unit=" V" color="text-green-400" />
-                    <ValueDisplay label="BOOST VOLTAGE" value={vals.boost} unit=" V" color="text-amber-400" />
-                    <ValueDisplay label="STARTER SENSE" value={vals.starter} unit=" V" color="text-purple-400" />
+                    <ValueDisplay label={getSeriesLabel('batteryStand')} value={vals.batStand} unit=" V" color="text-green-400" />
+                    <ValueDisplay label={getSeriesLabel('batteryComputer')} value={vals.batComp} unit=" V" color="text-green-400" />
+                    <ValueDisplay label={getSeriesLabel('boostVoltage')} value={vals.boost} unit=" V" color="text-amber-400" />
+                    <ValueDisplay label={getSeriesLabel('starterSense')} value={vals.starter} unit=" V" color="text-purple-400" />
 
                     <div className="my-2 border-t border-slate-700/50"></div>
 
                     {/* Thermal */}
                     {Object.entries(telemetry.temperatures).map(([id, temp]: [string, number]) => (
-                        <ValueDisplay key={id} label={`TEMP ${id}`} value={temp.toFixed(1)} unit=" °C" color="text-rose-400" />
+                        <ValueDisplay key={id} label={getSeriesLabel(id)} value={temp.toFixed(1)} unit=" °C" color="text-rose-400" />
                     ))}
                     {Object.keys(telemetry.temperatures).length === 0 && <div className="text-[10px] text-slate-600 text-center py-2">NO THERMAL DATA</div>}
                 </div>
@@ -474,7 +485,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({ telemetry, actions, 
                     {Object.entries(visibleLines).map(([key, active]) => (
                         <button key={key} onClick={() => toggleLine(key)} className={`px-2 py-1 border rounded text-[10px] font-bold uppercase flex items-center gap-2 ${active ? 'bg-slate-700 text-white border-slate-500' : 'bg-slate-900 text-slate-600 border-slate-800'}`}>
                             <div className="w-2 h-2 rounded-full" style={{backgroundColor: SENSOR_COLORS[key] || TEMP_COLORS[0]}}></div>
-                            {key}
+                            {getSeriesLabel(key)}
                         </button>
                     ))}
                 </div>

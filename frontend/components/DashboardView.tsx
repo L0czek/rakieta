@@ -11,6 +11,17 @@ interface DashboardViewProps {
 }
 
 export const DashboardView: React.FC<DashboardViewProps> = ({ telemetry, actions }) => {
+    const sensorLabels: Record<string, string> = {
+        tensometer: 'tensometer',
+        pressureTank: 'tank pressure',
+        pressureCombustion: 'combustion chamber pressure',
+        batteryStand: 'test stand battery',
+        batteryComputer: 'mainboard battery',
+        boostVoltage: 'boost voltage',
+        starterSense: 'starter sense',
+    };
+    const getSeriesLabel = (key: string) => sensorLabels[key] || `temp ${key}`;
+
     
     const getLatestValue = (data: {value: number}[]) => data.length > 0 ? data[data.length - 1].value : 0;
   
@@ -42,7 +53,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ telemetry, actions
             {/* Dashboard layout */}
             <div className="col-span-8 row-span-4">
                 <ScadaPanel 
-                    title="TANK PRESSURE" 
+                    title={getSeriesLabel('pressureTank')} 
                     className="h-full" 
                     headerRight={<span>{vals.tank} <span className="text-slate-500 text-[10px]">BAR</span></span>}
                 >
@@ -52,10 +63,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ telemetry, actions
             <div className="col-span-4 row-span-4 flex flex-col gap-2">
                     <ScadaPanel title="POWER SYSTEMS" className="flex-1">
                         <div className="p-2 space-y-2">
-                        <ValueDisplay label="STAND BATTERY" value={vals.batStand} unit=" V" color="text-green-400" />
-                        <ValueDisplay label="CPU BATTERY" value={vals.batComp} unit=" V" color="text-green-400" />
-                        <ValueDisplay label="BOOST VOLTAGE" value={vals.boost} unit=" V" color="text-amber-400" />
-                        <ValueDisplay label="STARTER SENSE" value={vals.starter} unit=" V" color="text-purple-400" />
+                        <ValueDisplay label={getSeriesLabel('batteryStand')} value={vals.batStand} unit=" V" color="text-green-400" />
+                        <ValueDisplay label={getSeriesLabel('batteryComputer')} value={vals.batComp} unit=" V" color="text-green-400" />
+                        <ValueDisplay label={getSeriesLabel('boostVoltage')} value={vals.boost} unit=" V" color="text-amber-400" />
+                        <ValueDisplay label={getSeriesLabel('starterSense')} value={vals.starter} unit=" V" color="text-purple-400" />
                         </div>
                     </ScadaPanel>
                     <ScadaPanel title="STATUS LOG" className="h-24">
@@ -66,7 +77,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ telemetry, actions
             </div>
             <div className="col-span-8 row-span-4">
                     <ScadaPanel 
-                    title="COMBUSTION CHAMBER" 
+                    title={getSeriesLabel('pressureCombustion')} 
                     className="h-full"
                     headerRight={<span>{vals.combustion} <span className="text-slate-500 text-[10px]">BAR</span></span>}
                     >
@@ -79,7 +90,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ telemetry, actions
                             <div className="p-2 grid grid-cols-2 gap-2 overflow-y-auto">
                                 {Object.entries(telemetry.temperatures).map(([id, temp]: [string, number]) => (
                                     <div key={id} className="bg-slate-900/50 p-2 border border-slate-700 rounded">
-                                        <div className="text-[10px] text-slate-500 uppercase truncate">#{id}</div>
+                                        <div className="text-[10px] text-slate-500 truncate">{getSeriesLabel(id)}</div>
                                         <div className="text-lg font-mono text-rose-400">{temp.toFixed(1)}°</div>
                                     </div>
                                 ))}
@@ -93,7 +104,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ telemetry, actions
             </div>
             <div className="col-span-8 row-span-4">
                     <ScadaPanel 
-                    title="TENSOMETER" 
+                    title={getSeriesLabel('tensometer')} 
                     className="h-full"
                     headerRight={<span>{vals.thrust} <span className="text-slate-500 text-[10px]">KG</span></span>}
                     >
