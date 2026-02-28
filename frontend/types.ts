@@ -26,6 +26,12 @@ export interface SensorDataPoint {
   value: number;
 }
 
+export interface StatusLogEntry {
+  message: string;
+  receivedAt: number;
+  type: 'status' | 'connection';
+}
+
 export interface SystemTelemetry {
   startTime: number;
   lastPacketTimestamp: number;
@@ -52,6 +58,7 @@ export interface SystemTelemetry {
   state: SystemState;
   servoState: ServoState;
   lastCmdStatus: string;
+  statusLog: StatusLogEntry[];
 }
 
 export interface MqttConfig {

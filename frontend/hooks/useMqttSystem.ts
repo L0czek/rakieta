@@ -37,11 +37,19 @@ const DEFAULT_TELEMETRY: SystemTelemetry = {
   state: SystemState.UNKNOWN,
   servoState: ServoState.UNKNOWN,
   lastCmdStatus: "Waiting for connection...",
+  statusLog: [
+    {
+      message: 'Waiting for connection...',
+      receivedAt: Date.now(),
+      type: 'connection',
+    },
+  ],
 };
 
 const MAX_FAST_LIVE_POINTS = 5000;
 const MAX_OTHER_LIVE_POINTS = 50;
 const MAX_SERVO_LIVE_POINTS = 500;
+const MAX_STATUS_LOG_ENTRIES = 50;
 const FLUSH_INTERVAL_MS = 500;
 const roundTimestamp = (timestamp: number): number => Math.round(timestamp);
 const STALE_CHUNK_FLUSH_MS = 500;
@@ -303,6 +311,13 @@ export const useMqttSystem = () => {
     setChecklistPointStates(checklistPointStatesRef.current);
   }, []);
 
+  const appendStatusLogEntry = useCallback((message: string, type: 'status' | 'connection') => {
+    const current = telemetryRef.current;
+    current.statusLog = [...current.statusLog, { message, receivedAt: Date.now(), type }].slice(
+      -MAX_STATUS_LOG_ENTRIES,
+    );
+  }, []);
+
   const handleMessage = (topic: string, message: any) => {
     if (connectionStatus === ConnectionState.ERROR) return;
     probeCount('mqtt.message.total');
@@ -477,7 +492,9 @@ export const useMqttSystem = () => {
         else current.servoState = ServoState.UNKNOWN;
     }
     else if (topic === 'status/cmd') {
-        current.lastCmdStatus = message.toString();
+        const statusMessage = message.toString();
+        current.lastCmdStatus = statusMessage;
+        appendStatusLogEntry(statusMessage, 'status');
     }
 
     telemetryVersionRef.current += 1;
@@ -507,6 +524,8 @@ export const useMqttSystem = () => {
 
     client.on('connect', () => {
         setConnectionStatus(ConnectionState.CONNECTED);
+      appendStatusLogEntry(`Connected to ${connectionUrl}`, 'connection');
+      telemetryVersionRef.current += 1;
         const topics = [
             'sensor/adc/fast/#',
             'sensor/adc/slow/#',
@@ -526,6 +545,8 @@ export const useMqttSystem = () => {
 
     client.on('close', () => {
         setConnectionStatus(ConnectionState.DISCONNECTED);
+      appendStatusLogEntry('Disconnected from broker', 'connection');
+      telemetryVersionRef.current += 1;
     });
 
     client.on('message', (topic, message) => {
@@ -537,7 +558,7 @@ export const useMqttSystem = () => {
     });
 
     clientRef.current = client;
-  }, []);
+  }, [appendStatusLogEntry]);
 
   const toggleSimulation = useCallback((enabled: boolean) => {
       if (enabled) {

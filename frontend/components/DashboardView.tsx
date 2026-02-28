@@ -63,11 +63,25 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ telemetry, actions
                         <ValueDisplay label={getSeriesLabel('starterSense')} value={vals.starter} unit=" V" color="text-purple-400" />
                         </div>
                     </ScadaPanel>
-                    <ScadaPanel title="STATUS LOG" className="h-24">
-                        <div className="font-mono text-xs text-amber-300 p-2 break-all">
-                            &gt; {telemetry.lastCmdStatus || "System Ready."}
-                        </div>
-                    </ScadaPanel>
+                                        <ScadaPanel title="STATUS LOG" className="h-24">
+                                                <div className="font-mono text-xs p-2 h-full overflow-y-auto pr-1 scrollbar-thin space-y-1">
+                                                        {(telemetry.statusLog.length > 0
+                                                            ? telemetry.statusLog
+                                                            : [{ message: 'System Ready.', receivedAt: 0, type: 'status' as const }]
+                                                        )
+                                                            .slice()
+                                                            .reverse()
+                                                            .map((entry, index) => (
+                                                                <div
+                                                                  key={`${entry.receivedAt}-${index}`}
+                                                                  className={`break-all ${entry.type === 'connection' ? 'text-cyan-300' : 'text-amber-300'}`}
+                                                                >
+                                                                    <span className="text-slate-500">[{new Date(entry.receivedAt).toLocaleString()}]</span>{' '}
+                                                                    &gt; {entry.message}
+                                                                </div>
+                                                            ))}
+                                                </div>
+                                        </ScadaPanel>
             </div>
             <div className="col-span-8 row-span-4">
                     <ScadaPanel 
