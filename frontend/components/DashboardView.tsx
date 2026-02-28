@@ -24,15 +24,18 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ telemetry, actions
 
     
     const getLatestValue = (data: {value: number}[]) => data.length > 0 ? data[data.length - 1].value : 0;
+    const latestTemperatures = Object.entries(telemetry.temperatures as Record<string, { value: number }[]>)
+        .map(([id, points]) => ({ id, value: getLatestValue(points) }));
+    const servoPositionPercent = getLatestValue(telemetry.servoPosition);
   
     const vals = {
         tank: getLatestValue(telemetry.pressureTank).toFixed(1),
         combustion: getLatestValue(telemetry.pressureCombustion).toFixed(1),
         thrust: getLatestValue(telemetry.tensometer).toFixed(1),
-        batStand: telemetry.batteryStand.toFixed(2),
-        batComp: telemetry.batteryComputer.toFixed(2),
-        boost: telemetry.boostVoltage.toFixed(2),
-        starter: telemetry.starterSense.toFixed(2)
+        batStand: getLatestValue(telemetry.batteryStand).toFixed(2),
+        batComp: getLatestValue(telemetry.batteryComputer).toFixed(2),
+        boost: getLatestValue(telemetry.boostVoltage).toFixed(2),
+        starter: getLatestValue(telemetry.starterSense).toFixed(2)
     };
 
     const chartWindowEnd = Math.ceil(telemetry.lastPacketTimestamp / 100) * 100;
@@ -79,18 +82,18 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ telemetry, actions
                 <div className="flex-1">
                     <ScadaPanel title="THERMAL SENSORS (°C)" className="h-full">
                             <div className="p-2 grid grid-cols-2 gap-2 overflow-y-auto">
-                                {Object.entries(telemetry.temperatures).map(([id, temp]: [string, number]) => (
+                                {latestTemperatures.map(({ id, value: temp }) => (
                                     <div key={id} className="bg-slate-900/50 p-2 border border-slate-700 rounded">
                                         <div className="text-[10px] text-slate-500 truncate">{getSeriesLabel(id)}</div>
                                         <div className="text-lg font-mono text-rose-400">{temp.toFixed(1)}°</div>
                                     </div>
                                 ))}
-                                {Object.keys(telemetry.temperatures).length === 0 && <div className="col-span-2 text-xs text-slate-600 text-center py-4">NO THERMAL DATA</div>}
+                                {latestTemperatures.length === 0 && <div className="col-span-2 text-xs text-slate-600 text-center py-4">NO THERMAL DATA</div>}
                             </div>
                         </ScadaPanel>
                 </div>
                 <div className="flex-1">
-                    <ServoPanel servoPosition={telemetry.servoPosition} servoState={telemetry.servoState} systemState={telemetry.state} actions={actions} />
+                    <ServoPanel servoPositionPercent={servoPositionPercent} servoState={telemetry.servoState} systemState={telemetry.state} actions={actions} />
                 </div>
             </div>
             <div className="col-span-8 row-span-4">

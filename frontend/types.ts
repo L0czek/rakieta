@@ -30,31 +30,23 @@ export interface SystemTelemetry {
   startTime: number;
   lastPacketTimestamp: number;
 
-  // Fast ADCs (History is built-in)
+  // Fast ADCs
   tensometer: SensorDataPoint[];
   pressureTank: SensorDataPoint[];
   pressureCombustion: SensorDataPoint[];
   
-  // Slow ADCs (Current Value)
-  batteryStand: number;
-  batteryComputer: number;
-  boostVoltage: number;
-  starterSense: number;
-  
-  // Slow ADCs (History for Analysis)
-  batteryStandHist: SensorDataPoint[];
-  batteryComputerHist: SensorDataPoint[];
-  boostVoltageHist: SensorDataPoint[];
-  starterSenseHist: SensorDataPoint[];
+  // Slow ADCs
+  batteryStand: SensorDataPoint[];
+  batteryComputer: SensorDataPoint[];
+  boostVoltage: SensorDataPoint[];
+  starterSense: SensorDataPoint[];
 
   // Digital/Virtual
   isUnsafe: boolean; // sensor/digital/armed
-  servoPosition: number; // 0-2000
-  servoPositionHist: SensorDataPoint[]; // 0-100%
+  servoPosition: SensorDataPoint[]; // 0-100%
   
   // Temperatures
-  temperatures: Record<string, number>; // Current values
-  temperatureHist: Record<string, SensorDataPoint[]>; // History
+  temperatures: Record<string, SensorDataPoint[]>;
   
   // Statuses
   state: SystemState;

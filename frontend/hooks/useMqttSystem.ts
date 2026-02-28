@@ -27,26 +27,20 @@ const DEFAULT_TELEMETRY: SystemTelemetry = {
   tensometer: [],
   pressureTank: [],
   pressureCombustion: [],
-  batteryStand: 0,
-  batteryComputer: 0,
-  boostVoltage: 0,
-  starterSense: 0,
-  batteryStandHist: [],
-  batteryComputerHist: [],
-  boostVoltageHist: [],
-  starterSenseHist: [],
+  batteryStand: [],
+  batteryComputer: [],
+  boostVoltage: [],
+  starterSense: [],
   isUnsafe: false,
-  servoPosition: 0,
-  servoPositionHist: [],
+  servoPosition: [],
   temperatures: {},
-  temperatureHist: {},
   state: SystemState.UNKNOWN,
   servoState: ServoState.UNKNOWN,
   lastCmdStatus: "Waiting for connection...",
 };
 
-// Reduced to 5000 to hold 5 seconds of data at 1000Hz
-const MAX_LIVE_POINTS = 5000;
+const MAX_FAST_LIVE_POINTS = 5000;
+const MAX_OTHER_LIVE_POINTS = 50;
 const FLUSH_INTERVAL_MS = 500;
 const roundTimestamp = (timestamp: number): number => Math.round(timestamp);
 const STALE_CHUNK_FLUSH_MS = 500;
@@ -114,6 +108,9 @@ export const parseChecklistPointStatePayload = (
     context,
   };
 };
+
+type FastHistoryKey = 'tensometer' | 'pressureTank' | 'pressureCombustion';
+type SlowHistoryKey = 'batteryStand' | 'batteryComputer' | 'boostVoltage' | 'starterSense';
 
 export const useMqttSystem = () => {
   const [connectionStatus, setConnectionStatus] = useState<ConnectionState>(ConnectionState.DISCONNECTED);
@@ -347,7 +344,7 @@ export const useMqttSystem = () => {
         return true;
     };
 
-    const updateFastSensor = (key: keyof SystemTelemetry, dbKey: string, tStart: number, tEnd: number, values: number[]) => {
+    const updateFastSensor = (key: FastHistoryKey, dbKey: string, tStart: number, tEnd: number, values: number[]) => {
       if (!checkTime(tStart)) return;
 
       current.lastPacketTimestamp = Math.max(current.lastPacketTimestamp, tEnd);
@@ -363,18 +360,15 @@ export const useMqttSystem = () => {
       
       appendPointsToChunk(dbKey, points);
 
-      // @ts-ignore
-      const currentHistory: SensorDataPoint[] = current[key];
-      // @ts-ignore
+      const currentHistory = current[key];
       current[key] = withProbe(
         'telemetry.fast.concat_slice.ms',
-        () => [...currentHistory, ...points].slice(-MAX_LIVE_POINTS)
+        () => [...currentHistory, ...points].slice(-MAX_FAST_LIVE_POINTS)
       );
     };
 
     const updateSlowSensor = (
-        valKey: keyof SystemTelemetry, 
-        histKey: keyof SystemTelemetry, 
+        key: SlowHistoryKey,
         dbKey: string,
         timestamp: number, 
         value: number
@@ -384,17 +378,13 @@ export const useMqttSystem = () => {
         current.lastPacketTimestamp = Math.max(current.lastPacketTimestamp, timestamp);
         if (current.startTime === 0) current.startTime = timestamp;
 
-        // @ts-ignore
-        current[valKey] = value;
         const pt = { timestamp, value };
         appendPointToChunk(dbKey, pt);
 
-        // @ts-ignore
-        const curHist = current[histKey] as SensorDataPoint[];
-        // @ts-ignore
-        current[histKey] = withProbe(
+        const curHist = current[key];
+        current[key] = withProbe(
           'telemetry.slow.concat_slice.ms',
-          () => [...curHist, pt].slice(-MAX_LIVE_POINTS)
+          () => [...curHist, pt].slice(-MAX_OTHER_LIVE_POINTS)
         );
     };
 
@@ -416,10 +406,10 @@ export const useMqttSystem = () => {
     else if (topic.startsWith('sensor/adc/slow/')) {
         probeCount('mqtt.message.slow');
         const { timestamp, value: raw } = Parser.parseSlowAdc(buffer);
-                if (topic.includes('battery/stand')) updateSlowSensor('batteryStand', 'batteryStandHist', 'batteryStand', timestamp, Converters.rawToVoltage(raw, 'batteryStand'));
-                if (topic.includes('battery/computer')) updateSlowSensor('batteryComputer', 'batteryComputerHist', 'batteryComputer', timestamp, Converters.rawToVoltage(raw, 'batteryComputer'));
-                if (topic.includes('boost_voltage')) updateSlowSensor('boostVoltage', 'boostVoltageHist', 'boostVoltage', timestamp, Converters.rawToVoltage(raw, 'boostVoltage'));
-                if (topic.includes('starter_sense')) updateSlowSensor('starterSense', 'starterSenseHist', 'starterSense', timestamp, Converters.rawToVoltage(raw, 'starterSense'));
+          if (topic.includes('battery/stand')) updateSlowSensor('batteryStand', 'batteryStand', timestamp, Converters.rawToVoltage(raw, 'batteryStand'));
+          if (topic.includes('battery/computer')) updateSlowSensor('batteryComputer', 'batteryComputer', timestamp, Converters.rawToVoltage(raw, 'batteryComputer'));
+          if (topic.includes('boost_voltage')) updateSlowSensor('boostVoltage', 'boostVoltage', timestamp, Converters.rawToVoltage(raw, 'boostVoltage'));
+          if (topic.includes('starter_sense')) updateSlowSensor('starterSense', 'starterSense', timestamp, Converters.rawToVoltage(raw, 'starterSense'));
     }
     else if (topic === 'sensor/digital/armed') {
         probeCount('mqtt.message.digital.armed');
@@ -444,17 +434,14 @@ export const useMqttSystem = () => {
           value,
         }));
 
-        const lastTemp = tempValues[tempValues.length - 1];
-        current.temperatures = { ...current.temperatures, [sensorId]: lastTemp };
-
         appendPointsToChunk(sensorId, points);
 
-        const oldHist = current.temperatureHist[sensorId] || [];
-            current.temperatureHist = {
-                ...current.temperatureHist,
+        const oldHist = current.temperatures[sensorId] || [];
+            current.temperatures = {
+                ...current.temperatures,
                 [sensorId]: withProbe(
                   'telemetry.temp.concat_slice.ms',
-                  () => [...oldHist, ...points].slice(-MAX_LIVE_POINTS)
+                  () => [...oldHist, ...points].slice(-MAX_OTHER_LIVE_POINTS)
                 )
             };
         }
@@ -464,14 +451,13 @@ export const useMqttSystem = () => {
         const { timestamp, value } = Parser.parseServo(buffer);
         checkTime(timestamp);
         current.lastPacketTimestamp = Math.max(current.lastPacketTimestamp, timestamp);
-        current.servoPosition = value;
         
         const percent = Converters.rawServoToPercent(value);
         const pt = { timestamp, value: percent };
         appendPointToChunk('servo', pt);
-        current.servoPositionHist = withProbe(
+        current.servoPosition = withProbe(
           'telemetry.servo.concat_slice.ms',
-          () => [...current.servoPositionHist, pt].slice(-MAX_LIVE_POINTS)
+          () => [...current.servoPosition, pt].slice(-MAX_OTHER_LIVE_POINTS)
         );
     }
     else if (topic === 'status/state') {

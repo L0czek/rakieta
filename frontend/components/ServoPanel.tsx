@@ -1,10 +1,9 @@
 import React from 'react';
 import { ScadaPanel, DigitalIndicator } from './Widgets';
 import { ServoState, SystemState } from '../types';
-import { rawServoToPercent } from '../utils/conversions';
 
 interface ServoPanelProps {
-    servoPosition: number;
+    servoPositionPercent: number;
     servoState: ServoState;
     systemState: SystemState;
     actions: {
@@ -12,10 +11,10 @@ interface ServoPanelProps {
     };
 }
 
-export const ServoPanel: React.FC<ServoPanelProps> = ({ servoPosition, servoState, systemState, actions }) => {
+export const ServoPanel: React.FC<ServoPanelProps> = ({ servoPositionPercent, servoState, systemState, actions }) => {
     
     const canServo = systemState !== SystemState.FIRE;
-    const percent = rawServoToPercent(servoPosition);
+    const percent = servoPositionPercent;
 
     return (
         <ScadaPanel title="SERVO DIAGNOSTICS & CONTROL" className="h-full">

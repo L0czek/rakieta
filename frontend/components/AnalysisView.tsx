@@ -210,11 +210,14 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({ telemetry, actions, 
     tank: getLatestValue(telemetry.pressureTank).toFixed(1),
     combustion: getLatestValue(telemetry.pressureCombustion).toFixed(1),
     thrust: getLatestValue(telemetry.tensometer).toFixed(1),
-    batStand: telemetry.batteryStand.toFixed(2),
-    batComp: telemetry.batteryComputer.toFixed(2),
-    boost: telemetry.boostVoltage.toFixed(2),
-    starter: telemetry.starterSense.toFixed(2)
+        batStand: getLatestValue(telemetry.batteryStand).toFixed(2),
+        batComp: getLatestValue(telemetry.batteryComputer).toFixed(2),
+        boost: getLatestValue(telemetry.boostVoltage).toFixed(2),
+        starter: getLatestValue(telemetry.starterSense).toFixed(2)
   };
+    const servoPositionPercent = getLatestValue(telemetry.servoPosition);
+    const latestTemperatures = Object.entries(telemetry.temperatures as Record<string, { value: number }[]>)
+        .map(([id, points]) => ({ id, value: getLatestValue(points) }));
 
   const liveSeriesData = React.useMemo(() => {
       if (!isLive) return {};
@@ -223,12 +226,12 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({ telemetry, actions, 
           tensometer: telemetry.tensometer,
           pressureTank: telemetry.pressureTank,
           pressureCombustion: telemetry.pressureCombustion,
-          batteryStand: telemetry.batteryStandHist,
-          batteryComputer: telemetry.batteryComputerHist,
-          boostVoltage: telemetry.boostVoltageHist,
-          starterSense: telemetry.starterSenseHist,
-          servo: telemetry.servoPositionHist,
-          ...telemetry.temperatureHist,
+          batteryStand: telemetry.batteryStand,
+          batteryComputer: telemetry.batteryComputer,
+          boostVoltage: telemetry.boostVoltage,
+          starterSense: telemetry.starterSense,
+          servo: telemetry.servoPosition,
+          ...telemetry.temperatures,
       };
 
       const next: Record<string, SensorDataPoint[]> = {};
@@ -251,12 +254,12 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({ telemetry, actions, 
     telemetry.tensometer,
     telemetry.pressureTank,
     telemetry.pressureCombustion,
-    telemetry.batteryStandHist,
-    telemetry.batteryComputerHist,
-    telemetry.boostVoltageHist,
-    telemetry.starterSenseHist,
-    telemetry.servoPositionHist,
-    telemetry.temperatureHist,
+        telemetry.batteryStand,
+        telemetry.batteryComputer,
+        telemetry.boostVoltage,
+        telemetry.starterSense,
+        telemetry.servoPosition,
+        telemetry.temperatures,
   ]);
 
   const historySeriesData = React.useMemo(() => {
@@ -463,10 +466,10 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({ telemetry, actions, 
                     <div className="my-2 border-t border-slate-700/50"></div>
 
                     {/* Thermal */}
-                    {Object.entries(telemetry.temperatures).map(([id, temp]: [string, number]) => (
+                    {latestTemperatures.map(({ id, value: temp }) => (
                         <ValueDisplay key={id} label={getSeriesLabel(id)} value={temp.toFixed(1)} unit=" °C" color="text-rose-400" />
                     ))}
-                    {Object.keys(telemetry.temperatures).length === 0 && <div className="text-[10px] text-slate-600 text-center py-2">NO THERMAL DATA</div>}
+                    {latestTemperatures.length === 0 && <div className="text-[10px] text-slate-600 text-center py-2">NO THERMAL DATA</div>}
                 </div>
             </ScadaPanel>
             <ScadaPanel title="STATUS LOG" className="h-32">
@@ -535,7 +538,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({ telemetry, actions, 
         <div className="col-span-3 row-span-8 flex flex-col gap-2">
             <div className="flex-1">
                 <ServoPanel 
-                    servoPosition={telemetry.servoPosition} 
+                    servoPositionPercent={servoPositionPercent} 
                     servoState={telemetry.servoState}
                     systemState={telemetry.state}
                     actions={actions}

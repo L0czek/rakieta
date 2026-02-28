@@ -18,20 +18,15 @@ const EMPTY_POINT_STATE: ChecklistPointRuntimeState = {
   context: {},
 };
 
-const SERIES_KEYS = new Set(['pressureTank', 'pressureCombustion', 'tensometer']);
-
 const getPointMapKey = (checklistId: string, pointId: string): string => `${checklistId}/${pointId}`;
 
 const getNumericSourceValue = (source: string, telemetry: SystemTelemetry): number | null => {
-  if (SERIES_KEYS.has(source)) {
-    const history = telemetry[source as 'pressureTank' | 'pressureCombustion' | 'tensometer'];
-    if (!history || history.length === 0) return null;
-    return history[history.length - 1].value;
-  }
-
   const value = telemetry[source as keyof SystemTelemetry];
-  if (typeof value !== 'number') return null;
-  return value;
+  if (typeof value === 'number') return value;
+  if (!Array.isArray(value) || value.length === 0) return null;
+
+  const last = value[value.length - 1] as { value?: unknown };
+  return typeof last.value === 'number' ? last.value : null;
 };
 
 const formatNumeric = (value: number | null, decimals: number = 2): string => {
