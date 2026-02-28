@@ -41,9 +41,10 @@ export interface ConversionSettings {
 // Default linear LUT
 // Maps Raw ADC (0-4095) -> Corrected Voltage (mV)
 // X: Raw Reading, Y: Voltage in mV
+// "Per design the ADC reference voltage is 1100 mV, however the true reference voltage can range from 1000 mV to 1200 mV amongst different ESP32s."
 const ADC_LUT: LutPoint[] = [
     { x: 0, y: 0 },
-    { x: 4095, y: 1000 }
+    { x: 4095, y: 1100 }
 ];
 
 const CONVERSION_SETTINGS_STORAGE_KEY = 'rocket.conversions.settings';
