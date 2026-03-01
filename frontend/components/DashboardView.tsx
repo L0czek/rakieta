@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { SystemTelemetry } from '../types';
-import { ScadaPanel, FastChart, ValueDisplay, SENSOR_COLORS, CHART_RANGES } from './Widgets';
+import { ScadaPanel, FastChart, SENSOR_COLORS, CHART_RANGES, TEMP_COLORS } from './Widgets';
 import { ControlPanel } from './ControlPanel';
 import { ServoPanel } from './ServoPanel';
 
@@ -10,6 +10,50 @@ interface DashboardViewProps {
     actions: any;
     commandsEnabled: boolean;
 }
+
+const MiniTrendChart: React.FC<{
+    data: { timestamp: number; value: number }[];
+    color: string;
+    xDomain: [number, number];
+}> = ({ data, color, xDomain }) => {
+    const width = 84;
+    const height = 22;
+    const [xMin, xMax] = xDomain;
+
+    const xRange = Math.max(1, xMax - xMin);
+    const visibleData = data.filter((point) => point.timestamp >= xMin && point.timestamp <= xMax);
+    const visibleValues = visibleData.map((point) => point.value);
+    const rawMin = visibleValues.length > 0 ? Math.min(...visibleValues) : 0;
+    const rawMax = visibleValues.length > 0 ? Math.max(...visibleValues) : 1;
+    const isFlat = rawMax === rawMin;
+    const pad = isFlat ? Math.max(0.5, Math.abs(rawMax) * 0.05) : (rawMax - rawMin) * 0.1;
+    const yMin = rawMin - pad;
+    const yMax = rawMax + pad;
+    const yRange = Math.max(1e-6, yMax - yMin);
+
+    const points = visibleData
+        .map((point) => {
+            const x = ((point.timestamp - xMin) / xRange) * width;
+            const normalizedY = (point.value - yMin) / yRange;
+            const y = height - Math.max(0, Math.min(1, normalizedY)) * height;
+            return `${x.toFixed(1)},${y.toFixed(1)}`;
+        });
+
+    return (
+        <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} className="shrink-0">
+            {points.length > 1 ? (
+                <polyline
+                    points={points.join(' ')}
+                    fill="none"
+                    stroke={color}
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                />
+            ) : null}
+        </svg>
+    );
+};
 
 export const DashboardView: React.FC<DashboardViewProps> = ({ telemetry, actions, commandsEnabled }) => {
     const sensorLabels: Record<string, string> = {
@@ -58,10 +102,34 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ telemetry, actions
             <div className="col-span-4 row-span-4 flex flex-col gap-2">
                     <ScadaPanel title="POWER SYSTEMS" className="flex-1">
                         <div className="p-2 space-y-2">
-                        <ValueDisplay label={getSeriesLabel('batteryStand')} value={vals.batStand} unit=" V" color="text-green-400" />
-                        <ValueDisplay label={getSeriesLabel('batteryComputer')} value={vals.batComp} unit=" V" color="text-green-400" />
-                        <ValueDisplay label={getSeriesLabel('boostVoltage')} value={vals.boost} unit=" V" color="text-amber-400" />
-                        <ValueDisplay label={getSeriesLabel('starterSense')} value={vals.starter} unit=" V" color="text-purple-400" />
+                        <div className="flex items-center justify-between border-b border-slate-700 pb-1 mb-1 gap-2 min-w-0">
+                            <div className="text-slate-400 text-xs uppercase truncate min-w-0">{getSeriesLabel('batteryStand')}</div>
+                            <div className="flex items-center gap-2 shrink-0">
+                                <MiniTrendChart data={telemetry.batteryStand} color={SENSOR_COLORS.batteryStand} xDomain={chartXDomain} />
+                                <div className="text-xl font-mono font-bold text-green-400 text-right leading-none">{vals.batStand}<span className="text-xs text-slate-500 ml-1"> V</span></div>
+                            </div>
+                        </div>
+                        <div className="flex items-center justify-between border-b border-slate-700 pb-1 mb-1 gap-2 min-w-0">
+                            <div className="text-slate-400 text-xs uppercase truncate min-w-0">{getSeriesLabel('batteryComputer')}</div>
+                            <div className="flex items-center gap-2 shrink-0">
+                                <MiniTrendChart data={telemetry.batteryComputer} color={SENSOR_COLORS.batteryComputer} xDomain={chartXDomain} />
+                                <div className="text-xl font-mono font-bold text-green-400 text-right leading-none">{vals.batComp}<span className="text-xs text-slate-500 ml-1"> V</span></div>
+                            </div>
+                        </div>
+                        <div className="flex items-center justify-between border-b border-slate-700 pb-1 mb-1 gap-2 min-w-0">
+                            <div className="text-slate-400 text-xs uppercase truncate min-w-0">{getSeriesLabel('boostVoltage')}</div>
+                            <div className="flex items-center gap-2 shrink-0">
+                                <MiniTrendChart data={telemetry.boostVoltage} color={SENSOR_COLORS.boostVoltage} xDomain={chartXDomain} />
+                                <div className="text-xl font-mono font-bold text-amber-400 text-right leading-none">{vals.boost}<span className="text-xs text-slate-500 ml-1"> V</span></div>
+                            </div>
+                        </div>
+                        <div className="flex items-center justify-between border-b border-slate-700 pb-1 mb-1 last:border-0 gap-2 min-w-0">
+                            <div className="text-slate-400 text-xs uppercase truncate min-w-0">{getSeriesLabel('starterSense')}</div>
+                            <div className="flex items-center gap-2 shrink-0">
+                                <MiniTrendChart data={telemetry.starterSense} color={SENSOR_COLORS.starterSense} xDomain={chartXDomain} />
+                                <div className="text-xl font-mono font-bold text-purple-400 text-right leading-none">{vals.starter}<span className="text-xs text-slate-500 ml-1"> V</span></div>
+                            </div>
+                        </div>
                         </div>
                     </ScadaPanel>
                                         <ScadaPanel title="STATUS LOG" className="h-24">
@@ -97,10 +165,17 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ telemetry, actions
                 <div className="flex-1">
                     <ScadaPanel title="THERMAL SENSORS (°C)" className="h-full">
                             <div className="p-2 grid grid-cols-2 gap-2 overflow-y-auto">
-                                {latestTemperatures.map(({ id, value: temp }) => (
-                                    <div key={id} className="bg-slate-900/50 p-2 border border-slate-700 rounded">
-                                        <div className="text-[10px] text-slate-500 truncate">{getSeriesLabel(id)}</div>
-                                        <div className="text-lg font-mono text-rose-400">{temp.toFixed(1)}°</div>
+                                {latestTemperatures.map(({ id, value: temp }, index) => (
+                                    <div key={id} className="bg-slate-900/50 p-2 border border-slate-700 rounded flex items-center justify-between gap-2 min-w-0">
+                                        <div className="text-[10px] text-slate-500 truncate min-w-0">{getSeriesLabel(id)}</div>
+                                        <div className="flex items-center gap-2 shrink-0">
+                                            <MiniTrendChart
+                                                data={telemetry.temperatures[id] || []}
+                                                color={TEMP_COLORS[index % TEMP_COLORS.length]}
+                                                xDomain={chartXDomain}
+                                            />
+                                            <div className="text-xl font-mono font-bold text-rose-400 text-right leading-none">{temp.toFixed(1)}<span className="text-xs text-slate-500 ml-1"> °C</span></div>
+                                        </div>
                                     </div>
                                 ))}
                                 {latestTemperatures.length === 0 && <div className="col-span-2 text-xs text-slate-600 text-center py-4">NO THERMAL DATA</div>}

@@ -48,8 +48,8 @@ const DEFAULT_TELEMETRY: SystemTelemetry = {
 
 const MAX_FAST_LIVE_POINTS = 5000;
 const MAX_OTHER_LIVE_POINTS = 50;
+const MAX_TEMPERATURE_LIVE_POINTS = 100;
 const MAX_SERVO_LIVE_POINTS = 500;
-const MAX_STATUS_LOG_ENTRIES = 50;
 const FLUSH_INTERVAL_MS = 500;
 const roundTimestamp = (timestamp: number): number => Math.round(timestamp);
 const STALE_CHUNK_FLUSH_MS = 500;
@@ -313,9 +313,7 @@ export const useMqttSystem = () => {
 
   const appendStatusLogEntry = useCallback((message: string, type: 'status' | 'connection') => {
     const current = telemetryRef.current;
-    current.statusLog = [...current.statusLog, { message, receivedAt: Date.now(), type }].slice(
-      -MAX_STATUS_LOG_ENTRIES,
-    );
+    current.statusLog = [...current.statusLog, { message, receivedAt: Date.now(), type }];
   }, []);
 
   const handleMessage = (topic: string, message: any, isRetained = false) => {
@@ -459,7 +457,7 @@ export const useMqttSystem = () => {
                 ...current.temperatures,
                 [sensorId]: withProbe(
                   'telemetry.temp.concat_slice.ms',
-                  () => [...oldHist, ...points].slice(-MAX_OTHER_LIVE_POINTS)
+                  () => [...oldHist, ...points].slice(-MAX_TEMPERATURE_LIVE_POINTS)
                 )
             };
         }
