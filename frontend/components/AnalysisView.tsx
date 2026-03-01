@@ -422,7 +422,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
               })),
           ],
           legend: { show: true },
-          cursor: { drag: { x: true, y: false } },
+          cursor: { drag: { x: false, y: true, uni: Infinity } },
       };
   }, [axes, chartSize.width, chartSize.height, seriesMeta, viewStart, windowSize]);
 
