@@ -387,12 +387,12 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
               ticks: { stroke: '#334155' },
               values: (_u, ticks) => ticks.map((val) => `${(val / 1000).toFixed(0)}s`),
           },
-          { scale: 'thrust', side: 3, stroke: SENSOR_COLORS.tensometer, show: visibleLines.tensometer, label: 'Kg' },
-          { scale: 'pressure', side: 3, stroke: SENSOR_COLORS.pressureTank, show: showAxisPressure, label: 'Bar' },
+          { scale: 'thrust', side: 3, stroke: SENSOR_COLORS.tensometer, show: visibleLines.tensometer, label: 'kg' },
+          { scale: 'pressure', side: 3, stroke: SENSOR_COLORS.pressureTank, show: showAxisPressure, label: 'bar' },
           { scale: 'voltage', side: 1, stroke: SENSOR_COLORS.batteryStand, show: showAxisVoltage, label: 'V' },
           { scale: 'starter', side: 1, stroke: SENSOR_COLORS.starterSense, show: visibleLines.starterSense, label: 'V(S)' },
           { scale: 'servo', side: 1, stroke: SENSOR_COLORS.servo, show: visibleLines.servo, label: '°' },
-          { scale: 'temp', side: 1, stroke: TEMP_COLORS[0], show: showAxisTemp, label: 'C' },
+          { scale: 'temp', side: 1, stroke: TEMP_COLORS[0], show: showAxisTemp, label: '°C' },
       ];
   }, [showAxisPressure, showAxisTemp, showAxisVoltage, visibleLines]);
 
@@ -422,7 +422,19 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
               })),
           ],
           legend: { show: true },
-          cursor: { drag: { x: false, y: true, uni: Infinity } },
+          cursor: {
+              drag: { x: false, y: true, uni: Infinity },
+              hover: {
+                  prox: (self, seriesIdx, hoveredIdx) => {
+                      const yVal = self.data[seriesIdx]?.[hoveredIdx];
+                      if (yVal === null) {
+                          return 15;
+                      }
+                      return null;
+                  },
+                  skip: [null],
+              },
+          },
       };
   }, [axes, chartSize.width, chartSize.height, seriesMeta, viewStart, windowSize]);
 
