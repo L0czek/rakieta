@@ -221,6 +221,11 @@ const App = () => {
           </div>
 
           <div className="flex items-center gap-2 px-3 py-1 bg-slate-900 border border-slate-700 rounded">
+            <span className="text-xs text-slate-500">AVG FAST ΔT</span>
+            <span className="font-mono font-bold text-lg text-slate-200">{telemetry.avgFastAdcPacketLength.toFixed(1)}</span>
+          </div>
+
+          <div className="flex items-center gap-2 px-3 py-1 bg-slate-900 border border-slate-700 rounded">
             <span className="text-xs text-slate-500">LAST PACKET</span>
             <span className="font-mono font-bold text-lg text-slate-200">T+{telemetry.lastPacketTimestamp}</span>
           </div>

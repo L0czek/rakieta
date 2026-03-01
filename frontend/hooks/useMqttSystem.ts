@@ -23,6 +23,7 @@ import { buildChecklistPointTopic, parseChecklistPointTopic } from '@/utils/chec
 const DEFAULT_TELEMETRY: SystemTelemetry = {
   startTime: 0,
   lastPacketTimestamp: 0,
+  avgFastAdcPacketLength: 0,
   tensometer: [],
   pressureTank: [],
   pressureCombustion: [],
@@ -46,6 +47,7 @@ const DEFAULT_TELEMETRY: SystemTelemetry = {
 };
 
 const MAX_FAST_LIVE_POINTS = 5000;
+const FAST_PACKET_AVERAGE_WINDOW = 50;
 const MAX_OTHER_LIVE_POINTS = 50;
 const MAX_TEMPERATURE_LIVE_POINTS = 100;
 const MAX_SERVO_LIVE_POINTS = 500;
@@ -135,6 +137,8 @@ export const useMqttSystem = () => {
   const publishedTelemetryVersionRef = useRef(-1);
   const simulatorRef = useRef<RocketSimulator | null>(null);
   const checklistPointStatesRef = useRef<Record<string, ChecklistPointRuntimeState>>({});
+  const fastPacketDurationWindowRef = useRef<number[]>([]);
+  const fastPacketDurationWindowSumRef = useRef(0);
   
   // Ref to handleMessage to avoid stale closures in simulator callback
   const handleMessageRef = useRef<(topic: string, message: any) => void>(null);
@@ -283,6 +287,8 @@ export const useMqttSystem = () => {
 
     // Reset Telemetry
     telemetryRef.current = cloneTelemetry(DEFAULT_TELEMETRY);
+    fastPacketDurationWindowRef.current = [];
+    fastPacketDurationWindowSumRef.current = 0;
     telemetryVersionRef.current += 1;
     setTelemetry(cloneTelemetry(DEFAULT_TELEMETRY));
     
@@ -349,6 +355,18 @@ export const useMqttSystem = () => {
 
     const updateFastSensor = (key: FastHistoryKey, dbKey: string, tStart: number, tEnd: number, values: number[]) => {
       if (!checkTime(tStart)) return;
+
+      const packetDuration = Math.max(0, tEnd - tStart);
+      fastPacketDurationWindowRef.current.push(packetDuration);
+      fastPacketDurationWindowSumRef.current += packetDuration;
+      if (fastPacketDurationWindowRef.current.length > FAST_PACKET_AVERAGE_WINDOW) {
+        const removed = fastPacketDurationWindowRef.current.shift() ?? 0;
+        fastPacketDurationWindowSumRef.current -= removed;
+      }
+      current.avgFastAdcPacketLength =
+        fastPacketDurationWindowRef.current.length > 0
+          ? fastPacketDurationWindowSumRef.current / fastPacketDurationWindowRef.current.length
+          : 0;
 
       current.lastPacketTimestamp = Math.max(current.lastPacketTimestamp, tEnd);
       if (current.startTime === 0) current.startTime = tStart;

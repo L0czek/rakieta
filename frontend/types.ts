@@ -35,6 +35,7 @@ export interface StatusLogEntry {
 export interface SystemTelemetry {
   startTime: number;
   lastPacketTimestamp: number;
+  avgFastAdcPacketLength: number;
 
   // Fast ADCs
   tensometer: SensorDataPoint[];
