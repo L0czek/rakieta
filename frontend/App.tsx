@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
 
-import { probeCount } from '@/utils/perfProbe';
-
 import { AnalysisView } from './components/AnalysisView';
 import { ChecklistView } from './components/ChecklistView';
 import { ConfigurationView } from './components/ConfigurationView';
@@ -63,7 +61,6 @@ const loadStoredMqttConfig = (): MqttConfig => {
 };
 
 const App = () => {
-  probeCount('render.App');
   const {
     connectionStatus,
     isSimulating,
@@ -112,7 +109,6 @@ const App = () => {
     connectionStatus === ConnectionState.CONNECTED || isSimulating;
 
   useEffect(() => {
-    probeCount('effect.App.commit');
   });
 
   useEffect(() => {

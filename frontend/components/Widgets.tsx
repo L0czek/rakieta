@@ -4,7 +4,6 @@ import uPlot from 'uplot';
 import UplotReact from 'uplot-react';
 import 'uplot/dist/uPlot.min.css';
 import { SensorDataPoint } from '../types';
-import { probeCount } from '@/utils/perfProbe';
 
 export const SENSOR_COLORS: Record<string, string> = {
     tensometer: '#c084fc', 
@@ -81,15 +80,8 @@ export const FastChart = ({
   domain?: [number, number];
   xDomain?: [number, number];
 }) => {
-  probeCount('render.FastChart');
   // Performance optimization: only render if data exists
   if (!data || data.length === 0) return <div className="w-full h-full flex items-center justify-center text-slate-500 text-xs">NO SIGNAL</div>;
-
-  const prevDataRef = useRef<SensorDataPoint[] | null>(null);
-  if (prevDataRef.current !== data) {
-    probeCount('render.FastChart.data_identity_changes');
-    prevDataRef.current = data;
-  }
 
   const { ref, size } = useChartSize();
 
@@ -147,10 +139,6 @@ export const FastChart = ({
       cursor: { show: false },
     };
   }, [size.width, size.height, color, domain, xDomain]);
-
-  useEffect(() => {
-    probeCount('effect.FastChart.commit');
-  });
 
   return (
     <div ref={ref} className="w-full h-full">

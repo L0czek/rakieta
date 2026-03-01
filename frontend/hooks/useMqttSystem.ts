@@ -13,7 +13,6 @@ import * as Parser from '../utils/parser';
 import * as Converters from '../utils/conversions';
 import * as DB from '../utils/db';
 import { RocketSimulator, PacketEmit } from '../utils/simulator';
-import { probeCount, probeDuration, withProbe } from '@/utils/perfProbe';
 import {
   ChecklistContextValue,
   ChecklistPointRuntimeState,
@@ -219,7 +218,6 @@ export const useMqttSystem = () => {
   // Flush buffer to DB periodically
   useEffect(() => {
       flushIntervalRef.current = setInterval(async () => {
-          const flushStart = performance.now();
           const now = performance.now();
 
           for (const [sensorId, chunk] of Object.entries(activeChunksRef.current) as [
@@ -236,20 +234,12 @@ export const useMqttSystem = () => {
           if (chunks.length === 0) return;
 
           sealedChunksRef.current = [];
-          const sensors = new Set(chunks.map(chunk => chunk.sensorId));
-          const pointsToFlush = chunks.reduce(
-            (sum, chunk) => sum + Math.min(chunk.timestamps.length, chunk.values.length),
-            0
-          );
 
           try {
               await DB.addChunks(chunks);
               
               const maxTs = Math.max(...chunks.map(chunk => chunk.chunkEnd));
               if (maxTs > 0) await DB.setLastTimestamp(maxTs);
-              probeCount('db.flush.sensors', sensors.size);
-              probeCount('db.flush.points', pointsToFlush);
-              probeDuration('db.flush.ms', performance.now() - flushStart);
 
           } catch (e) {
               console.error("DB Flush Error", e);
@@ -318,7 +308,6 @@ export const useMqttSystem = () => {
 
   const handleMessage = (topic: string, message: any, isRetained = false) => {
     if (connectionStatus === ConnectionState.ERROR) return;
-    probeCount('mqtt.message.total');
 
     const checklistTopicParts = parseChecklistPointTopic(topic);
     if (checklistTopicParts) {
@@ -370,15 +359,11 @@ export const useMqttSystem = () => {
         timestamp: roundTimestamp(tStart + (i * step)),
         value: v,
       }));
-      probeCount('mqtt.fast.points', points.length);
       
       appendPointsToChunk(dbKey, points);
 
       const currentHistory = current[key];
-      current[key] = withProbe(
-        'telemetry.fast.concat_slice.ms',
-        () => [...currentHistory, ...points].slice(-MAX_FAST_LIVE_POINTS)
-      );
+      current[key] = [...currentHistory, ...points].slice(-MAX_FAST_LIVE_POINTS);
     };
 
     const updateSlowSensor = (
@@ -396,29 +381,22 @@ export const useMqttSystem = () => {
         appendPointToChunk(dbKey, pt);
 
         const curHist = current[key];
-        current[key] = withProbe(
-          'telemetry.slow.concat_slice.ms',
-          () => [...curHist, pt].slice(-MAX_OTHER_LIVE_POINTS)
-        );
+        current[key] = [...curHist, pt].slice(-MAX_OTHER_LIVE_POINTS);
     };
 
     if (topic === 'sensor/adc/fast/tensometer') {
-      probeCount('mqtt.message.fast.tensometer');
       const { timestampStart, timestampEnd, values } = Parser.parseFastAdc(buffer);
       updateFastSensor('tensometer', 'tensometer', timestampStart, timestampEnd, values.map(v => Converters.rawToThrustKg(v)));
     } 
     else if (topic === 'sensor/adc/fast/pressure/tank') {
-      probeCount('mqtt.message.fast.pressure_tank');
       const { timestampStart, timestampEnd, values } = Parser.parseFastAdc(buffer);
             updateFastSensor('pressureTank', 'pressureTank', timestampStart, timestampEnd, values.map(v => Converters.rawToPressureBar(v, 'pressureTank')));
     }
     else if (topic === 'sensor/adc/fast/pressure/combustion') {
-      probeCount('mqtt.message.fast.pressure_combustion');
       const { timestampStart, timestampEnd, values } = Parser.parseFastAdc(buffer);
             updateFastSensor('pressureCombustion', 'pressureCombustion', timestampStart, timestampEnd, values.map(v => Converters.rawToPressureBar(v, 'pressureCombustion')));
     }
     else if (topic.startsWith('sensor/adc/slow/')) {
-        probeCount('mqtt.message.slow');
         const { timestamp, value: raw } = Parser.parseSlowAdc(buffer);
           if (topic.includes('battery/stand')) updateSlowSensor('batteryStand', 'batteryStand', timestamp, Converters.rawToVoltage(raw, 'batteryStand'));
           if (topic.includes('battery/computer')) updateSlowSensor('batteryComputer', 'batteryComputer', timestamp, Converters.rawToVoltage(raw, 'batteryComputer'));
@@ -426,7 +404,6 @@ export const useMqttSystem = () => {
           if (topic.includes('starter_sense')) updateSlowSensor('starterSense', 'starterSense', timestamp, Converters.rawToVoltage(raw, 'starterSense'));
     }
     else if (topic === 'sensor/digital/armed') {
-        probeCount('mqtt.message.digital.armed');
         const { timestamp, value } = Parser.parseDigital(buffer);
         if (!isRetained) {
           checkTime(timestamp);
@@ -435,7 +412,6 @@ export const useMqttSystem = () => {
         current.isUnsafe = value !== 0; 
     }
     else if (topic.startsWith('sensor/temp/')) {
-        probeCount('mqtt.message.temp');
         const { timestampStart, timestampEnd, values } = Parser.parseTemp(buffer);
         if (!checkTime(timestampStart)) return;
         current.lastPacketTimestamp = Math.max(current.lastPacketTimestamp, timestampEnd);
@@ -455,15 +431,11 @@ export const useMqttSystem = () => {
         const oldHist = current.temperatures[sensorId] || [];
             current.temperatures = {
                 ...current.temperatures,
-                [sensorId]: withProbe(
-                  'telemetry.temp.concat_slice.ms',
-                  () => [...oldHist, ...points].slice(-MAX_TEMPERATURE_LIVE_POINTS)
-                )
+                [sensorId]: [...oldHist, ...points].slice(-MAX_TEMPERATURE_LIVE_POINTS)
             };
         }
     }
     else if (topic === 'sensor/servo') {
-        probeCount('mqtt.message.servo');
         const { timestamp, value } = Parser.parseServo(buffer);
         if (!isRetained) {
           checkTime(timestamp);
@@ -475,10 +447,7 @@ export const useMqttSystem = () => {
         if (!isRetained) {
           appendPointToChunk('servo', pt);
         }
-        current.servoPosition = withProbe(
-          'telemetry.servo.concat_slice.ms',
-          () => [...current.servoPosition, pt].slice(-MAX_SERVO_LIVE_POINTS)
-        );
+        current.servoPosition = [...current.servoPosition, pt].slice(-MAX_SERVO_LIVE_POINTS);
     }
     else if (topic === 'status/state') {
         const val = message.toString();
@@ -602,11 +571,8 @@ export const useMqttSystem = () => {
               return;
           }
 
-          const publishStart = performance.now();
           publishedTelemetryVersionRef.current = telemetryVersionRef.current;
           setTelemetry({ ...telemetryRef.current });
-          probeCount('react.telemetry_publish.count');
-          probeDuration('react.telemetry_publish.call_ms', performance.now() - publishStart);
       }
     }, 33);
     return () => clearInterval(interval);

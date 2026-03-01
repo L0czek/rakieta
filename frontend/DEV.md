@@ -161,10 +161,3 @@ This is a single-page React+TypeScript application built on Vite. The architectu
 3. Expand checklist test coverage to include multi-client MQTT sync integration tests.
 4. Expand broker config with protocol/TLS/credentials UX where needed.
 
-## Debug instrumentation
-
-- `utils/perfProbe.ts` provides opt-in, aggregated performance probes.
-- Enable with `localStorage.setItem('scada.probe', '1')` and page reload.
-- Probes currently instrument:
-  - telemetry ingress and DB flush timing,
-  - App/Analysis/FastChart render and commit frequency.

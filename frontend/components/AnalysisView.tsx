@@ -8,7 +8,6 @@ import { Pause, Play, ZoomIn, ZoomOut } from 'lucide-react';
 import uPlot from 'uplot';
 import UplotReact from 'uplot-react';
 import * as DB from '../utils/db';
-import { probeCount } from '@/utils/perfProbe';
 import { ConnectionState } from '../types';
 
 interface AnalysisViewProps {
@@ -26,7 +25,6 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
     isSimulating,
     commandsEnabled,
 }) => {
-  probeCount('render.AnalysisView');
     const sensorLabels: Record<string, string> = {
         tensometer: 'tensometer',
         pressureTank: 'tank pressure',
@@ -205,10 +203,6 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
       }
   }, [viewStart, windowSize, isLive, visibleLines]);
 
-  useEffect(() => {
-      probeCount('effect.AnalysisView.commit');
-  });
-
   // --- HELPERS ---
 
   const getLatestValue = (data: {value: number}[]) => data.length > 0 ? data[data.length - 1].value : 0;
@@ -242,18 +236,11 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
       };
 
       const next: Record<string, SensorDataPoint[]> = {};
-      let inPoints = 0;
-      let lineCount = 0;
       for (const [key, visible] of Object.entries(visibleLines)) {
           if (!visible) continue;
           const raw = rawSeries[key] || [];
-          inPoints += raw.length;
-          lineCount += 1;
           next[key] = raw;
       }
-      probeCount('analysis.live.visible_lines', lineCount);
-      probeCount('analysis.live.in_points', inPoints);
-      probeCount('analysis.live.out_points', inPoints);
       return next;
   }, [
     isLive,
@@ -272,18 +259,11 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
   const historySeriesData = React.useMemo(() => {
       if (isLive || !chartData) return {};
       const next: Record<string, SensorDataPoint[]> = {};
-      let inPoints = 0;
-      let lineCount = 0;
       for (const [key, visible] of Object.entries(visibleLines)) {
           if (!visible) continue;
           const raw = chartData[key] || [];
-          inPoints += raw.length;
-          lineCount += 1;
           next[key] = raw;
       }
-      probeCount('analysis.history.visible_lines', lineCount);
-      probeCount('analysis.history.in_points', inPoints);
-      probeCount('analysis.history.out_points', inPoints);
       return next;
   }, [isLive, chartData, visibleLines]);
 
