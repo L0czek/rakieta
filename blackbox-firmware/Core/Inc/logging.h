@@ -1,13 +1,16 @@
 #ifndef __LOGGING_H__
 #define __LOGGING_H__
 
-#ifdef __cpluspluc
+#include <stdint.h>
+
+#ifdef __cplusplus
 extern "C" {
 #endif
 
-void LogError(const char *, ...);
+void LogInfo(const char *msg);
+void LogError(const char *msg);
 
-#ifdef __cpluspluc
+#ifdef __cplusplus
 }
 #endif
 
