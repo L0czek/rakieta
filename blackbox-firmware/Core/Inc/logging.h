@@ -7,8 +7,6 @@
 extern "C" {
 #endif
 
-void LogInfo(const char *msg);
-void LogError(const char *msg);
 
 #ifdef __cplusplus
 }

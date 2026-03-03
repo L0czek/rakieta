@@ -59,7 +59,7 @@
 extern DMA_HandleTypeDef hdma_spi1_tx;
 extern DMA_HandleTypeDef hdma_spi1_rx;
 extern SPI_HandleTypeDef hspi1;
-extern TIM_HandleTypeDef htim1;
+extern TIM_HandleTypeDef htim14;
 extern DMA_HandleTypeDef hdma_usart1_rx;
 extern UART_HandleTypeDef huart1;
 /* USER CODE BEGIN EV */
@@ -177,17 +177,17 @@ void DMA1_Channel2_3_IRQHandler(void)
 }
 
 /**
-  * @brief This function handles TIM1 break, update, trigger and commutation interrupts.
+  * @brief This function handles TIM14 global interrupt.
   */
-void TIM1_BRK_UP_TRG_COM_IRQHandler(void)
+void TIM14_IRQHandler(void)
 {
-  /* USER CODE BEGIN TIM1_BRK_UP_TRG_COM_IRQn 0 */
+  /* USER CODE BEGIN TIM14_IRQn 0 */
 
-  /* USER CODE END TIM1_BRK_UP_TRG_COM_IRQn 0 */
-  HAL_TIM_IRQHandler(&htim1);
-  /* USER CODE BEGIN TIM1_BRK_UP_TRG_COM_IRQn 1 */
+  /* USER CODE END TIM14_IRQn 0 */
+  HAL_TIM_IRQHandler(&htim14);
+  /* USER CODE BEGIN TIM14_IRQn 1 */
 
-  /* USER CODE END TIM1_BRK_UP_TRG_COM_IRQn 1 */
+  /* USER CODE END TIM14_IRQn 1 */
 }
 
 /**

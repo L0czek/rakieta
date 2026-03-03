@@ -21,10 +21,13 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <stdint.h>
 #include <string.h>
 #include "sd_functions.h"
 #include "blackbox.h"
-#include "logging.h"
+#include "stm32c0xx_hal_gpio.h"
+#include "stm32c0xx_hal_spi.h"
+#include "stm32c0xx_hal_tim.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -36,6 +39,7 @@
 /* USER CODE BEGIN PD */
 #define LED_STATUS_PIN    GPIO_PIN_2
 #define LED_ACTIVITY_PIN  GPIO_PIN_3
+#define LED_ACTIVITY_ON_TIME    500
 #define LED_PORT          GPIOA
 #define ACTIVITY_PULSE_MS 50
 #define BTN_PIN           GPIO_PIN_1
@@ -57,17 +61,16 @@ SPI_HandleTypeDef hspi1;
 DMA_HandleTypeDef hdma_spi1_tx;
 DMA_HandleTypeDef hdma_spi1_rx;
 
-TIM_HandleTypeDef htim1;
+TIM_HandleTypeDef htim14;
 
 UART_HandleTypeDef huart1;
 DMA_HandleTypeDef hdma_usart1_rx;
 
 /* USER CODE BEGIN PV */
 SD_Context sd_ctx;
-Blackbox logger;
-volatile uint8_t activity_ms;
-volatile uint8_t btn_debounce;
-volatile uint8_t btn_last;
+Blackbox blackbox;
+volatile uint8_t activity;
+volatile uint32_t activity_ms;
 uint32_t battery_check_tick;
 uint32_t sd_retry_tick;
 uint8_t card_present;
@@ -80,7 +83,7 @@ static void MX_DMA_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_SPI1_Init(void);
 static void MX_USART1_UART_Init(void);
-static void MX_TIM1_Init(void);
+static void MX_TIM14_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -89,69 +92,44 @@ static void MX_TIM1_Init(void);
 /* USER CODE BEGIN 0 */
 static void sd_start_logging(void)
 {
-  LogInfo("I\n");  /* I = init */
-  blackbox_init(&logger, &sd_ctx, &huart1,
+  blackbox_init(&blackbox, &sd_ctx, &huart1,
                 BLACKBOX_START_SECTOR, BLACKBOX_TIMEOUT_MS);
 
-  /* SD cards require <=400kHz during init */
-  hspi1.Instance->CR1 &= ~SPI_CR1_SPE;
-  hspi1.Instance->CR1 = (hspi1.Instance->CR1
-      & ~SPI_CR1_BR_Msk)
-      | SPI_BAUDRATEPRESCALER_128;
-  hspi1.Instance->CR1 |= SPI_CR1_SPE;
-
-  LogInfo("D\n");  /* D = disk_initialize */
   if (SD_disk_initialize(&sd_ctx) != 0) {
-    logger.error |= BLACKBOX_ERR_SD;
-    LogError("D\n");
+    blackbox.error |= BLACKBOX_ERR_SD;
     return;
   }
 
-  /* Switch to fast SPI after init */
-  hspi1.Instance->CR1 &= ~SPI_CR1_SPE;
-  hspi1.Instance->CR1 = (hspi1.Instance->CR1
-      & ~SPI_CR1_BR_Msk)
-      | SPI_BAUDRATEPRESCALER_4;
-  hspi1.Instance->CR1 |= SPI_CR1_SPE;
-
-  LogInfo("S\n");  /* S = search */
-  uint32_t free = blackbox_find_free_sector(
-      &logger, LED_PORT, LED_STATUS_PIN);
-  if (logger.error & BLACKBOX_ERR_SD) {
-    LogError("S\n");
+  uint32_t free = blackbox_find_free_sector(&blackbox);
+  if (blackbox.error & BLACKBOX_ERR_SD) {
     return;
   }
 
-  logger.next_sector = free;
+  free = 0;
+  blackbox.next_sector = free;
 
-  if (logger.next_sector >= logger.total_sectors) {
-    logger.error |= BLACKBOX_ERR_FULL;
-    LogError("F\n");  /* F = full */
+  if (blackbox.next_sector >= blackbox.total_sectors) {
+    blackbox.error |= BLACKBOX_ERR_FULL;
     return;
   }
 
-  LogInfo("W\n");  /* W = write separator */
-  memset(logger.dma_buf, 0, BLACKBOX_HALF_SIZE);
-  logger.dma_buf[0] = BLACKBOX_SEPARATOR_BYTE;
-  if (SD_disk_write(&sd_ctx, logger.dma_buf,
-                    logger.next_sector++, 1) != RES_OK) {
-    logger.error |= BLACKBOX_ERR_SD;
-    LogError("W\n");
+  WORD sector_size = 0;
+  if (SD_disk_ioctl(&sd_ctx, GET_SECTOR_SIZE, &sector_size) != RES_OK) {
+    blackbox.error |= BLACKBOX_ERR_SD;
+    return;
+  }
+  blackbox.sector_size = sector_size;
+
+  memset(blackbox.dma_buf, 0, BLACKBOX_HALF_SIZE);
+  blackbox.dma_buf[0] = BLACKBOX_SEPARATOR_BYTE;
+  if (SD_disk_write(&sd_ctx, blackbox.dma_buf,
+                    blackbox.next_sector++, 1) != RES_OK) {
+    blackbox.error |= BLACKBOX_ERR_SD;
     return;
   }
 
-  HAL_GPIO_WritePin(LED_PORT, LED_STATUS_PIN,
-                    GPIO_PIN_SET);
-  HAL_Delay(500);
-  HAL_GPIO_WritePin(LED_PORT, LED_STATUS_PIN,
-                    GPIO_PIN_RESET);
-  HAL_Delay(200);
-  HAL_GPIO_WritePin(LED_PORT, LED_STATUS_PIN,
-                    GPIO_PIN_SET);
-
-  memset(logger.dma_buf, 0, BLACKBOX_DMA_BUF_SIZE);
-  blackbox_start(&logger);
-  LogInfo("OK\n");
+  memset(blackbox.dma_buf, 0, BLACKBOX_DMA_BUF_SIZE);
+  blackbox_start(&blackbox);
 }
 /* USER CODE END 0 */
 
@@ -188,25 +166,23 @@ int main(void)
   MX_ADC1_Init();
   MX_SPI1_Init();
   MX_USART1_UART_Init();
-  MX_TIM1_Init();
+  MX_TIM14_Init();
   /* USER CODE BEGIN 2 */
-  LogInfo("Start\n");
   HAL_ADCEx_Calibration_Start(&hadc1);
   SD_init(&sd_ctx, &hspi1, GPIOA, GPIO_PIN_4);
   sd_start_logging();
-  card_present = !(logger.error & BLACKBOX_ERR_SD);
+  card_present = !(blackbox.error & BLACKBOX_ERR_SD);
 
   HAL_ADC_Start(&hadc1);
   if (HAL_ADC_PollForConversion(&hadc1, 10) == HAL_OK) {
     uint32_t adc_val = HAL_ADC_GetValue(&hadc1);
     if (adc_val < BATTERY_LOW_ADC) {
-      logger.error |= BLACKBOX_ERR_BATTERY;
-      LogError("Batt low\n");
+      blackbox.error |= BLACKBOX_ERR_BATTERY;
     }
   }
   HAL_ADC_Stop(&hadc1);
 
-  HAL_TIM_Base_Start_IT(&htim1);
+  HAL_TIM_Base_Start_IT(&htim14);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -217,44 +193,40 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
     {
+      while (blackbox.error & BLACKBOX_ERR_OVERRUN)
+          ;
+
       uint8_t inserted = (HAL_GPIO_ReadPin(CD_PORT, CD_PIN)
                           == GPIO_PIN_RESET);
       if (!inserted && card_present) {
-        HAL_UART_DMAStop(logger.huart);
-        logger.error |= BLACKBOX_ERR_SD;
+        HAL_UART_DMAStop(blackbox.huart);
+        blackbox.error |= BLACKBOX_ERR_SD;
         card_present = 0;
-        LogError("Card out\n");
       } else if (inserted && !card_present
                && (HAL_GetTick() - sd_retry_tick >= 2000)) {
         sd_start_logging();
         card_present =
-            !(logger.error & BLACKBOX_ERR_SD);
+            !(blackbox.error & BLACKBOX_ERR_SD);
         if (!card_present)
           sd_retry_tick = HAL_GetTick();
       }
     }
     if (card_present) {
-      if (logger.write_pending[0] || logger.write_pending[1]
-          || logger.flush_pending) {
-        HAL_GPIO_WritePin(LED_PORT, LED_ACTIVITY_PIN,
-                          GPIO_PIN_SET);
-        activity_ms = ACTIVITY_PULSE_MS;
-      }
-      blackbox_process(&logger);
+        blackbox_process(&blackbox);
     }
-    uint32_t now = HAL_GetTick();
-    if (now - battery_check_tick >= BATTERY_CHECK_MS) {
-      battery_check_tick = now;
-      HAL_ADC_Start(&hadc1);
-      if (HAL_ADC_PollForConversion(&hadc1, 10) == HAL_OK) {
-        uint32_t adc_val = HAL_ADC_GetValue(&hadc1);
-        if (adc_val < BATTERY_LOW_ADC)
-          logger.error |= BLACKBOX_ERR_BATTERY;
-        else
-          logger.error &= (uint8_t)~BLACKBOX_ERR_BATTERY;
-      }
-      HAL_ADC_Stop(&hadc1);
-    }
+    // uint32_t now = HAL_GetTick();
+    // if (now - battery_check_tick >= BATTERY_CHECK_MS) {
+    //   battery_check_tick = now;
+    //   HAL_ADC_Start(&hadc1);
+    //   if (HAL_ADC_PollForConversion(&hadc1, 10) == HAL_OK) {
+    //     uint32_t adc_val = HAL_ADC_GetValue(&hadc1);
+    //     if (adc_val < BATTERY_LOW_ADC)
+    //       blackbox.error |= BLACKBOX_ERR_BATTERY;
+    //     else
+    //       blackbox.error &= (uint8_t)~BLACKBOX_ERR_BATTERY;
+    //   }
+    //   HAL_ADC_Stop(&hadc1);
+    // }
   }
   /* USER CODE END 3 */
 }
@@ -377,7 +349,7 @@ static void MX_SPI1_Init(void)
   hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
   hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
   hspi1.Init.NSS = SPI_NSS_SOFT;
-  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
+  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_4;
   hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
@@ -395,49 +367,33 @@ static void MX_SPI1_Init(void)
 }
 
 /**
-  * @brief TIM1 Initialization Function
+  * @brief TIM14 Initialization Function
   * @param None
   * @retval None
   */
-static void MX_TIM1_Init(void)
+static void MX_TIM14_Init(void)
 {
 
-  /* USER CODE BEGIN TIM1_Init 0 */
+  /* USER CODE BEGIN TIM14_Init 0 */
 
-  /* USER CODE END TIM1_Init 0 */
+  /* USER CODE END TIM14_Init 0 */
 
-  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
-  TIM_MasterConfigTypeDef sMasterConfig = {0};
+  /* USER CODE BEGIN TIM14_Init 1 */
 
-  /* USER CODE BEGIN TIM1_Init 1 */
-
-  /* USER CODE END TIM1_Init 1 */
-  htim1.Instance = TIM1;
-  htim1.Init.Prescaler = 47;
-  htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim1.Init.Period = 999;
-  htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-  htim1.Init.RepetitionCounter = 0;
-  htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-  if (HAL_TIM_Base_Init(&htim1) != HAL_OK)
+  /* USER CODE END TIM14_Init 1 */
+  htim14.Instance = TIM14;
+  htim14.Init.Prescaler = 47;
+  htim14.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim14.Init.Period = 999;
+  htim14.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim14.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim14) != HAL_OK)
   {
     Error_Handler();
   }
-  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
-  if (HAL_TIM_ConfigClockSource(&htim1, &sClockSourceConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
-  sMasterConfig.MasterOutputTrigger2 = TIM_TRGO2_RESET;
-  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
-  if (HAL_TIMEx_MasterConfigSynchronization(&htim1, &sMasterConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN TIM1_Init 2 */
+  /* USER CODE BEGIN TIM14_Init 2 */
 
-  /* USER CODE END TIM1_Init 2 */
+  /* USER CODE END TIM14_Init 2 */
 
 }
 
@@ -457,7 +413,7 @@ static void MX_USART1_UART_Init(void)
 
   /* USER CODE END USART1_Init 1 */
   huart1.Instance = USART1;
-  huart1.Init.BaudRate = 115200;
+  huart1.Init.BaudRate = 3000000;
   huart1.Init.WordLength = UART_WORDLENGTH_8B;
   huart1.Init.StopBits = UART_STOPBITS_1;
   huart1.Init.Parity = UART_PARITY_NONE;
@@ -527,23 +483,24 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2|GPIO_PIN_3|GPIO_PIN_4, GPIO_PIN_RESET);
 
-  /*Configure GPIO pin : PA1 (button) */
-  GPIO_InitStruct.Pin = GPIO_PIN_1;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : PA8 (card detect, LOW=inserted) */
-  GPIO_InitStruct.Pin = GPIO_PIN_8;
+  /*Configure GPIO pins : PA1 PA8 */
+  GPIO_InitStruct.Pin = GPIO_PIN_1|GPIO_PIN_8;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PA2 PA3 PA4 */
-  GPIO_InitStruct.Pin = GPIO_PIN_2|GPIO_PIN_3|GPIO_PIN_4;
+  /*Configure GPIO pins : PA2 PA3 */
+  GPIO_InitStruct.Pin = GPIO_PIN_2|GPIO_PIN_3;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : PA4 */
+  GPIO_InitStruct.Pin = GPIO_PIN_4;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /* USER CODE BEGIN MX_GPIO_Init_2 */
@@ -572,61 +529,160 @@ void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi)
 
 void HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart)
 {
-  if (huart->Instance == USART1)
-    logger.write_pending[0] = 1;
+    if (huart->Instance == USART1) {
+        blackbox.buffer_to_write = 0;
+        blackbox.do_write = 1;
+
+        if (blackbox.writing_to_sd_in_progress == 1)
+            blackbox.error |= BLACKBOX_ERR_OVERRUN;
+    }
 }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-  if (huart->Instance == USART1)
-    logger.write_pending[1] = 1;
+    if (huart->Instance == USART1) {
+        blackbox.buffer_to_write = 1;
+        blackbox.do_write = 1;
+
+        if (blackbox.writing_to_sd_in_progress == 1)
+            blackbox.error |= BLACKBOX_ERR_OVERRUN;
+    }
+}
+
+static volatile enum : uint8_t {
+    StatusLEDIdle,
+    StatusLEDBlinking,
+    StatusLEDBlanking
+} status_led_state = StatusLEDIdle;
+
+static void periodic_task_handler()
+{
+    blackbox_tick(&blackbox);
+
+    /* ---------------- Activity LED (unchanged) ---------------- */
+
+    static volatile uint32_t activity_deltatime = 0;
+    if (blackbox.is_active) {
+        if (activity_deltatime++ >= LED_ACTIVITY_ON_TIME) {
+            HAL_GPIO_TogglePin(LED_PORT, LED_ACTIVITY_PIN);
+            activity_deltatime = 0;
+        }
+    } else {
+        HAL_GPIO_WritePin(LED_PORT, LED_ACTIVITY_PIN, GPIO_PIN_RESET);
+    }
+
+    /* ---------------- Status LED (error blinking) ---------------- */
+
+    static uint32_t status_timer = 0;
+    static uint8_t blink_count = 0;
+    static uint8_t blink_target = 0;
+    static uint8_t led_on = 0;
+
+    uint8_t err = blackbox.error;
+
+    switch (status_led_state)
+    {
+        case StatusLEDIdle:
+            HAL_GPIO_WritePin(LED_PORT, LED_STATUS_PIN, GPIO_PIN_RESET);
+
+            if (err)
+            {
+                blink_target = err;
+                blink_count  = 0;
+                status_timer = 0;
+                led_on       = 1;
+
+                HAL_GPIO_WritePin(LED_PORT, LED_STATUS_PIN, GPIO_PIN_SET);
+
+                status_led_state = StatusLEDBlinking;
+            }
+            break;
+
+        case StatusLEDBlinking:
+            if (++status_timer >= 500)   // 500 ms
+            {
+                status_timer = 0;
+                if (led_on)
+                {
+                    // Turn LED OFF (end of ON phase)
+                    HAL_GPIO_WritePin(LED_PORT, LED_STATUS_PIN, GPIO_PIN_RESET);
+                    led_on = 0;
+                }
+                else
+                {
+                    // Completed one full blink (ON + OFF)
+                    blink_count++;
+                    if (blink_count >= blink_target)
+                    {
+                        // All blinks done → go to 3 second pause
+                        status_led_state = StatusLEDBlanking;
+                    }
+                    else
+                    {
+                        // Start next blink
+                        HAL_GPIO_WritePin(LED_PORT, LED_STATUS_PIN, GPIO_PIN_SET);
+                        led_on = 1;
+                    }
+                }
+            }
+            break;
+
+        case StatusLEDBlanking:
+
+            HAL_GPIO_WritePin(LED_PORT, LED_STATUS_PIN, GPIO_PIN_RESET);
+
+            if (++status_timer >= 3000)  // 3 seconds pause
+            {
+                status_timer = 0;
+                if (err)
+                {
+                    // Restart blinking same error
+                    blink_target = err;
+                    blink_count  = 0;
+                    led_on       = 1;
+
+                    HAL_GPIO_WritePin(LED_PORT, LED_STATUS_PIN, GPIO_PIN_SET);
+
+                    status_led_state = StatusLEDBlinking;
+                }
+                else
+                {
+                    status_led_state = StatusLEDIdle;
+                }
+            }
+            break;
+    }
+
+
+    // ========================= BUTTON DEBOUNCE =========================
+    //
+    static uint8_t button_stable_state = 1;
+    static uint16_t button_debounce_counter = 0;
+    uint8_t button_raw = HAL_GPIO_ReadPin(BTN_PORT, BTN_PIN);  // 1 = not pressed, 0 = pressed
+
+    if (button_raw != button_stable_state)
+    {
+        if (++button_debounce_counter >= 50)  // 50 ms debounce time
+        {
+            button_stable_state = button_raw;
+            button_debounce_counter = 0;
+
+            if (button_stable_state == GPIO_PIN_RESET)
+                blackbox.push_separator = 1;
+        }
+    }
+    else
+    {
+        button_debounce_counter = 0;
+    }
 }
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-  if (htim->Instance != TIM1)
-    return;
-
-  blackbox_tick(&logger);
-
-  /* Activity LED off after pulse */
-  if (activity_ms > 0) {
-    activity_ms--;
-    if (activity_ms == 0)
-      HAL_GPIO_WritePin(LED_PORT, LED_ACTIVITY_PIN,
-                        GPIO_PIN_RESET);
-  }
-
-  /* Button debounce (PA1, active LOW) */
-  if (btn_debounce > 0) {
-    btn_debounce--;
-  } else {
-    uint8_t raw = (HAL_GPIO_ReadPin(BTN_PORT, BTN_PIN)
-                   == GPIO_PIN_RESET);
-    if (raw && !btn_last) {
-      logger.separator_pending = 1;
-      btn_debounce = BTN_DEBOUNCE_MS;
-    }
-    btn_last = raw;
-  }
-
-  /* Error LED: SD/full ~1Hz, battery ~4Hz */
-  {
-    static uint16_t led_cnt;
-    uint8_t err = logger.error;
-    uint16_t period = 0;
-    if (err & (BLACKBOX_ERR_SD | BLACKBOX_ERR_FULL))
-      period = 500;
-    else if (err & BLACKBOX_ERR_BATTERY)
-      period = 125;
-    if (period && ++led_cnt >= period) {
-      HAL_GPIO_TogglePin(LED_PORT, LED_STATUS_PIN);
-      led_cnt = 0;
-    } else if (!period) {
-      led_cnt = 0;
-    }
-  }
+    if (htim == &htim14)
+        periodic_task_handler();
 }
+
 /* USER CODE END 4 */
 
 /**
