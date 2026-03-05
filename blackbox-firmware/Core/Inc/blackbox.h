@@ -44,6 +44,9 @@ typedef struct {
     volatile uint8_t error;
     volatile uint8_t separator_pending;
     volatile uint8_t writing_to_sd_in_progress;
+    volatile uint32_t write_count;
+    volatile uint32_t last_write_ms;
+    volatile uint32_t max_write_ms;
     uint32_t sector_size;
     uint8_t separator_byte;
     SD_Context *sd;

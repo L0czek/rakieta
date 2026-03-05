@@ -25,6 +25,9 @@ void blackbox_init(Blackbox *bb, SD_Context *sd,
     bb->huart = huart;
     bb->push_separator = 0;
     bb->writing_to_sd_in_progress = 0;
+    bb->write_count = 0;
+    bb->last_write_ms = 0;
+    bb->max_write_ms = 0;
 }
 
 void blackbox_start(Blackbox *bb)
@@ -101,8 +104,23 @@ void blackbox_process(Blackbox *bb)
         return;
     }
 
-    if (bb->do_write)
-        blackbox_write_buffer(bb, bb->next_sector++);
+    if (bb->do_write) {
+        uint8_t buffer_index = bb->buffer_to_write;
+        uint32_t primask = __get_PRIMASK();
+
+        blackbox_write_buffer(bb, bb->next_sector);
+        bb->next_sector += BLACKBOX_HALF_SIZE / bb->sector_size;
+        __disable_irq();
+        bb->do_write &= (uint8_t)~(1U << buffer_index);
+        if ((bb->do_write & 0x01U) != 0U) {
+            bb->buffer_to_write = 0;
+        } else if ((bb->do_write & 0x02U) != 0U) {
+            bb->buffer_to_write = 1;
+        }
+        if (primask == 0U) {
+            __enable_irq();
+        }
+    }
 
     // if (bb->flush_pending)
     //     blackbox_write_buffer(bb, bb->next_sector);
@@ -115,10 +133,23 @@ void blackbox_process(Blackbox *bb)
 }
 
 void blackbox_write_buffer(Blackbox *bb, uint32_t sector) {
+    uint32_t start = HAL_GetTick();
     bb->writing_to_sd_in_progress = 1;
     void *buf = &bb->dma_buf[BLACKBOX_HALF_SIZE * bb->buffer_to_write];
-    if (SD_disk_write(bb->sd, buf, sector, BLACKBOX_HALF_SIZE / 512) != RES_OK)
+
+    if (SD_disk_write(bb->sd, buf, sector, BLACKBOX_HALF_SIZE / 512) != RES_OK) {
         bb->error |= BLACKBOX_ERR_SD;
+        Log_SemihostText("bb:wr! ");
+        Log_SemihostHex32(sector);
+    } else {
+        bb->write_count++;
+    }
+    bb->last_write_ms = HAL_GetTick() - start;
+    if (bb->last_write_ms > bb->max_write_ms) {
+        bb->max_write_ms = bb->last_write_ms;
+        Log_SemihostText("wmax\n");
+        Log_SemihostHex32(bb->max_write_ms);
+    }
 
     bb->is_active = 1;
     bb->writing_to_sd_in_progress = 0;

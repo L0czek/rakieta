@@ -74,6 +74,13 @@ volatile uint32_t activity_ms;
 uint32_t battery_check_tick;
 uint32_t sd_retry_tick;
 uint8_t card_present;
+volatile uint32_t uart_rx_bytes_total;
+volatile uint32_t uart_avg_bps;
+volatile uint32_t uart_pending_bps;
+volatile uint8_t uart_rate_log_pending;
+uint32_t uart_last_event_ms;
+uint32_t uart_interval_sum_ms;
+uint32_t uart_interval_events;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -90,6 +97,91 @@ static void MX_TIM14_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+static void sh_puts(const char *s)
+{
+  Log_SemihostText(s);
+}
+
+static void sh_put_hex8(uint8_t value)
+{
+  Log_SemihostHex8(value);
+}
+
+static void sh_put_hex32(uint32_t value)
+{
+  Log_SemihostHex32(value);
+}
+
+static void log_blackbox_error(const char *prefix)
+{
+  sh_puts(prefix);
+  sh_put_hex8(blackbox.error);
+}
+
+static void update_uart_rate_average(void)
+{
+  uint32_t now = HAL_GetTick();
+  uint32_t elapsed_ms;
+  uint32_t bytes_total;
+  uint32_t avg_bps;
+
+  uart_rx_bytes_total += BLACKBOX_HALF_SIZE;
+
+  if (uart_last_event_ms == 0U) {
+    uart_last_event_ms = now;
+    return;
+  }
+
+  elapsed_ms = now - uart_last_event_ms;
+  uart_last_event_ms = now;
+  if (elapsed_ms == 0U) {
+    return;
+  }
+
+  uart_interval_sum_ms += elapsed_ms;
+  uart_interval_events++;
+
+  if (uart_interval_sum_ms < 1000U) {
+    return;
+  }
+
+  bytes_total = uart_interval_events * BLACKBOX_HALF_SIZE;
+  avg_bps = (bytes_total * 1000UL) / uart_interval_sum_ms;
+  if (avg_bps > uart_avg_bps) {
+    uart_avg_bps = avg_bps;
+    uart_pending_bps = avg_bps;
+    uart_rate_log_pending = 1U;
+  }
+  uart_interval_sum_ms = 0U;
+  uart_interval_events = 0U;
+}
+
+static void log_uart_rate_if_pending(void)
+{
+  if (uart_rate_log_pending == 0U) {
+    return;
+  }
+
+  uart_rate_log_pending = 0U;
+  sh_puts("uavg\n");
+  sh_put_hex32(uart_pending_bps);
+}
+
+static void log_dma_overrun(uint8_t is_half)
+{
+  if ((blackbox.error & BLACKBOX_ERR_OVERRUN) != 0U) {
+    return;
+  }
+
+  blackbox.error |= BLACKBOX_ERR_OVERRUN;
+  sh_puts(is_half ? "ovr:h\n" : "ovr:f\n");
+  sh_puts("ovr:w\n");
+  sh_put_hex32(blackbox.write_count);
+  sh_puts("ovr:t\n");
+  sh_put_hex32(blackbox.last_write_ms);
+  sh_puts((blackbox.write_count < 4U) ? "ovr:p\n" : "ovr:j\n");
+}
+
 static void sd_start_logging(void)
 {
   blackbox_init(&blackbox, &sd_ctx, &huart1,
@@ -97,25 +189,32 @@ static void sd_start_logging(void)
 
   if (SD_disk_initialize(&sd_ctx) != 0) {
     blackbox.error |= BLACKBOX_ERR_SD;
+    log_blackbox_error("m:sd0=");
     return;
   }
+  sh_puts("main: SD initialized\n");
 
-  uint32_t free = blackbox_find_free_sector(&blackbox);
-  if (blackbox.error & BLACKBOX_ERR_SD) {
+  DWORD sector_count = 0;
+  if (SD_disk_ioctl(&sd_ctx, GET_SECTOR_COUNT, &sector_count) != RES_OK
+      || sector_count == 0) {
+    blackbox.error |= BLACKBOX_ERR_SD;
+    log_blackbox_error("m:sc=");
     return;
   }
-
-  free = 0;
-  blackbox.next_sector = free;
+  blackbox.total_sectors = sector_count;
+  blackbox.next_sector = 0;
+  sh_puts("main: sector count ready\n");
 
   if (blackbox.next_sector >= blackbox.total_sectors) {
     blackbox.error |= BLACKBOX_ERR_FULL;
+    log_blackbox_error("m:full=");
     return;
   }
 
   WORD sector_size = 0;
   if (SD_disk_ioctl(&sd_ctx, GET_SECTOR_SIZE, &sector_size) != RES_OK) {
     blackbox.error |= BLACKBOX_ERR_SD;
+    log_blackbox_error("m:ss=");
     return;
   }
   blackbox.sector_size = sector_size;
@@ -125,8 +224,10 @@ static void sd_start_logging(void)
   if (SD_disk_write(&sd_ctx, blackbox.dma_buf,
                     blackbox.next_sector++, 1) != RES_OK) {
     blackbox.error |= BLACKBOX_ERR_SD;
+    log_blackbox_error("m:wr0=");
     return;
   }
+  sh_puts("main: initial separator written\n");
 
   memset(blackbox.dma_buf, 0, BLACKBOX_DMA_BUF_SIZE);
   blackbox_start(&blackbox);
@@ -168,16 +269,30 @@ int main(void)
   MX_USART1_UART_Init();
   MX_TIM14_Init();
   /* USER CODE BEGIN 2 */
+  sh_puts("main: boot\n");
+  uart_rx_bytes_total = 0U;
+  uart_avg_bps = 0U;
+  uart_pending_bps = 0U;
+  uart_rate_log_pending = 0U;
+  uart_last_event_ms = 0U;
+  uart_interval_sum_ms = 0U;
+  uart_interval_events = 0U;
   HAL_ADCEx_Calibration_Start(&hadc1);
   SD_init(&sd_ctx, &hspi1, GPIOA, GPIO_PIN_4);
   sd_start_logging();
   card_present = !(blackbox.error & BLACKBOX_ERR_SD);
+  if (card_present) {
+    sh_puts("main: card present after init\n");
+  } else {
+    log_blackbox_error("m:init=");
+  }
 
   HAL_ADC_Start(&hadc1);
   if (HAL_ADC_PollForConversion(&hadc1, 10) == HAL_OK) {
     uint32_t adc_val = HAL_ADC_GetValue(&hadc1);
     if (adc_val < BATTERY_LOW_ADC) {
       blackbox.error |= BLACKBOX_ERR_BATTERY;
+      log_blackbox_error("m:bat=");
     }
   }
   HAL_ADC_Stop(&hadc1);
@@ -192,6 +307,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+    log_uart_rate_if_pending();
     {
       while (blackbox.error & BLACKBOX_ERR_OVERRUN)
           ;
@@ -199,34 +315,41 @@ int main(void)
       uint8_t inserted = (HAL_GPIO_ReadPin(CD_PORT, CD_PIN)
                           == GPIO_PIN_RESET);
       if (!inserted && card_present) {
+        sh_puts("main: card removed\n");
         HAL_UART_DMAStop(blackbox.huart);
         blackbox.error |= BLACKBOX_ERR_SD;
         card_present = 0;
+        log_blackbox_error("m:rm=");
       } else if (inserted && !card_present
                && (HAL_GetTick() - sd_retry_tick >= 2000)) {
+        sh_puts("main: retrying card init\n");
         sd_start_logging();
         card_present =
             !(blackbox.error & BLACKBOX_ERR_SD);
-        if (!card_present)
+        if (!card_present) {
           sd_retry_tick = HAL_GetTick();
+          log_blackbox_error("m:rty=");
+        } else {
+          sh_puts("main: card reinitialized\n");
+        }
       }
     }
     if (card_present) {
         blackbox_process(&blackbox);
     }
-    // uint32_t now = HAL_GetTick();
-    // if (now - battery_check_tick >= BATTERY_CHECK_MS) {
-    //   battery_check_tick = now;
-    //   HAL_ADC_Start(&hadc1);
-    //   if (HAL_ADC_PollForConversion(&hadc1, 10) == HAL_OK) {
-    //     uint32_t adc_val = HAL_ADC_GetValue(&hadc1);
-    //     if (adc_val < BATTERY_LOW_ADC)
-    //       blackbox.error |= BLACKBOX_ERR_BATTERY;
-    //     else
-    //       blackbox.error &= (uint8_t)~BLACKBOX_ERR_BATTERY;
-    //   }
-    //   HAL_ADC_Stop(&hadc1);
-    // }
+    uint32_t now = HAL_GetTick();
+    if (now - battery_check_tick >= BATTERY_CHECK_MS) {
+      battery_check_tick = now;
+      HAL_ADC_Start(&hadc1);
+      if (HAL_ADC_PollForConversion(&hadc1, 10) == HAL_OK) {
+        uint32_t adc_val = HAL_ADC_GetValue(&hadc1);
+        if (adc_val < BATTERY_LOW_ADC)
+          blackbox.error |= BLACKBOX_ERR_BATTERY;
+        else
+          blackbox.error &= (uint8_t)~BLACKBOX_ERR_BATTERY;
+      }
+      HAL_ADC_Stop(&hadc1);
+    }
   }
   /* USER CODE END 3 */
 }
@@ -530,22 +653,30 @@ void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi)
 void HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart)
 {
     if (huart->Instance == USART1) {
-        blackbox.buffer_to_write = 0;
-        blackbox.do_write = 1;
-
-        if (blackbox.writing_to_sd_in_progress == 1)
-            blackbox.error |= BLACKBOX_ERR_OVERRUN;
+        if ((blackbox.do_write & 0x02U) != 0U) {
+            log_dma_overrun(1U);
+            return;
+        }
+        if (blackbox.do_write == 0U) {
+            blackbox.buffer_to_write = 0;
+        }
+        blackbox.do_write |= 0x01U;
+        update_uart_rate_average();
     }
 }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
     if (huart->Instance == USART1) {
-        blackbox.buffer_to_write = 1;
-        blackbox.do_write = 1;
-
-        if (blackbox.writing_to_sd_in_progress == 1)
-            blackbox.error |= BLACKBOX_ERR_OVERRUN;
+        if ((blackbox.do_write & 0x01U) != 0U) {
+            log_dma_overrun(0U);
+            return;
+        }
+        if (blackbox.do_write == 0U) {
+            blackbox.buffer_to_write = 1;
+        }
+        blackbox.do_write |= 0x02U;
+        update_uart_rate_average();
     }
 }
 
