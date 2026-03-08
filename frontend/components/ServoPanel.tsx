@@ -26,7 +26,7 @@ export const ServoPanel: React.FC<ServoPanelProps> = ({
 
     return (
         <ScadaPanel title="SERVO DIAGNOSTICS & CONTROL" className="h-full">
-            <div className="grid grid-cols-2 gap-2 h-full p-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 h-full p-1">
                 {/* Left: Visualization */}
                 <div className="flex flex-col justify-between">
                     <div>
@@ -55,14 +55,14 @@ export const ServoPanel: React.FC<ServoPanelProps> = ({
                          <button 
                             onClick={() => actions.setServoCmd('OPEN')}
                             disabled={!canServo}
-                            className={`flex-1 rounded border border-cyan-500/50 flex items-center justify-center text-xs font-bold ${servoState === ServoState.OPEN ? 'bg-cyan-600 text-white' : 'bg-slate-800 text-cyan-400 hover:bg-slate-700'} disabled:opacity-50 disabled:cursor-not-allowed`}
+                            className={`flex-1 min-h-11 rounded border border-cyan-500/50 flex items-center justify-center text-xs font-bold md:min-h-0 ${servoState === ServoState.OPEN ? 'bg-cyan-600 text-white' : 'bg-slate-800 text-cyan-400 hover:bg-slate-700'} disabled:opacity-50 disabled:cursor-not-allowed`}
                         >
                             OPEN
                         </button>
                         <button 
                             onClick={() => actions.setServoCmd('CLOSE')}
                             disabled={!canServo}
-                            className={`flex-1 rounded border border-cyan-500/50 flex items-center justify-center text-xs font-bold ${servoState === ServoState.CLOSED ? 'bg-cyan-900/50 text-white' : 'bg-slate-800 text-cyan-400 hover:bg-slate-700'} disabled:opacity-50 disabled:cursor-not-allowed`}
+                            className={`flex-1 min-h-11 rounded border border-cyan-500/50 flex items-center justify-center text-xs font-bold md:min-h-0 ${servoState === ServoState.CLOSED ? 'bg-cyan-900/50 text-white' : 'bg-slate-800 text-cyan-400 hover:bg-slate-700'} disabled:opacity-50 disabled:cursor-not-allowed`}
                         >
                             CLOSE
                         </button>

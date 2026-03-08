@@ -84,7 +84,8 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
           shadow-[inset_0_0_0_1px_rgba(56,189,248,0.08)]"
       >
         <select
-          className="bg-slate-900 border border-slate-700 rounded-sm px-3 py-2 text-sm text-slate-100
+          aria-label="Select checklist"
+          className="bg-slate-900 border border-slate-700 rounded-sm px-3 py-2.5 min-h-11 text-sm text-slate-100
             tracking-wide min-w-[190px] flex-1"
           value={selectedChecklistId}
           onChange={(event) => onSelectChecklist(event.target.value)}
@@ -96,7 +97,7 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
           ))}
         </select>
         <button
-          className="px-3 py-2 text-xs font-bold bg-slate-800 border border-slate-700 rounded-sm
+          className="px-3 py-2.5 min-h-11 text-xs font-bold bg-slate-800 border border-slate-700 rounded-sm
             text-slate-100 tracking-wider hover:border-cyan-700/70 disabled:opacity-50"
           disabled={isReadOnly || isSubmitting}
           onClick={() => runAction(onResetChecklist)}
@@ -104,7 +105,7 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
           RESET CHECKLIST
         </button>
         <button
-          className="px-3 py-2 text-xs font-bold bg-slate-800 border border-slate-700 rounded-sm
+          className="px-3 py-2.5 min-h-11 text-xs font-bold bg-slate-800 border border-slate-700 rounded-sm
             text-slate-100 tracking-wider hover:border-cyan-700/70 disabled:opacity-50"
           disabled={isReadOnly || isSubmitting}
           onClick={() => runAction(onResetAllChecklists)}
@@ -166,7 +167,7 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
                       <label key={field.id} className="text-xs text-slate-300 flex flex-col gap-1">
                         {field.label}
                         <input
-                          className="bg-slate-900 border border-slate-700 rounded-sm px-2 py-1
+                          className="bg-slate-900 border border-slate-700 rounded-sm px-2 py-2.5 min-h-11
                             text-slate-100 focus:outline-none focus:border-cyan-500/70"
                           type={field.type}
                           placeholder={field.placeholder}
@@ -181,7 +182,7 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
                     ))}
 
                     <button
-                      className="self-start px-3 py-2 rounded-sm bg-cyan-700 text-white font-bold text-sm
+                      className="self-start px-3 py-2.5 min-h-11 rounded-sm bg-cyan-700 text-white font-bold text-sm
                         tracking-wide border border-cyan-500/70 shadow-[0_0_10px_rgba(6,182,212,0.3)]
                         disabled:opacity-50"
                       disabled={

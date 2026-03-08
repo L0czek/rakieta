@@ -130,14 +130,14 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
             <button
               onClick={() => actions.setFireState('FIRE_RESET')}
               disabled={!commandsEnabled}
-              className="h-10 bg-slate-700 hover:bg-slate-600 text-slate-200 font-mono text-xs border border-slate-600 rounded flex items-center justify-center gap-2"
+              className="min-h-11 bg-slate-700 hover:bg-slate-600 text-slate-200 font-mono text-xs border border-slate-600 rounded flex items-center justify-center gap-2"
             >
               <RefreshCcw className="w-3 h-3" /> RESET STATE
             </button>
             <button
               onClick={() => setShowShutdownConfirm(true)}
               disabled={!canShutdown}
-              className="h-10 bg-amber-700 hover:bg-amber-600 text-amber-50 font-mono text-xs border border-amber-500 rounded flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="min-h-11 bg-amber-700 hover:bg-amber-600 text-amber-50 font-mono text-xs border border-amber-500 rounded flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Power className="w-3 h-3" /> SHUTDOWN
             </button>

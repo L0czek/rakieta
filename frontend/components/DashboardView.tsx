@@ -88,9 +88,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ telemetry, actions
     const chartXDomain: [number, number] = [chartWindowStart, chartWindowEnd];
 
     return (
-        <div className="grid grid-cols-12 grid-rows-12 gap-2 h-full">
+        <div className="grid grid-cols-1 gap-2 auto-rows-[minmax(220px,auto)] min-h-full md:grid-cols-12 md:grid-rows-12 md:h-full">
             {/* Dashboard layout */}
-            <div className="col-span-8 row-span-4">
+            <div className="min-h-[220px] md:col-span-8 md:row-span-4 md:min-h-0">
                 <ScadaPanel 
                     title={getSeriesLabel('pressureTank')} 
                     className="h-full" 
@@ -99,7 +99,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ telemetry, actions
                     <FastChart data={telemetry.pressureTank} color={SENSOR_COLORS.pressureTank} domain={CHART_RANGES.pressure} xDomain={chartXDomain} />
                 </ScadaPanel>
             </div>
-            <div className="col-span-4 row-span-4 flex flex-col gap-2">
+            <div className="flex flex-col gap-2 md:col-span-4 md:row-span-4">
                     <ScadaPanel title="POWER SYSTEMS" className="flex-1">
                         <div className="p-2 space-y-2">
                         <div className="flex items-center justify-between border-b border-slate-700 pb-1 mb-1 gap-2 min-w-0">
@@ -132,7 +132,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ telemetry, actions
                         </div>
                         </div>
                     </ScadaPanel>
-                                        <ScadaPanel title="STATUS LOG" className="h-24">
+                                        <ScadaPanel title="STATUS LOG" className="h-40 md:h-24">
                                                 <div className="font-mono text-xs p-2 h-full overflow-y-auto pr-1 scrollbar-thin space-y-1">
                                                         {(telemetry.statusLog.length > 0
                                                             ? telemetry.statusLog
@@ -152,7 +152,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ telemetry, actions
                                                 </div>
                                         </ScadaPanel>
             </div>
-            <div className="col-span-8 row-span-4">
+            <div className="min-h-[220px] md:col-span-8 md:row-span-4 md:min-h-0">
                     <ScadaPanel 
                     title={getSeriesLabel('pressureCombustion')} 
                     className="h-full"
@@ -161,10 +161,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ telemetry, actions
                     <FastChart data={telemetry.pressureCombustion} color={SENSOR_COLORS.pressureCombustion} domain={CHART_RANGES.pressure} xDomain={chartXDomain} />
                 </ScadaPanel>
             </div>
-            <div className="col-span-4 row-span-4 flex flex-col gap-2">
+            <div className="flex flex-col gap-2 md:col-span-4 md:row-span-4">
                 <div className="flex-1">
                     <ScadaPanel title="THERMAL SENSORS (°C)" className="h-full">
-                            <div className="p-2 grid grid-cols-2 gap-2 overflow-y-auto">
+                            <div className="p-2 grid grid-cols-1 sm:grid-cols-2 gap-2 overflow-y-auto">
                                 {latestTemperatures.map(({ id, value: temp }, index) => (
                                     <div key={id} className="bg-slate-900/50 p-2 border border-slate-700 rounded flex items-center justify-between gap-2 min-w-0">
                                         <div className="text-[10px] text-slate-500 truncate min-w-0">{getSeriesLabel(id)}</div>
@@ -192,7 +192,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ telemetry, actions
                     />
                 </div>
             </div>
-            <div className="col-span-8 row-span-4">
+            <div className="min-h-[220px] md:col-span-8 md:row-span-4 md:min-h-0">
                     <ScadaPanel 
                     title={getSeriesLabel('tensometer')} 
                     className="h-full"
@@ -201,7 +201,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ telemetry, actions
                     <FastChart data={telemetry.tensometer} color={SENSOR_COLORS.tensometer} domain={CHART_RANGES.thrust} xDomain={chartXDomain} />
                     </ScadaPanel>
             </div>
-            <div className="col-span-4 row-span-4">
+            <div className="md:col-span-4 md:row-span-4">
                 <ControlPanel
                     systemState={telemetry.state}
                     isUnsafe={telemetry.isUnsafe}

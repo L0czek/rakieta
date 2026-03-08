@@ -308,11 +308,11 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
 
     return (
         <div className="h-full overflow-auto pr-1">
-            <div className="grid grid-cols-12 gap-2 min-h-full">
+            <div className="grid grid-cols-1 gap-2 min-h-full lg:grid-cols-12">
                 <div className="col-span-12 lg:col-span-4">
                     <ScadaPanel title="CONVERSION SETTINGS" className="h-full">
                         <div className="p-3 space-y-4">
-                            <div className="grid grid-cols-2 gap-2">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                 <div>
                                     <label className="text-xs text-slate-400 block mb-1">TENSOMETER DIVIDER RATIO</label>
                                     <input
@@ -320,7 +320,7 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
                                         step="any"
                                         value={settings.tensometerDividerRatio}
                                         onChange={e => setSettingsState(prev => ({ ...prev, tensometerDividerRatio: Number(e.target.value) }))}
-                                        className="w-full bg-slate-900 border border-slate-700 text-white px-3 py-2 font-mono outline-none focus:border-cyan-500"
+                                        className="w-full bg-slate-900 border border-slate-700 text-white px-3 py-2.5 min-h-11 font-mono outline-none focus:border-cyan-500"
                                     />
                                 </div>
                                 <div>
@@ -330,7 +330,7 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
                                         step="any"
                                         value={settings.tensometerKgPerV}
                                         onChange={e => setSettingsState(prev => ({ ...prev, tensometerKgPerV: Number(e.target.value) }))}
-                                        className="w-full bg-slate-900 border border-slate-700 text-white px-3 py-2 font-mono outline-none focus:border-cyan-500"
+                                        className="w-full bg-slate-900 border border-slate-700 text-white px-3 py-2.5 min-h-11 font-mono outline-none focus:border-cyan-500"
                                     />
                                 </div>
 
@@ -344,7 +344,7 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
                                             ...prev,
                                             pressureDividerRatio: { ...prev.pressureDividerRatio, pressureTank: Number(e.target.value) }
                                         }))}
-                                        className="w-full bg-slate-900 border border-slate-700 text-white px-3 py-2 font-mono outline-none focus:border-cyan-500"
+                                        className="w-full bg-slate-900 border border-slate-700 text-white px-3 py-2.5 min-h-11 font-mono outline-none focus:border-cyan-500"
                                     />
                                 </div>
                                 <div>
@@ -357,7 +357,7 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
                                             ...prev,
                                             pressureScaleBarPerV: { ...prev.pressureScaleBarPerV, pressureTank: Number(e.target.value) }
                                         }))}
-                                        className="w-full bg-slate-900 border border-slate-700 text-white px-3 py-2 font-mono outline-none focus:border-cyan-500"
+                                        className="w-full bg-slate-900 border border-slate-700 text-white px-3 py-2.5 min-h-11 font-mono outline-none focus:border-cyan-500"
                                     />
                                 </div>
 
@@ -371,7 +371,7 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
                                             ...prev,
                                             pressureDividerRatio: { ...prev.pressureDividerRatio, pressureCombustion: Number(e.target.value) }
                                         }))}
-                                        className="w-full bg-slate-900 border border-slate-700 text-white px-3 py-2 font-mono outline-none focus:border-cyan-500"
+                                        className="w-full bg-slate-900 border border-slate-700 text-white px-3 py-2.5 min-h-11 font-mono outline-none focus:border-cyan-500"
                                     />
                                 </div>
                                 <div>
@@ -384,7 +384,7 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
                                             ...prev,
                                             pressureScaleBarPerV: { ...prev.pressureScaleBarPerV, pressureCombustion: Number(e.target.value) }
                                         }))}
-                                        className="w-full bg-slate-900 border border-slate-700 text-white px-3 py-2 font-mono outline-none focus:border-cyan-500"
+                                        className="w-full bg-slate-900 border border-slate-700 text-white px-3 py-2.5 min-h-11 font-mono outline-none focus:border-cyan-500"
                                     />
                                 </div>
 
@@ -398,7 +398,7 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
                                             ...prev,
                                             voltageDividerRatio: { ...prev.voltageDividerRatio, batteryStand: Number(e.target.value) }
                                         }))}
-                                        className="w-full bg-slate-900 border border-slate-700 text-white px-3 py-2 font-mono outline-none focus:border-cyan-500"
+                                        className="w-full bg-slate-900 border border-slate-700 text-white px-3 py-2.5 min-h-11 font-mono outline-none focus:border-cyan-500"
                                     />
                                 </div>
                                 <div>
@@ -414,7 +414,7 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
                                             ...prev,
                                             voltageDividerRatio: { ...prev.voltageDividerRatio, batteryComputer: Number(e.target.value) }
                                         }))}
-                                        className="w-full bg-slate-900 border border-slate-700 text-white px-3 py-2 font-mono outline-none focus:border-cyan-500"
+                                        className="w-full bg-slate-900 border border-slate-700 text-white px-3 py-2.5 min-h-11 font-mono outline-none focus:border-cyan-500"
                                     />
                                 </div>
                                 <div>
@@ -430,7 +430,7 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
                                             ...prev,
                                             voltageDividerRatio: { ...prev.voltageDividerRatio, starterSense: Number(e.target.value) }
                                         }))}
-                                        className="w-full bg-slate-900 border border-slate-700 text-white px-3 py-2 font-mono outline-none focus:border-cyan-500"
+                                        className="w-full bg-slate-900 border border-slate-700 text-white px-3 py-2.5 min-h-11 font-mono outline-none focus:border-cyan-500"
                                     />
                                 </div>
                                 <div>
@@ -446,7 +446,7 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
                                             ...prev,
                                             voltageDividerRatio: { ...prev.voltageDividerRatio, boostVoltage: Number(e.target.value) }
                                         }))}
-                                        className="w-full bg-slate-900 border border-slate-700 text-white px-3 py-2 font-mono outline-none focus:border-cyan-500"
+                                        className="w-full bg-slate-900 border border-slate-700 text-white px-3 py-2.5 min-h-11 font-mono outline-none focus:border-cyan-500"
                                     />
                                 </div>
                                 <div>
@@ -455,22 +455,22 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
 
                             <div className="pt-2 border-t border-slate-700 space-y-2">
                                 <div className="flex gap-2">
-                                    <button onClick={handleSaveAll} disabled={!hasUnsavedChanges} className="flex-1 bg-cyan-700 hover:bg-cyan-600 text-white font-bold py-2 text-sm disabled:opacity-40 disabled:cursor-not-allowed">
+                                    <button onClick={handleSaveAll} disabled={!hasUnsavedChanges} className="flex-1 bg-cyan-700 hover:bg-cyan-600 text-white font-bold py-2.5 min-h-11 text-sm disabled:opacity-40 disabled:cursor-not-allowed">
                                         SAVE SETTINGS
                                     </button>
-                                    <button onClick={handleRevert} disabled={!hasUnsavedChanges} className="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 text-sm disabled:opacity-40 disabled:cursor-not-allowed">
+                                    <button onClick={handleRevert} disabled={!hasUnsavedChanges} className="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-bold py-2.5 min-h-11 text-sm disabled:opacity-40 disabled:cursor-not-allowed">
                                         REVERT CHANGES
                                     </button>
                                 </div>
                                 <div className="flex gap-2">
-                                    <button onClick={handleExport} className="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 text-sm">
+                                    <button onClick={handleExport} className="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-bold py-2.5 min-h-11 text-sm">
                                         EXPORT JSON
                                     </button>
-                                    <button onClick={() => fileInputRef.current?.click()} className="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 text-sm">
+                                    <button onClick={() => fileInputRef.current?.click()} className="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-bold py-2.5 min-h-11 text-sm">
                                         IMPORT JSON
                                     </button>
                                 </div>
-                                <button onClick={handleReset} className="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 text-sm">
+                                <button onClick={handleReset} className="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-2.5 min-h-11 text-sm">
                                     RESET TO DEFAULTS
                                 </button>
                                 <input
@@ -498,7 +498,7 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
                                 <select
                                     value={selectedChannel}
                                     onChange={e => setSelectedChannel(e.target.value as AnalogChannel)}
-                                    className="w-full bg-slate-900 border border-slate-700 text-white px-3 py-2 text-sm font-mono outline-none focus:border-cyan-500"
+                                    className="w-full bg-slate-900 border border-slate-700 text-white px-3 py-2.5 min-h-11 text-sm font-mono outline-none focus:border-cyan-500"
                                 >
                                     {ANALOG_CHANNELS.map(channel => (
                                         <option key={channel} value={channel}>{CHANNEL_LABELS[channel]}</option>
@@ -532,7 +532,7 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
                                                             max={4095}
                                                             value={point.x}
                                                             onChange={e => updateLutPoint(selectedChannel, idx, 'x', e.target.value)}
-                                                            className={`w-full bg-slate-900 border px-2 py-1 outline-none focus:border-cyan-500 ${hoveredPointIndex === idx ? 'border-cyan-500 text-cyan-200' : 'border-slate-700 text-slate-200'}`}
+                                                            className={`w-full bg-slate-900 border px-2 py-2 min-h-11 outline-none focus:border-cyan-500 ${hoveredPointIndex === idx ? 'border-cyan-500 text-cyan-200' : 'border-slate-700 text-slate-200'}`}
                                                         />
                                                     </td>
                                                     <td className="px-2 py-1">
@@ -543,13 +543,13 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
                                                             max={1500}
                                                             value={point.y}
                                                             onChange={e => updateLutPoint(selectedChannel, idx, 'y', e.target.value)}
-                                                            className={`w-full bg-slate-900 border px-2 py-1 outline-none focus:border-cyan-500 ${hoveredPointIndex === idx ? 'border-cyan-500 text-cyan-200' : 'border-slate-700 text-slate-200'}`}
+                                                            className={`w-full bg-slate-900 border px-2 py-2 min-h-11 outline-none focus:border-cyan-500 ${hoveredPointIndex === idx ? 'border-cyan-500 text-cyan-200' : 'border-slate-700 text-slate-200'}`}
                                                         />
                                                     </td>
                                                     <td className="px-2 py-1">
                                                         <button
                                                             onClick={() => removeLutPoint(selectedChannel, idx)}
-                                                            className="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 px-2 py-1 disabled:opacity-40"
+                                                            className="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 px-2 py-2 min-h-11 disabled:opacity-40"
                                                             disabled={selectedPoints.length <= 2}
                                                         >
                                                             X
@@ -562,7 +562,7 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
                                         </div>
                                         <button
                                             onClick={() => addLutPoint(selectedChannel)}
-                                            className="mt-2 w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold py-1 text-xs"
+                                            className="mt-2 w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold py-2.5 min-h-11 text-xs"
                                         >
                                             ADD LUT POINT
                                         </button>

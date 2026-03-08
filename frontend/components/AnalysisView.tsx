@@ -431,9 +431,9 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
   }, []);
 
   return (
-    <div className="grid grid-cols-12 grid-rows-12 gap-2 h-full">
+    <div className="grid grid-cols-1 gap-2 auto-rows-[minmax(220px,auto)] min-h-full md:h-full md:grid-cols-[minmax(0,1fr)_22rem] md:grid-rows-[minmax(0,1fr)_320px]">
         {/* Top-Left: Big Chart (Rows 1-8, Cols 1-9) */}
-        <div className="col-span-9 row-span-8">
+        <div className="min-h-[320px] md:col-start-1 md:row-start-1 md:min-h-0">
             <ScadaPanel title="ANALYSIS" className="h-full">
             <div ref={chartRef} className="w-full h-full relative overflow-hidden">
                 {chartSize.width > 0 && chartSize.height > 0 && seriesMeta.length > 0 ? (
@@ -446,7 +446,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
         </div>
 
         {/* Top-Right: Current Values (Rows 1-8, Cols 10-12) */}
-        <div className="col-span-3 row-span-8 flex flex-col gap-2">
+        <div className="flex flex-col gap-2 md:col-start-2 md:row-start-1 md:min-h-0">
             <ScadaPanel title="LIVE VALUES" className="flex-1">
                 <div className="p-2 space-y-1 overflow-y-auto h-full pr-1 scrollbar-thin">
                     {/* Primary */}
@@ -471,7 +471,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
                     {latestTemperatures.length === 0 && <div className="text-[10px] text-slate-600 text-center py-2">NO THERMAL DATA</div>}
                 </div>
             </ScadaPanel>
-            <ScadaPanel title="STATUS LOG" className="h-32">
+            <ScadaPanel title="STATUS LOG" className="h-40 md:h-32">
                                 <div className="font-mono text-xs p-2 h-full overflow-y-auto pr-1 scrollbar-thin space-y-1">
                                         {(telemetry.statusLog.length > 0
                                             ? telemetry.statusLog
@@ -493,13 +493,13 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
         </div>
 
         {/* Bottom-Left: Data Controls & Navigation (Rows 9-12, Cols 10-12) */}
-        <div className="col-span-9 row-span-4">
+        <div className="md:col-start-1 md:row-start-2">
         <ScadaPanel title="DATA CONTROL" className="h-full">
             <div className="flex flex-col h-full p-2 gap-2">
                 {/* Series Toggles */}
                 <div className="flex flex-wrap gap-2">
                     {Object.entries(visibleLines).map(([key, active]) => (
-                        <button key={key} onClick={() => toggleLine(key)} className={`px-2 py-1 border rounded text-[10px] font-bold uppercase flex items-center gap-2 ${active ? 'bg-slate-700 text-white border-slate-500' : 'bg-slate-900 text-slate-600 border-slate-800'}`}>
+                        <button key={key} onClick={() => toggleLine(key)} className={`px-3 py-2 min-h-11 border rounded text-[10px] font-bold uppercase flex items-center gap-2 md:min-h-0 md:px-2 md:py-1 ${active ? 'bg-slate-700 text-white border-slate-500' : 'bg-slate-900 text-slate-600 border-slate-800'}`}>
                             <div className="w-2 h-2 rounded-full" style={{backgroundColor: SENSOR_COLORS[key] || TEMP_COLORS[0]}}></div>
                             {getSeriesLabel(key)}
                         </button>
@@ -508,30 +508,30 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
                 
                 {/* Navigation Bar */}
                 <div className="mt-auto bg-slate-900/50 p-2 rounded border border-slate-700 flex flex-col gap-2">
-                        <div className="flex items-center gap-4">
+                        <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-4">
                             <button 
                             onClick={() => setIsLive(!isLive)} 
-                            className={`flex items-center gap-2 px-3 py-1 rounded text-xs font-bold border shadow-lg ${isLive ? 'bg-cyan-900/80 border-cyan-500 text-cyan-400' : 'bg-slate-700/80 border-slate-500 text-slate-300'}`}
+                            className={`flex min-h-11 items-center justify-center gap-2 px-3 py-2 rounded text-xs font-bold border shadow-lg md:min-h-0 md:py-1 ${isLive ? 'bg-cyan-900/80 border-cyan-500 text-cyan-400' : 'bg-slate-700/80 border-slate-500 text-slate-300'}`}
                             >
                             {isLive ? <Pause size={14} fill="currentColor"/> : <Play size={14} fill="currentColor"/>}
                             {isLive ? 'LIVE' : 'PAUSED'}
                             </button>
 
-                            <div className="h-6 w-px bg-slate-700"></div>
+                            <div className="hidden h-6 w-px bg-slate-700 md:block"></div>
 
                             <div className="flex items-center gap-1">
-                                <button onClick={() => handleZoom('in')} className="p-1 hover:bg-slate-700 rounded"><ZoomIn size={16} className="text-slate-400"/></button>
-                                <button onClick={() => handleZoom('out')} className="p-1 hover:bg-slate-700 rounded"><ZoomOut size={16} className="text-slate-400"/></button>
+                                <button aria-label="Zoom in analysis window" onClick={() => handleZoom('in')} className="h-11 w-11 flex items-center justify-center hover:bg-slate-700 rounded md:h-8 md:w-8"><ZoomIn size={16} className="text-slate-400"/></button>
+                                <button aria-label="Zoom out analysis window" onClick={() => handleZoom('out')} className="h-11 w-11 flex items-center justify-center hover:bg-slate-700 rounded md:h-8 md:w-8"><ZoomOut size={16} className="text-slate-400"/></button>
                                 <span className="text-xs font-mono text-slate-500 ml-2">WINDOW: {(windowSize/1000).toFixed(1)}s</span>
                             </div>
                             
-                            <div className="ml-auto text-xs font-mono text-slate-500">
+                            <div className="text-xs font-mono text-slate-500 md:ml-auto">
                                 CURSOR: T+{viewStart}
                             </div>
                         </div>
 
                         {/* History Scrollbar */}
-                        <div className="relative h-6 w-full flex items-center">
+                        <div className="relative h-11 w-full flex items-center">
                             <input 
                             type="range" 
                             min={telemetry.startTime} 
@@ -539,7 +539,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
                             value={viewStart} 
                             onChange={handleScroll}
                             disabled={isLive}
-                            className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-500 disabled:opacity-50"
+                            className="w-full h-11 bg-slate-800/80 rounded-lg appearance-none cursor-pointer accent-cyan-500 disabled:opacity-50"
                             />
                         </div>
                 </div>
@@ -548,7 +548,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
         </div>
 
         {/* Bottom-Right: Master Control & Servo (Rows 9-12, Cols 10-12) */}
-        <div className="col-span-3 row-span-8 flex flex-col gap-2">
+        <div className="flex flex-col gap-2 md:col-start-2 md:row-start-2">
             <div className="flex-1">
                 <ServoPanel 
                     servoPositionDegrees={servoPositionDegrees} 
