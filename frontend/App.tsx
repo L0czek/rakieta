@@ -186,7 +186,7 @@ const App = () => {
             <div className="flex gap-4">
               <button
                 onClick={resetData}
-                className="flex-1 py-4 bg-scada-danger hover:bg-[var(--scada-bg-danger-strong)] text-scada-inverse font-bold rounded text-xl shadow-lg transition-colors flex items-center justify-center gap-2"
+                className="flex-1 py-4 bg-scada-danger hover-bg-scada-danger-strong text-scada-inverse font-bold rounded text-xl shadow-lg transition-colors flex items-center justify-center gap-2"
               >
                 <Trash2 /> WIPE DATA & RESET
               </button>
@@ -215,7 +215,7 @@ const App = () => {
               <button
                 onClick={() => handleViewChange('DASHBOARD')}
                 className={`flex min-h-11 items-center gap-2 px-3 py-2 text-xs font-bold rounded transition-colors lg:min-h-0 lg:py-1 ${
-                  view === 'DASHBOARD' ? 'bg-scada-accent-soft text-scada-accent' : 'text-scada-muted hover:text-[var(--scada-text-secondary)]'
+                  view === 'DASHBOARD' ? 'bg-scada-accent-soft text-scada-accent' : 'text-scada-muted hover-text-scada-secondary'
                 }`}
               >
                 <LayoutDashboard size={14} /> DASHBOARD
@@ -223,7 +223,7 @@ const App = () => {
               <button
                 onClick={() => handleViewChange('ANALYSIS')}
                 className={`flex min-h-11 items-center gap-2 px-3 py-2 text-xs font-bold rounded transition-colors lg:min-h-0 lg:py-1 ${
-                  view === 'ANALYSIS' ? 'bg-scada-accent-soft text-scada-accent' : 'text-scada-muted hover:text-[var(--scada-text-secondary)]'
+                  view === 'ANALYSIS' ? 'bg-scada-accent-soft text-scada-accent' : 'text-scada-muted hover-text-scada-secondary'
                 }`}
               >
                 <LineChartIcon size={14} /> ANALYSIS
@@ -231,7 +231,7 @@ const App = () => {
               <button
                 onClick={() => handleViewChange('CHECKLIST')}
                 className={`flex min-h-11 items-center gap-2 px-3 py-2 text-xs font-bold rounded transition-colors lg:min-h-0 lg:py-1 ${
-                  view === 'CHECKLIST' ? 'bg-scada-accent-soft text-scada-accent' : 'text-scada-muted hover:text-[var(--scada-text-secondary)]'
+                  view === 'CHECKLIST' ? 'bg-scada-accent-soft text-scada-accent' : 'text-scada-muted hover-text-scada-secondary'
                 }`}
               >
                 <ListChecks size={14} /> CHECKLIST
@@ -239,7 +239,7 @@ const App = () => {
               <button
                 onClick={() => handleViewChange('CONFIGURATION')}
                 className={`flex min-h-11 items-center gap-2 px-3 py-2 text-xs font-bold rounded transition-colors lg:min-h-0 lg:py-1 ${
-                  view === 'CONFIGURATION' ? 'bg-scada-accent-soft text-scada-accent' : 'text-scada-muted hover:text-[var(--scada-text-secondary)]'
+                  view === 'CONFIGURATION' ? 'bg-scada-accent-soft text-scada-accent' : 'text-scada-muted hover-text-scada-secondary'
                 }`}
               >
                 <SlidersHorizontal size={14} /> CONFIGURATION
@@ -254,7 +254,7 @@ const App = () => {
                 className={`flex min-h-11 items-center gap-2 px-3 py-2 text-xs font-bold rounded transition-colors border lg:min-h-0 lg:py-1 ${
                   isSimulating
                     ? 'bg-scada-accent-soft border-scada-accent text-scada-accent'
-                    : 'border-scada text-scada-muted hover:text-[var(--scada-text-secondary)]'
+                    : 'border-scada text-scada-muted hover-text-scada-secondary'
                 }`}
               >
                 <Beaker size={14} /> {isSimulating ? 'STOP SIM' : 'SIM'}
@@ -290,7 +290,7 @@ const App = () => {
             <button
               aria-label="Toggle connection config"
               onClick={() => setShowConfig(!showConfig)}
-              className="h-11 w-11 flex items-center justify-center rounded text-scada-secondary hover:text-[var(--scada-text-inverse)] hover:bg-[var(--scada-bg-surface-elevated)] transition-colors"
+              className="h-11 w-11 flex items-center justify-center rounded text-scada-secondary hover-text-scada-inverse hover-bg-scada-surface-elevated transition-colors"
             >
               <Settings size={20} />
             </button>
@@ -311,7 +311,7 @@ const App = () => {
 
       <main className="flex-1 p-2 pb-16 min-h-0 overflow-auto md:pb-0 md:overflow-hidden relative z-0">
         {showConfig && (
-          <div className="absolute inset-0 z-50 flex items-center justify-center bg-[var(--scada-bg-overlay)] backdrop-blur-sm">
+          <div className="absolute inset-0 z-50 flex items-center justify-center bg-scada-overlay backdrop-blur-sm">
             <div className="bg-scada-surface-elevated border border-scada-accent p-6 rounded shadow-scada-accent-md w-full max-w-sm">
               <h2 className="text-scada-accent font-bold mb-4 text-lg">CONNECTION CONFIG</h2>
               <div className="space-y-4">
@@ -352,7 +352,7 @@ const App = () => {
                   />
                 </div>
 
-                <button onClick={handleConnect} className="w-full min-h-11 bg-scada-accent hover:bg-[var(--scada-bg-accent)] text-scada-inverse font-bold py-2 mt-2">
+                <button onClick={handleConnect} className="w-full min-h-11 bg-scada-accent hover-bg-scada-accent text-scada-inverse font-bold py-2 mt-2">
                   CONNECT
                 </button>
               </div>

@@ -24,6 +24,7 @@ Defined in `frontend/index.css`.
 | `--scada-bg-app` | `#0b1220` | App canvas background |
 | `--scada-bg-surface` | `#111b30` | Base panel/input surfaces |
 | `--scada-bg-surface-elevated` | `#17233a` | Elevated cards/modals |
+| `--scada-bg-accent` | `#0c7b99` | Filled primary button background |
 | `--scada-border-subtle` | `#334155` | Default borders/grid lines |
 | `--scada-border-strong` | `#4b6385` | Hover/strong separators |
 | `--scada-text-primary` | `#e2e8f0` | Primary readable text |
@@ -42,8 +43,12 @@ Defined in `frontend/index.css`.
 - `text-scada-secondary`: secondary text color.
 - `bg-scada-app`: app-level background.
 - `bg-scada-surface`: shared surface background.
+- `bg-scada-overlay`: shared modal/scrim overlay.
 - `border-scada`: semantic subtle border color.
 - `scada-input`: standardized input/select appearance and focus ring.
+- `hover-bg-scada-*` and `hover-text-scada-*`: semantic hover states for interactive controls.
+- `focus-ring-scada`: consistent focus ring token (`--scada-focus-ring`).
+- `accent-scada`: shared accent token for range/checkbox/radio control accents.
 
 ## Chart tokens
 

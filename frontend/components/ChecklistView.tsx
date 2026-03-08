@@ -97,7 +97,7 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
         </select>
         <button
           className="px-3 py-2.5 min-h-11 text-xs font-bold bg-scada-surface-elevated border border-scada rounded-sm
-            text-scada-primary tracking-wider hover:border-[var(--scada-border-accent-soft)] disabled:opacity-50"
+            text-scada-primary tracking-wider hover-border-scada-accent-soft disabled:opacity-50"
           disabled={isReadOnly || isSubmitting}
           onClick={() => runAction(onResetChecklist)}
         >
@@ -105,7 +105,7 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
         </button>
         <button
           className="px-3 py-2.5 min-h-11 text-xs font-bold bg-scada-surface-elevated border border-scada rounded-sm
-            text-scada-primary tracking-wider hover:border-[var(--scada-border-accent-soft)] disabled:opacity-50"
+            text-scada-primary tracking-wider hover-border-scada-accent-soft disabled:opacity-50"
           disabled={isReadOnly || isSubmitting}
           onClick={() => runAction(onResetAllChecklists)}
         >

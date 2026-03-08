@@ -25,7 +25,7 @@
   --scada-bg-success: #16a34a;
   --scada-bg-success-strong: rgba(20, 83, 45, 0.8);
   --scada-bg-info-soft: rgba(30, 58, 138, 0.2);
-  --scada-bg-accent: #0891b2;
+  --scada-bg-accent: #0c7b99;
   --scada-bg-accent-soft: rgba(8, 47, 73, 0.5);
   --scada-bg-accent-strong: rgba(8, 47, 73, 0.8);
 
@@ -319,6 +319,51 @@ body {
 
 .border-scada-info {
   border-color: var(--scada-border-info);
+}
+
+.bg-scada-overlay {
+  background-color: var(--scada-bg-overlay);
+}
+
+.hover-bg-scada-surface-elevated:hover {
+  background-color: var(--scada-bg-surface-elevated);
+}
+
+.hover-bg-scada-surface-strong:hover {
+  background-color: var(--scada-bg-surface-strong);
+}
+
+.hover-bg-scada-accent:hover {
+  background-color: var(--scada-bg-accent);
+}
+
+.hover-bg-scada-warning:hover {
+  background-color: var(--scada-bg-warning);
+}
+
+.hover-bg-scada-danger-strong:hover {
+  background-color: var(--scada-bg-danger-strong);
+}
+
+.hover-text-scada-secondary:hover {
+  color: var(--scada-text-secondary);
+}
+
+.hover-text-scada-inverse:hover {
+  color: var(--scada-text-inverse);
+}
+
+.hover-border-scada-accent-soft:hover {
+  border-color: var(--scada-border-accent-soft);
+}
+
+.focus-ring-scada:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--scada-focus-ring);
+}
+
+.accent-scada {
+  accent-color: var(--scada-accent);
 }
 
 .shadow-scada-danger-soft {

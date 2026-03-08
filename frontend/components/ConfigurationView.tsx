@@ -456,22 +456,22 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
 
                             <div className="pt-2 border-t border-scada space-y-2">
                                 <div className="flex gap-2">
-                                    <button onClick={handleSaveAll} disabled={!hasUnsavedChanges} className="flex-1 bg-scada-accent-strong hover:bg-[var(--scada-bg-accent)] text-scada-inverse font-bold py-2.5 min-h-11 text-sm disabled:opacity-40 disabled:cursor-not-allowed">
+                                    <button onClick={handleSaveAll} disabled={!hasUnsavedChanges} className="flex-1 bg-scada-accent-strong hover-bg-scada-accent text-scada-inverse font-bold py-2.5 min-h-11 text-sm disabled:opacity-40 disabled:cursor-not-allowed">
                                         SAVE SETTINGS
                                     </button>
-                                    <button onClick={handleRevert} disabled={!hasUnsavedChanges} className="flex-1 bg-scada-surface-strong hover:bg-[var(--scada-bg-surface-strong)] text-scada-inverse font-bold py-2.5 min-h-11 text-sm disabled:opacity-40 disabled:cursor-not-allowed">
+                                    <button onClick={handleRevert} disabled={!hasUnsavedChanges} className="flex-1 bg-scada-surface-strong hover-bg-scada-surface-strong text-scada-inverse font-bold py-2.5 min-h-11 text-sm disabled:opacity-40 disabled:cursor-not-allowed">
                                         REVERT CHANGES
                                     </button>
                                 </div>
                                 <div className="flex gap-2">
-                                    <button onClick={handleExport} className="flex-1 bg-scada-surface-strong hover:bg-[var(--scada-bg-surface-strong)] text-scada-inverse font-bold py-2.5 min-h-11 text-sm">
+                                    <button onClick={handleExport} className="flex-1 bg-scada-surface-strong hover-bg-scada-surface-strong text-scada-inverse font-bold py-2.5 min-h-11 text-sm">
                                         EXPORT JSON
                                     </button>
-                                    <button onClick={() => fileInputRef.current?.click()} className="flex-1 bg-scada-surface-strong hover:bg-[var(--scada-bg-surface-strong)] text-scada-inverse font-bold py-2.5 min-h-11 text-sm">
+                                    <button onClick={() => fileInputRef.current?.click()} className="flex-1 bg-scada-surface-strong hover-bg-scada-surface-strong text-scada-inverse font-bold py-2.5 min-h-11 text-sm">
                                         IMPORT JSON
                                     </button>
                                 </div>
-                                <button onClick={handleReset} className="w-full bg-scada-surface-strong hover:bg-[var(--scada-bg-surface-strong)] text-scada-inverse font-bold py-2.5 min-h-11 text-sm">
+                                <button onClick={handleReset} className="w-full bg-scada-surface-strong hover-bg-scada-surface-strong text-scada-inverse font-bold py-2.5 min-h-11 text-sm">
                                     RESET TO DEFAULTS
                                 </button>
                                 <input
@@ -533,7 +533,7 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
                                                             max={4095}
                                                             value={point.x}
                                                             onChange={e => updateLutPoint(selectedChannel, idx, 'x', e.target.value)}
-                                                            className={`w-full border bg-scada-surface px-2 py-2 min-h-11 text-scada-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--scada-focus-ring)] ${hoveredPointIndex === idx ? 'border-scada-accent text-scada-accent-bright' : 'border-scada'}`}
+                                                            className={`w-full border bg-scada-surface px-2 py-2 min-h-11 text-scada-secondary focus-ring-scada ${hoveredPointIndex === idx ? 'border-scada-accent text-scada-accent-bright' : 'border-scada'}`}
                                                         />
                                                     </td>
                                                     <td className="px-2 py-1">
@@ -544,13 +544,13 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
                                                             max={1500}
                                                             value={point.y}
                                                             onChange={e => updateLutPoint(selectedChannel, idx, 'y', e.target.value)}
-                                                            className={`w-full border bg-scada-surface px-2 py-2 min-h-11 text-scada-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--scada-focus-ring)] ${hoveredPointIndex === idx ? 'border-scada-accent text-scada-accent-bright' : 'border-scada'}`}
+                                                            className={`w-full border bg-scada-surface px-2 py-2 min-h-11 text-scada-secondary focus-ring-scada ${hoveredPointIndex === idx ? 'border-scada-accent text-scada-accent-bright' : 'border-scada'}`}
                                                         />
                                                     </td>
                                                     <td className="px-2 py-1">
                                                         <button
                                                             onClick={() => removeLutPoint(selectedChannel, idx)}
-                                                            className="w-full bg-scada-surface-elevated hover:bg-[var(--scada-bg-surface-strong)] text-scada-secondary px-2 py-2 min-h-11 disabled:opacity-40"
+                                                            className="w-full bg-scada-surface-elevated hover-bg-scada-surface-strong text-scada-secondary px-2 py-2 min-h-11 disabled:opacity-40"
                                                             disabled={selectedPoints.length <= 2}
                                                         >
                                                             X
@@ -563,7 +563,7 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
                                         </div>
                                         <button
                                             onClick={() => addLutPoint(selectedChannel)}
-                                            className="mt-2 w-full bg-scada-surface-elevated hover:bg-[var(--scada-bg-surface-strong)] text-scada-secondary font-bold py-2.5 min-h-11 text-xs"
+                                            className="mt-2 w-full bg-scada-surface-elevated hover-bg-scada-surface-strong text-scada-secondary font-bold py-2.5 min-h-11 text-xs"
                                         >
                                             ADD LUT POINT
                                         </button>

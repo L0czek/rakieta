@@ -434,7 +434,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
   return (
     <div className="grid grid-cols-1 gap-2 auto-rows-[minmax(220px,auto)] min-h-full lg:h-full lg:grid-cols-[minmax(0,1fr)_minmax(18rem,22rem)] lg:grid-rows-[minmax(0,1fr)_360px]">
         {/* Top-Left: Big Chart (Rows 1-8, Cols 1-9) */}
-        <div className="min-h-[320px] lg:col-start-1 lg:row-start-1 lg:min-h-0">
+        <div className="order-1 min-h-[320px] lg:order-none lg:col-start-1 lg:row-start-1 lg:min-h-0">
             <ScadaPanel title="ANALYSIS" className="h-full">
             <div ref={chartRef} className="w-full h-full relative overflow-hidden">
                 {chartSize.width > 0 && chartSize.height > 0 && seriesMeta.length > 0 ? (
@@ -447,7 +447,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
         </div>
 
         {/* Top-Right: Current Values (Rows 1-8, Cols 10-12) */}
-        <div className="flex flex-col gap-2 lg:col-start-2 lg:row-start-1 lg:min-h-0">
+        <div className="order-3 flex flex-col gap-2 lg:order-none lg:col-start-2 lg:row-start-1 lg:min-h-0">
             <ScadaPanel title="LIVE VALUES" className="flex-1">
                 <div className="p-2 space-y-1 overflow-y-auto h-full pr-1 scrollbar-thin">
                     {/* Primary */}
@@ -494,7 +494,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
         </div>
 
         {/* Bottom-Left: Data Controls & Navigation (Rows 9-12, Cols 10-12) */}
-        <div className="lg:col-start-1 lg:row-start-2">
+        <div className="order-2 lg:order-none lg:col-start-1 lg:row-start-2">
         <ScadaPanel title="DATA CONTROL" className="h-full">
             <div className="flex flex-col h-full p-2 gap-2">
                 {/* Series Toggles */}
@@ -521,8 +521,8 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
                             <div className="hidden h-6 w-px bg-scada-surface-strong md:block"></div>
 
                             <div className="flex items-center gap-1">
-                                <button aria-label="Zoom in analysis window" onClick={() => handleZoom('in')} className="h-11 w-11 flex items-center justify-center hover:bg-[var(--scada-bg-surface-strong)] rounded lg:h-8 lg:w-8"><ZoomIn size={16} className="text-scada-secondary"/></button>
-                                <button aria-label="Zoom out analysis window" onClick={() => handleZoom('out')} className="h-11 w-11 flex items-center justify-center hover:bg-[var(--scada-bg-surface-strong)] rounded lg:h-8 lg:w-8"><ZoomOut size={16} className="text-scada-secondary"/></button>
+                                <button aria-label="Zoom in analysis window" onClick={() => handleZoom('in')} className="h-11 w-11 flex items-center justify-center hover-bg-scada-surface-strong rounded lg:h-8 lg:w-8"><ZoomIn size={16} className="text-scada-secondary"/></button>
+                                <button aria-label="Zoom out analysis window" onClick={() => handleZoom('out')} className="h-11 w-11 flex items-center justify-center hover-bg-scada-surface-strong rounded lg:h-8 lg:w-8"><ZoomOut size={16} className="text-scada-secondary"/></button>
                                 <span className="text-xs font-mono text-scada-muted ml-2">WINDOW: {(windowSize/1000).toFixed(1)}s</span>
                             </div>
                             
@@ -540,7 +540,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
                             value={viewStart} 
                             onChange={handleScroll}
                             disabled={isLive}
-                            className="w-full h-11 bg-scada-surface-soft-strong rounded-lg appearance-none cursor-pointer accent-[var(--scada-accent)] disabled:opacity-50"
+                            className="w-full h-11 bg-scada-surface-soft-strong rounded-lg appearance-none cursor-pointer accent-scada disabled:opacity-50"
                             />
                         </div>
                 </div>
@@ -549,7 +549,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
         </div>
 
         {/* Bottom-Right: Master Control & Servo (Rows 9-12, Cols 10-12) */}
-        <div className="grid gap-2 lg:col-start-2 lg:row-start-2 lg:grid-rows-[120px_minmax(0,1fr)]">
+        <div className="order-4 grid gap-2 lg:order-none lg:col-start-2 lg:row-start-2 lg:grid-rows-[120px_minmax(0,1fr)]">
             <div className="min-h-[120px] lg:min-h-0">
                 <ServoPanel 
                     servoPositionDegrees={servoPositionDegrees} 
