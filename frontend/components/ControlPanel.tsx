@@ -36,7 +36,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
   
   const stateColor = {
     [SystemState.ARMED]: 'text-scada-warning-soft border-scada-warning bg-scada-warning-soft',
-    [SystemState.FIRE]: 'text-scada-danger-soft border-scada-danger bg-scada-danger-soft animate-pulse',
+    [SystemState.FIRE]: 'text-scada-danger-soft border-scada-danger bg-scada-danger-soft',
     [SystemState.POSTFIRE]: 'text-scada-info border-scada-info bg-scada-info-soft',
     [SystemState.UNKNOWN]: 'text-scada-muted border-scada bg-scada-surface-elevated'
   }[systemState];

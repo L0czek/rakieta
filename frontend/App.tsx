@@ -123,7 +123,7 @@ const App = () => {
 
       {criticalError && (
         <div className="absolute inset-0 z-[100] bg-scada-danger-overlay backdrop-blur-md flex items-center justify-center p-8">
-          <div className="bg-scada-danger-strong border-4 border-scada-danger rounded-lg p-8 max-w-2xl shadow-scada-danger-xl animate-bounce-short">
+          <div className="bg-scada-danger-strong border-4 border-scada-danger rounded-lg p-8 max-w-2xl shadow-scada-danger-xl">
             <div className="flex items-center gap-4 mb-4 text-scada-inverse">
               <ShieldAlert size={64} className="animate-pulse" />
               <div>
@@ -149,7 +149,7 @@ const App = () => {
       <header className="bg-scada-app border-b border-scada-weak px-2 py-2 md:px-4 md:py-0 shrink-0 z-10">
         <div className="flex flex-wrap items-center gap-2 md:gap-3 xl:gap-4 md:min-h-14">
           <div className="flex items-center gap-2 min-w-0 md:gap-3">
-            <div className="w-3 h-3 bg-scada-danger-strong rounded-full animate-ping absolute opacity-20"></div>
+            <div className="w-3 h-3 bg-scada-danger-strong rounded-full absolute opacity-20"></div>
             <Rocket className="text-scada-accent" />
             <div className="min-w-0">
               <h1 className="text-scada-accent font-bold tracking-wide text-sm leading-none neon-text whitespace-nowrap md:text-base xl:tracking-widest xl:text-lg">
