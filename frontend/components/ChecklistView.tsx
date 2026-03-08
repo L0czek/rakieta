@@ -85,8 +85,7 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
       >
         <select
           aria-label="Select checklist"
-          className="bg-slate-900 border border-slate-700 rounded-sm px-3 py-2.5 min-h-11 text-sm text-slate-100
-            tracking-wide min-w-[190px] flex-1"
+          className="scada-input min-w-[190px] flex-1 rounded-sm text-sm tracking-wide"
           value={selectedChecklistId}
           onChange={(event) => onSelectChecklist(event.target.value)}
         >
@@ -167,8 +166,7 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
                       <label key={field.id} className="text-xs text-slate-300 flex flex-col gap-1">
                         {field.label}
                         <input
-                          className="bg-slate-900 border border-slate-700 rounded-sm px-2 py-2.5 min-h-11
-                            text-slate-100 focus:outline-none focus:border-cyan-500/70"
+                          className="scada-input rounded-sm px-2"
                           type={field.type}
                           placeholder={field.placeholder}
                           value={String(inlineContext[field.id] ?? '')}

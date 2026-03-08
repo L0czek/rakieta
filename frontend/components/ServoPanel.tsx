@@ -1,6 +1,6 @@
 import React from 'react';
-import { ScadaPanel, DigitalIndicator } from './Widgets';
-import { ServoState, SystemState } from '../types';
+import { ScadaPanel, DigitalIndicator } from '@/components/Widgets';
+import { ServoState, SystemState } from '@/types';
 
 interface ServoPanelProps {
     servoPositionDegrees: number;
@@ -30,8 +30,11 @@ export const ServoPanel: React.FC<ServoPanelProps> = ({
                 {/* Left: Visualization */}
                 <div className="flex flex-col justify-between">
                     <div>
-                        <div className="text-[10px] text-slate-500 mb-1">POSITION</div>
-                        <div className="text-3xl font-mono text-white">{degrees.toFixed(0)}<span className="text-sm text-slate-500 ml-1">°</span></div>
+                        <div className="mb-1 text-[10px] text-scada-muted">POSITION</div>
+                        <div className="text-3xl font-mono text-white">
+                            {degrees.toFixed(0)}
+                            <span className="ml-1 text-sm text-scada-muted">°</span>
+                        </div>
                     </div>
                     
                     <div className="w-full bg-slate-700 h-4 rounded-full overflow-hidden border border-slate-600 relative">
@@ -47,8 +50,8 @@ export const ServoPanel: React.FC<ServoPanelProps> = ({
                 {/* Right: State & Controls */}
                 <div className="flex flex-col gap-2">
                     <div className="flex gap-1 justify-center">
-                        <DigitalIndicator active={servoState === ServoState.OPEN} label="OPN" color="bg-green-500" />
-                        <DigitalIndicator active={servoState === ServoState.CLOSED} label="CLS" color="bg-amber-500" />
+                        <DigitalIndicator active={servoState === ServoState.OPEN} label="OPN" tone="success" />
+                        <DigitalIndicator active={servoState === ServoState.CLOSED} label="CLS" tone="warning" />
                     </div>
 
                     <div className="flex-1 flex gap-1 mt-1">

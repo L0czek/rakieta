@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 
-import { AnalysisView } from './components/AnalysisView';
-import { ChecklistView } from './components/ChecklistView';
-import { ConfigurationView } from './components/ConfigurationView';
-import { DashboardView } from './components/DashboardView';
-import { useChecklistEngine } from './hooks/useChecklistEngine';
-import { useMqttSystem } from './hooks/useMqttSystem';
-import { ConnectionState, MqttConfig } from './types';
+import { AnalysisView } from '@/components/AnalysisView';
+import { ChecklistView } from '@/components/ChecklistView';
+import { ConfigurationView } from '@/components/ConfigurationView';
+import { DashboardView } from '@/components/DashboardView';
+import { useChecklistEngine } from '@/hooks/useChecklistEngine';
+import { useMqttSystem } from '@/hooks/useMqttSystem';
+import { ConnectionState, MqttConfig } from '@/types';
 import {
   AlertOctagon,
   Beaker,
@@ -118,7 +118,7 @@ const App = () => {
   }, [mqttConfig]);
 
   return (
-    <div className="w-screen h-screen overflow-hidden bg-slate-900 flex flex-col relative">
+    <div className="w-screen h-screen overflow-hidden bg-scada-app flex flex-col relative">
       <div className="absolute inset-0 pointer-events-none z-50 crt-lines opacity-20"></div>
 
       {criticalError && (
@@ -155,7 +155,7 @@ const App = () => {
               <h1 className="text-cyan-400 font-bold tracking-wide text-sm leading-none neon-text whitespace-nowrap md:text-base xl:tracking-widest xl:text-lg">
                 ROCKET TEST STAND
               </h1>
-              <span className="hidden text-slate-500 text-[10px] tracking-[0.2em] xl:inline">
+              <span className="hidden text-scada-muted text-[10px] tracking-[0.2em] xl:inline">
                 TELEMETRY & CONTROL LINK
               </span>
             </div>
@@ -166,7 +166,7 @@ const App = () => {
               <button
                 onClick={() => handleViewChange('DASHBOARD')}
                 className={`flex items-center gap-2 px-3 py-1 text-xs font-bold rounded transition-colors ${
-                  view === 'DASHBOARD' ? 'bg-cyan-900/50 text-cyan-400' : 'text-slate-500 hover:text-slate-300'
+                  view === 'DASHBOARD' ? 'bg-cyan-900/50 text-cyan-400' : 'text-scada-muted hover:text-slate-300'
                 }`}
               >
                 <LayoutDashboard size={14} /> DASHBOARD
@@ -174,7 +174,7 @@ const App = () => {
               <button
                 onClick={() => handleViewChange('ANALYSIS')}
                 className={`flex items-center gap-2 px-3 py-1 text-xs font-bold rounded transition-colors ${
-                  view === 'ANALYSIS' ? 'bg-cyan-900/50 text-cyan-400' : 'text-slate-500 hover:text-slate-300'
+                  view === 'ANALYSIS' ? 'bg-cyan-900/50 text-cyan-400' : 'text-scada-muted hover:text-slate-300'
                 }`}
               >
                 <LineChartIcon size={14} /> ANALYSIS
@@ -182,7 +182,7 @@ const App = () => {
               <button
                 onClick={() => handleViewChange('CHECKLIST')}
                 className={`flex items-center gap-2 px-3 py-1 text-xs font-bold rounded transition-colors ${
-                  view === 'CHECKLIST' ? 'bg-cyan-900/50 text-cyan-400' : 'text-slate-500 hover:text-slate-300'
+                  view === 'CHECKLIST' ? 'bg-cyan-900/50 text-cyan-400' : 'text-scada-muted hover:text-slate-300'
                 }`}
               >
                 <ListChecks size={14} /> CHECKLIST
@@ -190,7 +190,7 @@ const App = () => {
               <button
                 onClick={() => handleViewChange('CONFIGURATION')}
                 className={`flex items-center gap-2 px-3 py-1 text-xs font-bold rounded transition-colors ${
-                  view === 'CONFIGURATION' ? 'bg-cyan-900/50 text-cyan-400' : 'text-slate-500 hover:text-slate-300'
+                  view === 'CONFIGURATION' ? 'bg-cyan-900/50 text-cyan-400' : 'text-scada-muted hover:text-slate-300'
                 }`}
               >
                 <SlidersHorizontal size={14} /> CONFIGURATION
@@ -205,7 +205,7 @@ const App = () => {
                 className={`flex min-h-11 items-center gap-2 px-3 py-2 text-xs font-bold rounded transition-colors border md:min-h-0 md:py-1 ${
                   isSimulating
                     ? 'bg-cyan-900/50 border-cyan-500 text-cyan-400'
-                    : 'border-slate-700 text-slate-500 hover:text-slate-300'
+                    : 'border-slate-700 text-scada-muted hover:text-slate-300'
                 }`}
               >
                 <Beaker size={14} /> {isSimulating ? 'STOP SIM' : 'SIM'}
@@ -229,12 +229,12 @@ const App = () => {
             </div>
 
             <div className="hidden items-center gap-2 px-3 py-1 bg-slate-900 border border-slate-700 rounded lg:flex">
-              <span className="text-xs text-slate-500">AVG FAST ΔT</span>
+              <span className="text-xs text-scada-muted">AVG FAST ΔT</span>
               <span className="font-mono font-bold text-lg text-slate-200">{telemetry.avgFastAdcPacketLength.toFixed(1)}</span>
             </div>
 
             <div className="hidden items-center gap-2 px-3 py-1 bg-slate-900 border border-slate-700 rounded lg:flex">
-              <span className="text-xs text-slate-500">LAST PACKET</span>
+              <span className="text-xs text-scada-muted">LAST PACKET</span>
               <span className="font-mono font-bold text-lg text-slate-200">T+{telemetry.lastPacketTimestamp}</span>
             </div>
 
@@ -262,7 +262,7 @@ const App = () => {
 
       <main className="flex-1 p-2 pb-16 min-h-0 overflow-auto md:pb-0 md:overflow-hidden relative z-0">
         {showConfig && (
-          <div className="absolute inset-0 bg-slate-900/90 z-50 flex items-center justify-center backdrop-blur-sm">
+          <div className="absolute inset-0 z-50 flex items-center justify-center bg-[var(--scada-bg-overlay)] backdrop-blur-sm">
             <div className="bg-slate-800 border border-cyan-500/50 p-6 rounded shadow-[0_0_50px_rgba(6,182,212,0.2)] w-full max-w-sm">
               <h2 className="text-cyan-400 font-bold mb-4 text-lg">CONNECTION CONFIG</h2>
               <div className="space-y-4">
@@ -272,8 +272,7 @@ const App = () => {
                     type="text"
                     value={mqttConfig.host}
                     onChange={(event) => setMqttConfig({ ...mqttConfig, host: event.target.value })}
-                    className="w-full bg-slate-900 border border-slate-700 text-white px-3 py-2.5 font-mono
-                      outline-none focus:border-cyan-500"
+                    className="scada-input"
                   />
                 </div>
                 <div>
@@ -282,8 +281,7 @@ const App = () => {
                     type="number"
                     value={mqttConfig.port}
                     onChange={(event) => setMqttConfig({ ...mqttConfig, port: Number(event.target.value) })}
-                    className="w-full bg-slate-900 border border-slate-700 text-white px-3 py-2.5 font-mono
-                      outline-none focus:border-cyan-500"
+                    className="scada-input"
                   />
                 </div>
                 <div>
@@ -292,8 +290,7 @@ const App = () => {
                     type="text"
                     value={mqttConfig.username ?? ''}
                     onChange={(event) => setMqttConfig({ ...mqttConfig, username: event.target.value })}
-                    className="w-full bg-slate-900 border border-slate-700 text-white px-3 py-2.5 font-mono
-                      outline-none focus:border-cyan-500"
+                    className="scada-input"
                   />
                 </div>
                 <div>
@@ -302,8 +299,7 @@ const App = () => {
                     type="password"
                     value={mqttConfig.password ?? ''}
                     onChange={(event) => setMqttConfig({ ...mqttConfig, password: event.target.value })}
-                    className="w-full bg-slate-900 border border-slate-700 text-white px-3 py-2.5 font-mono
-                      outline-none focus:border-cyan-500"
+                    className="scada-input"
                   />
                 </div>
 
@@ -367,7 +363,7 @@ const App = () => {
           <button
             onClick={() => handleViewChange('DASHBOARD')}
             className={`min-h-14 bg-slate-950 px-2 py-1 flex flex-col items-center justify-center text-[10px] font-bold tracking-wide ${
-              view === 'DASHBOARD' ? 'text-cyan-400' : 'text-slate-500'
+              view === 'DASHBOARD' ? 'text-cyan-400' : 'text-scada-muted'
             }`}
           >
             <LayoutDashboard size={16} />
@@ -376,7 +372,7 @@ const App = () => {
           <button
             onClick={() => handleViewChange('ANALYSIS')}
             className={`min-h-14 bg-slate-950 px-2 py-1 flex flex-col items-center justify-center text-[10px] font-bold tracking-wide ${
-              view === 'ANALYSIS' ? 'text-cyan-400' : 'text-slate-500'
+              view === 'ANALYSIS' ? 'text-cyan-400' : 'text-scada-muted'
             }`}
           >
             <LineChartIcon size={16} />
@@ -385,7 +381,7 @@ const App = () => {
           <button
             onClick={() => handleViewChange('CHECKLIST')}
             className={`min-h-14 bg-slate-950 px-2 py-1 flex flex-col items-center justify-center text-[10px] font-bold tracking-wide ${
-              view === 'CHECKLIST' ? 'text-cyan-400' : 'text-slate-500'
+              view === 'CHECKLIST' ? 'text-cyan-400' : 'text-scada-muted'
             }`}
           >
             <ListChecks size={16} />
@@ -394,7 +390,7 @@ const App = () => {
           <button
             onClick={() => handleViewChange('CONFIGURATION')}
             className={`min-h-14 bg-slate-950 px-2 py-1 flex flex-col items-center justify-center text-[10px] font-bold tracking-wide ${
-              view === 'CONFIGURATION' ? 'text-cyan-400' : 'text-slate-500'
+              view === 'CONFIGURATION' ? 'text-cyan-400' : 'text-scada-muted'
             }`}
           >
             <SlidersHorizontal size={16} />

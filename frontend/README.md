@@ -84,6 +84,7 @@ Published commands:
 ## Operator UX/design
 
 - Dark SCADA look: cyan highlights, panel borders, monospace typography, CRT overlay lines
+- Design tokens and UI conventions are documented in `docs/design-system.md`
 - Safety-first interactions:
   - Fire allowed only when system is ARMED and physical safety is unsafe/armed
   - Servo commands blocked during FIRE
@@ -102,4 +103,3 @@ Published commands:
   one-record-per-point, which reduces write amplification under high-rate telemetry.
 - `Reset` in critical modal clears IndexedDB and in-memory telemetry.
 - `vite.config.ts` exposes `GEMINI_API_KEY` defines, but this frontend currently does not use Gemini APIs.
-

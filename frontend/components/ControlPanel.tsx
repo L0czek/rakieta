@@ -1,6 +1,6 @@
 import React from 'react';
-import { ScadaPanel } from './Widgets';
-import { SystemState } from '../types';
+import { ScadaPanel } from '@/components/Widgets';
+import { SystemState } from '@/types';
 import { AlertOctagon, Lock, Flame, RefreshCcw, Power } from 'lucide-react';
 
 interface ControlPanelProps {
@@ -31,7 +31,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
     [SystemState.ARMED]: 'text-amber-500 border-amber-500/50 bg-amber-900/20',
     [SystemState.FIRE]: 'text-red-500 border-red-500/50 bg-red-900/20 animate-pulse',
     [SystemState.POSTFIRE]: 'text-blue-400 border-blue-500/50 bg-blue-900/20',
-    [SystemState.UNKNOWN]: 'text-slate-500 border-slate-700 bg-slate-800'
+    [SystemState.UNKNOWN]: 'text-scada-muted border-slate-700 bg-slate-800'
   }[systemState];
 
   return (
@@ -113,7 +113,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                 className={`flex-1 font-bold text-2xl border-2 rounded flex flex-col items-center justify-center transition-all ${
                     canFire 
                     ? 'bg-red-600 hover:bg-red-500 border-red-500 text-white shadow-[0_0_20px_rgba(220,38,38,0.5)]' 
-                    : 'bg-slate-800 border-slate-700 text-slate-600 cursor-not-allowed'
+                    : 'bg-slate-800 border-slate-700 text-scada-muted cursor-not-allowed'
                 }`}
                >
                 <div className="flex items-center gap-2">

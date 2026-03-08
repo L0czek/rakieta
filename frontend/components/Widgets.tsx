@@ -3,20 +3,25 @@ import React, { useMemo, useRef, useEffect, useState } from 'react';
 import uPlot from 'uplot';
 import UplotReact from 'uplot-react';
 import 'uplot/dist/uPlot.min.css';
-import { SensorDataPoint } from '../types';
+import { SensorDataPoint } from '@/types';
 
 export const SENSOR_COLORS: Record<string, string> = {
-    tensometer: '#c084fc', 
-    pressureTank: '#22d3ee', 
-    pressureCombustion: '#fb923c',
-    batteryStand: '#4ade80', 
-    batteryComputer: '#2dd4bf', 
-    boostVoltage: '#fbbf24',
-    starterSense: '#a78bfa', 
-    servo: '#f472b6',
+  tensometer: '#c084fc',
+  pressureTank: '#22d3ee',
+  pressureCombustion: '#fb923c',
+  batteryStand: '#4ade80',
+  batteryComputer: '#2dd4bf',
+  boostVoltage: '#fbbf24',
+  starterSense: '#a78bfa',
+  servo: '#f472b6',
 };
 
-export const TEMP_COLORS = ['#f87171', '#fda4af', '#e11d48', '#be123c'];
+export const TEMP_COLORS = [
+  '#f87171',
+  '#fda4af',
+  '#e11d48',
+  '#be123c',
+];
 
 export const CHART_RANGES = {
   thrust: [0, 700] as [number, number],
@@ -52,8 +57,11 @@ export const useChartSize = () => {
   return { ref, size };
 };
 
+const CHART_AXIS_COLOR = '#8fa3be';
+const CHART_GRID_COLOR = '#334155';
+
 export const ScadaPanel = ({ title, children, className = "", danger = false, headerRight = null }: { title: string, children?: React.ReactNode, className?: string, danger?: boolean, headerRight?: React.ReactNode }) => (
-  <div className={`relative flex flex-col bg-slate-800/80 border ${danger ? 'border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.2)]' : 'border-cyan-500/30'} backdrop-blur-sm rounded-sm overflow-hidden ${className}`}>
+  <div className={`relative flex flex-col bg-[var(--scada-bg-surface-elevated)]/80 border ${danger ? 'border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.2)]' : 'border-cyan-500/30'} backdrop-blur-sm rounded-sm overflow-hidden ${className}`}>
     <div className={`px-2 py-1 text-xs font-bold tracking-widest border-b flex justify-between items-center ${danger ? 'bg-red-900/40 text-red-200 border-red-500/50' : 'bg-cyan-900/20 text-cyan-400 border-cyan-500/30'}`}>
       <span>{title.toUpperCase()}</span>
       {headerRight && <div className="font-mono">{headerRight}</div>}
@@ -81,7 +89,7 @@ export const FastChart = ({
   xDomain?: [number, number];
 }) => {
   // Performance optimization: only render if data exists
-  if (!data || data.length === 0) return <div className="w-full h-full flex items-center justify-center text-slate-500 text-xs">NO SIGNAL</div>;
+  if (!data || data.length === 0) return <div className="w-full h-full flex items-center justify-center text-scada-muted text-xs">NO SIGNAL</div>;
 
   const { ref, size } = useChartSize();
 
@@ -111,9 +119,9 @@ export const FastChart = ({
       ],
       axes: [
         {
-          stroke: '#64748b',
-          grid: { stroke: '#334155' },
-          ticks: { stroke: '#334155' },
+          stroke: CHART_AXIS_COLOR,
+          grid: { stroke: CHART_GRID_COLOR },
+          ticks: { stroke: CHART_GRID_COLOR },
           splits: (u) => {
             const min = u.scales.x.min ?? 0;
             const max = u.scales.x.max ?? 0;
@@ -129,9 +137,9 @@ export const FastChart = ({
             ticks.map((val, idx) => (idx % 5 === 0 ? `${(val / 1000).toFixed(1)}s` : '')),
         },
         {
-          stroke: '#64748b',
-          grid: { stroke: '#334155' },
-          ticks: { stroke: '#334155' },
+          stroke: CHART_AXIS_COLOR,
+          grid: { stroke: CHART_GRID_COLOR },
+          ticks: { stroke: CHART_GRID_COLOR },
           values: (_u, vals) => vals.map((val) => `${val}`),
         },
       ],
@@ -159,14 +167,47 @@ export const ValueDisplay: React.FC<{
       <span className="text-slate-400 text-xs uppercase">{label}</span>
       <span className={`text-xl font-mono font-bold ${color}`}>
         {value}
-        <span className="text-xs text-slate-500 ml-1">{unit}</span>
+        <span className="text-xs text-scada-muted ml-1">{unit}</span>
       </span>
     </div>
   );
 
-export const DigitalIndicator = ({ active, label, color = "bg-green-500" }: { active: boolean, label: string, color?: string }) => (
-    <div className={`flex items-center gap-2 p-2 rounded border ${active ? `border-${color.split('-')[1]}-500 bg-${color.split('-')[1]}-900/20` : 'border-slate-700 bg-slate-900/50 opacity-50'}`}>
-        <div className={`w-3 h-3 rounded-full ${active ? `${color} shadow-[0_0_8px_currentColor]` : 'bg-slate-700'}`}></div>
-        <span className={`text-xs font-bold tracking-wider ${active ? 'text-white' : 'text-slate-500'}`}>{label}</span>
+const DIGITAL_INDICATOR_STYLES = {
+  success: {
+    activeContainer: 'border-green-500 bg-green-900/20',
+    activeDot: 'bg-green-500',
+  },
+  warning: {
+    activeContainer: 'border-amber-500 bg-amber-900/20',
+    activeDot: 'bg-amber-500',
+  },
+} as const;
+
+export const DigitalIndicator = ({
+  active,
+  label,
+  tone = 'success',
+}: {
+  active: boolean;
+  label: string;
+  tone?: keyof typeof DIGITAL_INDICATOR_STYLES;
+}) => {
+  const style = DIGITAL_INDICATOR_STYLES[tone];
+
+  return (
+    <div
+      className={`flex items-center gap-2 rounded border p-2 ${
+        active ? style.activeContainer : 'border-slate-700 bg-slate-900/50 opacity-50'
+      }`}
+    >
+      <div
+        className={`h-3 w-3 rounded-full ${
+          active ? `${style.activeDot} shadow-[0_0_8px_currentColor]` : 'bg-slate-700'
+        }`}
+      />
+      <span className={`text-xs font-bold tracking-wider ${active ? 'text-white' : 'text-scada-muted'}`}>
+        {label}
+      </span>
     </div>
-)
+  );
+};

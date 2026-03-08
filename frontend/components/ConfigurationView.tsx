@@ -10,8 +10,8 @@ import {
     importConversionSettingsFromJson,
     resetConversionSettings,
     setConversionSettings,
-} from '../utils/conversions';
-import { ScadaPanel, useChartSize } from './Widgets';
+} from '@/utils/conversions';
+import { ScadaPanel, useChartSize } from '@/components/Widgets';
 
 interface ConfigurationViewProps {
     onDirtyChange?: (isDirty: boolean) => void;
@@ -90,7 +90,7 @@ const LutChart: React.FC<{ points: LutPoint[]; onHoverIndexChange?: (index: numb
             ],
             axes: [
                 {
-                    stroke: '#64748b',
+                    stroke: '#8fa3be',
                     grid: { stroke: '#334155' },
                     ticks: { stroke: '#334155' },
                     splits: () => {
@@ -104,7 +104,7 @@ const LutChart: React.FC<{ points: LutPoint[]; onHoverIndexChange?: (index: numb
                     values: (_u, vals) => vals.map((val) => `${Math.round(val)}`),
                 },
                 {
-                    stroke: '#64748b',
+                    stroke: '#8fa3be',
                     grid: { stroke: '#334155' },
                     ticks: { stroke: '#334155' },
                     size: 72,
@@ -320,7 +320,7 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
                                         step="any"
                                         value={settings.tensometerDividerRatio}
                                         onChange={e => setSettingsState(prev => ({ ...prev, tensometerDividerRatio: Number(e.target.value) }))}
-                                        className="w-full bg-slate-900 border border-slate-700 text-white px-3 py-2.5 min-h-11 font-mono outline-none focus:border-cyan-500"
+                                        className="scada-input"
                                     />
                                 </div>
                                 <div>
@@ -330,7 +330,7 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
                                         step="any"
                                         value={settings.tensometerKgPerV}
                                         onChange={e => setSettingsState(prev => ({ ...prev, tensometerKgPerV: Number(e.target.value) }))}
-                                        className="w-full bg-slate-900 border border-slate-700 text-white px-3 py-2.5 min-h-11 font-mono outline-none focus:border-cyan-500"
+                                        className="scada-input"
                                     />
                                 </div>
 
@@ -344,7 +344,7 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
                                             ...prev,
                                             pressureDividerRatio: { ...prev.pressureDividerRatio, pressureTank: Number(e.target.value) }
                                         }))}
-                                        className="w-full bg-slate-900 border border-slate-700 text-white px-3 py-2.5 min-h-11 font-mono outline-none focus:border-cyan-500"
+                                        className="scada-input"
                                     />
                                 </div>
                                 <div>
@@ -357,7 +357,7 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
                                             ...prev,
                                             pressureScaleBarPerV: { ...prev.pressureScaleBarPerV, pressureTank: Number(e.target.value) }
                                         }))}
-                                        className="w-full bg-slate-900 border border-slate-700 text-white px-3 py-2.5 min-h-11 font-mono outline-none focus:border-cyan-500"
+                                        className="scada-input"
                                     />
                                 </div>
 
@@ -371,7 +371,7 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
                                             ...prev,
                                             pressureDividerRatio: { ...prev.pressureDividerRatio, pressureCombustion: Number(e.target.value) }
                                         }))}
-                                        className="w-full bg-slate-900 border border-slate-700 text-white px-3 py-2.5 min-h-11 font-mono outline-none focus:border-cyan-500"
+                                        className="scada-input"
                                     />
                                 </div>
                                 <div>
@@ -384,7 +384,7 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
                                             ...prev,
                                             pressureScaleBarPerV: { ...prev.pressureScaleBarPerV, pressureCombustion: Number(e.target.value) }
                                         }))}
-                                        className="w-full bg-slate-900 border border-slate-700 text-white px-3 py-2.5 min-h-11 font-mono outline-none focus:border-cyan-500"
+                                        className="scada-input"
                                     />
                                 </div>
 
@@ -398,7 +398,7 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
                                             ...prev,
                                             voltageDividerRatio: { ...prev.voltageDividerRatio, batteryStand: Number(e.target.value) }
                                         }))}
-                                        className="w-full bg-slate-900 border border-slate-700 text-white px-3 py-2.5 min-h-11 font-mono outline-none focus:border-cyan-500"
+                                        className="scada-input"
                                     />
                                 </div>
                                 <div>
@@ -414,7 +414,7 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
                                             ...prev,
                                             voltageDividerRatio: { ...prev.voltageDividerRatio, batteryComputer: Number(e.target.value) }
                                         }))}
-                                        className="w-full bg-slate-900 border border-slate-700 text-white px-3 py-2.5 min-h-11 font-mono outline-none focus:border-cyan-500"
+                                        className="scada-input"
                                     />
                                 </div>
                                 <div>
@@ -430,7 +430,7 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
                                             ...prev,
                                             voltageDividerRatio: { ...prev.voltageDividerRatio, starterSense: Number(e.target.value) }
                                         }))}
-                                        className="w-full bg-slate-900 border border-slate-700 text-white px-3 py-2.5 min-h-11 font-mono outline-none focus:border-cyan-500"
+                                        className="scada-input"
                                     />
                                 </div>
                                 <div>
@@ -446,7 +446,7 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
                                             ...prev,
                                             voltageDividerRatio: { ...prev.voltageDividerRatio, boostVoltage: Number(e.target.value) }
                                         }))}
-                                        className="w-full bg-slate-900 border border-slate-700 text-white px-3 py-2.5 min-h-11 font-mono outline-none focus:border-cyan-500"
+                                        className="scada-input"
                                     />
                                 </div>
                                 <div>
@@ -498,7 +498,7 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
                                 <select
                                     value={selectedChannel}
                                     onChange={e => setSelectedChannel(e.target.value as AnalogChannel)}
-                                    className="w-full bg-slate-900 border border-slate-700 text-white px-3 py-2.5 min-h-11 text-sm font-mono outline-none focus:border-cyan-500"
+                                    className="scada-input text-sm"
                                 >
                                     {ANALOG_CHANNELS.map(channel => (
                                         <option key={channel} value={channel}>{CHANNEL_LABELS[channel]}</option>
@@ -532,7 +532,7 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
                                                             max={4095}
                                                             value={point.x}
                                                             onChange={e => updateLutPoint(selectedChannel, idx, 'x', e.target.value)}
-                                                            className={`w-full bg-slate-900 border px-2 py-2 min-h-11 outline-none focus:border-cyan-500 ${hoveredPointIndex === idx ? 'border-cyan-500 text-cyan-200' : 'border-slate-700 text-slate-200'}`}
+                                                            className={`w-full border bg-slate-900 px-2 py-2 min-h-11 text-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/30 ${hoveredPointIndex === idx ? 'border-cyan-500 text-cyan-200' : 'border-slate-700'}`}
                                                         />
                                                     </td>
                                                     <td className="px-2 py-1">
@@ -543,7 +543,7 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
                                                             max={1500}
                                                             value={point.y}
                                                             onChange={e => updateLutPoint(selectedChannel, idx, 'y', e.target.value)}
-                                                            className={`w-full bg-slate-900 border px-2 py-2 min-h-11 outline-none focus:border-cyan-500 ${hoveredPointIndex === idx ? 'border-cyan-500 text-cyan-200' : 'border-slate-700 text-slate-200'}`}
+                                                            className={`w-full border bg-slate-900 px-2 py-2 min-h-11 text-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/30 ${hoveredPointIndex === idx ? 'border-cyan-500 text-cyan-200' : 'border-slate-700'}`}
                                                         />
                                                     </td>
                                                     <td className="px-2 py-1">

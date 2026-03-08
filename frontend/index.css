@@ -1,1 +1,144 @@
-/* Intentionally minimal: runtime theme styles are defined in index.html. */
+:root {
+  --scada-font-primary: "IBM Plex Mono", "JetBrains Mono", "SFMono-Regular", Menlo, Consolas,
+    "Liberation Mono", monospace;
+
+  --scada-bg-app: #0b1220;
+  --scada-bg-surface: #111b30;
+  --scada-bg-surface-elevated: #17233a;
+  --scada-bg-overlay: rgba(11, 18, 32, 0.9);
+
+  --scada-border-subtle: #334155;
+  --scada-border-strong: #4b6385;
+
+  --scada-text-primary: #e2e8f0;
+  --scada-text-secondary: #cbd5e1;
+  --scada-text-muted: #9fb0c8;
+
+  --scada-accent: #22d3ee;
+  --scada-accent-soft: rgba(34, 211, 238, 0.2);
+
+  --scada-success: #4ade80;
+  --scada-warning: #fbbf24;
+  --scada-danger: #f87171;
+
+  --scada-chart-axis: #8fa3be;
+  --scada-chart-grid: #334155;
+  --scada-chart-legend: rgba(11, 18, 32, 0.88);
+
+  --scada-focus-ring: rgba(34, 211, 238, 0.35);
+
+  --scada-series-tensometer: #c084fc;
+  --scada-series-pressure-tank: #22d3ee;
+  --scada-series-pressure-combustion: #fb923c;
+  --scada-series-battery-stand: #4ade80;
+  --scada-series-battery-computer: #2dd4bf;
+  --scada-series-boost-voltage: #fbbf24;
+  --scada-series-starter-sense: #a78bfa;
+  --scada-series-servo: #f472b6;
+
+  --scada-series-temp-1: #f87171;
+  --scada-series-temp-2: #fda4af;
+  --scada-series-temp-3: #e11d48;
+  --scada-series-temp-4: #be123c;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: var(--scada-bg-app);
+  color: var(--scada-text-primary);
+  font-family: var(--scada-font-primary);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--scada-bg-surface);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scada-border-strong);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scada-text-muted);
+}
+
+.text-scada-muted {
+  color: var(--scada-text-muted);
+}
+
+.text-scada-secondary {
+  color: var(--scada-text-secondary);
+}
+
+.bg-scada-app {
+  background-color: var(--scada-bg-app);
+}
+
+.bg-scada-surface {
+  background-color: var(--scada-bg-surface);
+}
+
+.border-scada {
+  border-color: var(--scada-border-subtle);
+}
+
+.scada-input {
+  width: 100%;
+  background: var(--scada-bg-app);
+  border: 1px solid var(--scada-border-subtle);
+  color: var(--scada-text-primary);
+  padding: 0.625rem 0.75rem;
+  min-height: 2.75rem;
+  font-family: var(--scada-font-primary);
+}
+
+.scada-input:focus-visible {
+  outline: none;
+  border-color: var(--scada-accent);
+  box-shadow: 0 0 0 2px var(--scada-focus-ring);
+}
+
+.neon-text {
+  text-shadow: 0 0 5px rgba(34, 211, 238, 0.5);
+}
+
+.crt-lines {
+  background:
+    linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+    linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+  background-size: 100% 2px, 3px 100%;
+  pointer-events: none;
+}
+
+.uplot {
+  font-family: var(--scada-font-primary);
+  color: var(--scada-text-muted);
+  background: transparent;
+}
+
+.uplot .u-grid line {
+  stroke: var(--scada-chart-grid);
+}
+
+.uplot .u-axis line,
+.uplot .u-axis path,
+.uplot .u-tick {
+  stroke: var(--scada-chart-grid);
+}
+
+.uplot .u-legend {
+  background: var(--scada-chart-legend);
+  border: 1px solid var(--scada-border-subtle);
+  color: var(--scada-text-secondary);
+}

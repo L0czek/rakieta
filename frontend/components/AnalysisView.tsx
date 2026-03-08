@@ -1,14 +1,14 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { SystemTelemetry, SensorDataPoint } from '../types';
-import { ScadaPanel, ValueDisplay, SENSOR_COLORS, TEMP_COLORS, useChartSize, CHART_RANGES } from './Widgets';
-import { ControlPanel } from './ControlPanel';
-import { ServoPanel } from './ServoPanel';
+import { SystemTelemetry, SensorDataPoint } from '@/types';
+import { ScadaPanel, ValueDisplay, SENSOR_COLORS, TEMP_COLORS, useChartSize, CHART_RANGES } from '@/components/Widgets';
+import { ControlPanel } from '@/components/ControlPanel';
+import { ServoPanel } from '@/components/ServoPanel';
 import { Pause, Play, ZoomIn, ZoomOut } from 'lucide-react';
 import uPlot from 'uplot';
 import UplotReact from 'uplot-react';
-import * as DB from '../utils/db';
-import { ConnectionState } from '../types';
+import * as DB from '@/utils/db';
+import { ConnectionState } from '@/types';
 
 interface AnalysisViewProps {
     telemetry: SystemTelemetry;
@@ -362,7 +362,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
   const axes = React.useMemo<uPlot.Axis[]>(() => {
       return [
           {
-              stroke: '#64748b',
+              stroke: '#8fa3be',
               grid: { stroke: '#334155' },
               ticks: { stroke: '#334155' },
               values: (_u, ticks) => ticks.map((val) => `${(val / 1000).toFixed(0)}s`),
@@ -439,7 +439,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
                 {chartSize.width > 0 && chartSize.height > 0 && seriesMeta.length > 0 ? (
                     <UplotReact options={chartOptions} data={alignedData} resetScales={false} onCreate={handleChartCreate} />
                 ) : (
-                    <div className="w-full h-full flex items-center justify-center text-slate-500 text-xs">NO DATA</div>
+                    <div className="w-full h-full flex items-center justify-center text-scada-muted text-xs">NO DATA</div>
                 )}
             </div>
             </ScadaPanel>
@@ -468,7 +468,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
                     {latestTemperatures.map(({ id, value: temp }) => (
                         <ValueDisplay key={id} label={getSeriesLabel(id)} value={temp.toFixed(1)} unit=" °C" color="text-rose-400" />
                     ))}
-                    {latestTemperatures.length === 0 && <div className="text-[10px] text-slate-600 text-center py-2">NO THERMAL DATA</div>}
+                    {latestTemperatures.length === 0 && <div className="text-[10px] text-scada-muted text-center py-2">NO THERMAL DATA</div>}
                 </div>
             </ScadaPanel>
             <ScadaPanel title="STATUS LOG" className="h-40 md:h-32">
@@ -484,7 +484,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
                                                   key={`${entry.receivedAt}-${index}`}
                                                   className={`break-all ${entry.type === 'connection' ? 'text-cyan-300' : 'text-amber-300'}`}
                                                 >
-                                                        <span className="text-slate-500">[{new Date(entry.receivedAt).toLocaleString()}]</span>{' '}
+                                                        <span className="text-scada-muted">[{new Date(entry.receivedAt).toLocaleString()}]</span>{' '}
                                                         &gt; {entry.message}
                                                 </div>
                                             ))}
@@ -499,7 +499,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
                 {/* Series Toggles */}
                 <div className="flex flex-wrap gap-2">
                     {Object.entries(visibleLines).map(([key, active]) => (
-                        <button key={key} onClick={() => toggleLine(key)} className={`px-3 py-2 min-h-11 border rounded text-[10px] font-bold uppercase flex items-center gap-2 md:min-h-0 md:px-2 md:py-1 ${active ? 'bg-slate-700 text-white border-slate-500' : 'bg-slate-900 text-slate-600 border-slate-800'}`}>
+                        <button key={key} onClick={() => toggleLine(key)} className={`px-3 py-2 min-h-11 border rounded text-[10px] font-bold uppercase flex items-center gap-2 md:min-h-0 md:px-2 md:py-1 ${active ? 'bg-slate-700 text-white border-slate-500' : 'bg-slate-900 text-scada-muted border-slate-800'}`}>
                             <div className="w-2 h-2 rounded-full" style={{backgroundColor: SENSOR_COLORS[key] || TEMP_COLORS[0]}}></div>
                             {getSeriesLabel(key)}
                         </button>
@@ -522,10 +522,10 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
                             <div className="flex items-center gap-1">
                                 <button aria-label="Zoom in analysis window" onClick={() => handleZoom('in')} className="h-11 w-11 flex items-center justify-center hover:bg-slate-700 rounded md:h-8 md:w-8"><ZoomIn size={16} className="text-slate-400"/></button>
                                 <button aria-label="Zoom out analysis window" onClick={() => handleZoom('out')} className="h-11 w-11 flex items-center justify-center hover:bg-slate-700 rounded md:h-8 md:w-8"><ZoomOut size={16} className="text-slate-400"/></button>
-                                <span className="text-xs font-mono text-slate-500 ml-2">WINDOW: {(windowSize/1000).toFixed(1)}s</span>
+                                <span className="text-xs font-mono text-scada-muted ml-2">WINDOW: {(windowSize/1000).toFixed(1)}s</span>
                             </div>
                             
-                            <div className="text-xs font-mono text-slate-500 md:ml-auto">
+                            <div className="text-xs font-mono text-scada-muted md:ml-auto">
                                 CURSOR: T+{viewStart}
                             </div>
                         </div>
