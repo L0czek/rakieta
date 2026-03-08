@@ -214,7 +214,7 @@ const App = () => {
             <div className="flex min-w-max bg-scada-surface rounded border border-scada p-1">
               <button
                 onClick={() => handleViewChange('DASHBOARD')}
-                className={`flex items-center gap-2 px-3 py-1 text-xs font-bold rounded transition-colors ${
+                className={`flex min-h-11 items-center gap-2 px-3 py-2 text-xs font-bold rounded transition-colors lg:min-h-0 lg:py-1 ${
                   view === 'DASHBOARD' ? 'bg-scada-accent-soft text-scada-accent' : 'text-scada-muted hover:text-[var(--scada-text-secondary)]'
                 }`}
               >
@@ -222,7 +222,7 @@ const App = () => {
               </button>
               <button
                 onClick={() => handleViewChange('ANALYSIS')}
-                className={`flex items-center gap-2 px-3 py-1 text-xs font-bold rounded transition-colors ${
+                className={`flex min-h-11 items-center gap-2 px-3 py-2 text-xs font-bold rounded transition-colors lg:min-h-0 lg:py-1 ${
                   view === 'ANALYSIS' ? 'bg-scada-accent-soft text-scada-accent' : 'text-scada-muted hover:text-[var(--scada-text-secondary)]'
                 }`}
               >
@@ -230,7 +230,7 @@ const App = () => {
               </button>
               <button
                 onClick={() => handleViewChange('CHECKLIST')}
-                className={`flex items-center gap-2 px-3 py-1 text-xs font-bold rounded transition-colors ${
+                className={`flex min-h-11 items-center gap-2 px-3 py-2 text-xs font-bold rounded transition-colors lg:min-h-0 lg:py-1 ${
                   view === 'CHECKLIST' ? 'bg-scada-accent-soft text-scada-accent' : 'text-scada-muted hover:text-[var(--scada-text-secondary)]'
                 }`}
               >
@@ -238,7 +238,7 @@ const App = () => {
               </button>
               <button
                 onClick={() => handleViewChange('CONFIGURATION')}
-                className={`flex items-center gap-2 px-3 py-1 text-xs font-bold rounded transition-colors ${
+                className={`flex min-h-11 items-center gap-2 px-3 py-2 text-xs font-bold rounded transition-colors lg:min-h-0 lg:py-1 ${
                   view === 'CONFIGURATION' ? 'bg-scada-accent-soft text-scada-accent' : 'text-scada-muted hover:text-[var(--scada-text-secondary)]'
                 }`}
               >
@@ -251,7 +251,7 @@ const App = () => {
             <div className="flex items-center gap-2">
               <button
                 onClick={handleSimToggle}
-                className={`flex min-h-11 items-center gap-2 px-3 py-2 text-xs font-bold rounded transition-colors border md:min-h-0 md:py-1 ${
+                className={`flex min-h-11 items-center gap-2 px-3 py-2 text-xs font-bold rounded transition-colors border lg:min-h-0 lg:py-1 ${
                   isSimulating
                     ? 'bg-scada-accent-soft border-scada-accent text-scada-accent'
                     : 'border-scada text-scada-muted hover:text-[var(--scada-text-secondary)]'
@@ -262,7 +262,7 @@ const App = () => {
               {isSimulating && (
                 <button
                   onClick={actions.toggleSimSafety}
-                  className={`flex min-h-11 items-center gap-2 px-3 py-2 rounded text-xs font-bold border md:min-h-0 md:py-1 ${
+                  className={`flex min-h-11 items-center gap-2 px-3 py-2 rounded text-xs font-bold border lg:min-h-0 lg:py-1 ${
                     telemetry.isUnsafe
                       ? 'bg-scada-danger-strong border-scada-danger text-scada-inverse'
                       : 'bg-scada-success-strong border-scada-success text-scada-inverse'
