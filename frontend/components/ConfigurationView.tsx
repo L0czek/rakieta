@@ -533,7 +533,7 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
                                                             max={4095}
                                                             value={point.x}
                                                             onChange={e => updateLutPoint(selectedChannel, idx, 'x', e.target.value)}
-                                                            className={`w-full border bg-scada-surface px-2 py-2 min-h-11 text-scada-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/30 ${hoveredPointIndex === idx ? 'border-scada-accent text-scada-accent-bright' : 'border-scada'}`}
+                                                            className={`w-full border bg-scada-surface px-2 py-2 min-h-11 text-scada-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--scada-focus-ring)] ${hoveredPointIndex === idx ? 'border-scada-accent text-scada-accent-bright' : 'border-scada'}`}
                                                         />
                                                     </td>
                                                     <td className="px-2 py-1">
@@ -544,7 +544,7 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
                                                             max={1500}
                                                             value={point.y}
                                                             onChange={e => updateLutPoint(selectedChannel, idx, 'y', e.target.value)}
-                                                            className={`w-full border bg-scada-surface px-2 py-2 min-h-11 text-scada-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/30 ${hoveredPointIndex === idx ? 'border-scada-accent text-scada-accent-bright' : 'border-scada'}`}
+                                                            className={`w-full border bg-scada-surface px-2 py-2 min-h-11 text-scada-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--scada-focus-ring)] ${hoveredPointIndex === idx ? 'border-scada-accent text-scada-accent-bright' : 'border-scada'}`}
                                                         />
                                                     </td>
                                                     <td className="px-2 py-1">

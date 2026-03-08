@@ -432,7 +432,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
   }, []);
 
   return (
-    <div className="grid grid-cols-1 gap-2 auto-rows-[minmax(220px,auto)] min-h-full md:h-full md:grid-cols-[minmax(0,1fr)_22rem] md:grid-rows-[minmax(0,1fr)_320px]">
+    <div className="grid grid-cols-1 gap-2 auto-rows-[minmax(220px,auto)] min-h-full md:h-full md:grid-cols-[minmax(0,1fr)_22rem] md:grid-rows-[minmax(0,1fr)_360px]">
         {/* Top-Left: Big Chart (Rows 1-8, Cols 1-9) */}
         <div className="min-h-[320px] md:col-start-1 md:row-start-1 md:min-h-0">
             <ScadaPanel title="ANALYSIS" className="h-full">
@@ -549,8 +549,8 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
         </div>
 
         {/* Bottom-Right: Master Control & Servo (Rows 9-12, Cols 10-12) */}
-        <div className="flex flex-col gap-2 md:col-start-2 md:row-start-2">
-            <div className="flex-1">
+        <div className="grid gap-2 md:col-start-2 md:row-start-2 md:grid-rows-[120px_minmax(0,1fr)]">
+            <div className="min-h-[120px] md:min-h-0">
                 <ServoPanel 
                     servoPositionDegrees={servoPositionDegrees} 
                     servoState={telemetry.servoState}
@@ -559,7 +559,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
                     commandsEnabled={commandsEnabled}
                 />
             </div>
-            <div className="flex-1">
+            <div className="min-h-[220px] md:min-h-0">
                 <ControlPanel 
                     systemState={telemetry.state} 
                     isUnsafe={telemetry.isUnsafe} 

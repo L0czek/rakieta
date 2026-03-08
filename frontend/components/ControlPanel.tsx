@@ -117,7 +117,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                <button 
                 onClick={() => actions.setFireState('FIRE')}
                 disabled={!canFire}
-                className={`flex-1 font-bold text-2xl border-2 rounded flex flex-col items-center justify-center transition-all ${
+                className={`flex-1 font-bold text-2xl border-2 rounded flex flex-col items-center justify-center transition-colors transition-shadow ${
                     canFire 
                     ? 'bg-scada-danger hover:bg-[var(--scada-bg-danger-strong)] border-scada-danger text-scada-inverse shadow-scada-danger-md' 
                     : 'bg-scada-surface-elevated border-scada text-scada-muted cursor-not-allowed'

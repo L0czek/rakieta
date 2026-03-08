@@ -1,9 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { Suspense, lazy, useEffect, useState } from 'react';
 
-import { AnalysisView } from '@/components/AnalysisView';
-import { ChecklistView } from '@/components/ChecklistView';
-import { ConfigurationView } from '@/components/ConfigurationView';
-import { DashboardView } from '@/components/DashboardView';
 import { useChecklistEngine } from '@/hooks/useChecklistEngine';
 import { useMqttSystem } from '@/hooks/useMqttSystem';
 import { ConnectionState, MqttConfig } from '@/types';
@@ -27,6 +23,26 @@ type AppView = 'DASHBOARD' | 'ANALYSIS' | 'CHECKLIST' | 'CONFIGURATION';
 
 const MQTT_CONFIG_STORAGE_KEY = 'rocket.mqtt.config';
 const DEFAULT_MQTT_PORT = 8000;
+
+const DashboardView = lazy(async () => {
+  const module = await import('@/components/DashboardView');
+  return { default: module.DashboardView };
+});
+
+const AnalysisView = lazy(async () => {
+  const module = await import('@/components/AnalysisView');
+  return { default: module.AnalysisView };
+});
+
+const ChecklistView = lazy(async () => {
+  const module = await import('@/components/ChecklistView');
+  return { default: module.ChecklistView };
+});
+
+const ConfigurationView = lazy(async () => {
+  const module = await import('@/components/ConfigurationView');
+  return { default: module.ConfigurationView };
+});
 
 const getDefaultMqttConfig = (): MqttConfig => ({
   host: window.location.hostname,
@@ -109,13 +125,46 @@ const App = () => {
     connectionStatus === ConnectionState.CONNECTED || isSimulating;
 
   useEffect(() => {
-  });
-
-  useEffect(() => {
     try {
       localStorage.setItem(MQTT_CONFIG_STORAGE_KEY, JSON.stringify(mqttConfig));
     } catch {}
   }, [mqttConfig]);
+
+  const currentView = (() => {
+    if (view === 'DASHBOARD') {
+      return <DashboardView telemetry={telemetry} actions={actions} commandsEnabled={commandsEnabled} />;
+    }
+    if (view === 'ANALYSIS') {
+      return (
+        <AnalysisView
+          telemetry={telemetry}
+          actions={actions}
+          connectionStatus={connectionStatus}
+          isSimulating={isSimulating}
+          commandsEnabled={commandsEnabled}
+        />
+      );
+    }
+    if (view === 'CHECKLIST') {
+      return (
+        <ChecklistView
+          mode={checklistEngine.mode}
+          summaries={checklistEngine.summaries}
+          selectedChecklistId={checklistEngine.selectedChecklistId}
+          onSelectChecklist={checklistEngine.setSelectedChecklistId}
+          stepStates={checklistEngine.stepStates}
+          activeStep={checklistEngine.activeStep}
+          getStepContext={checklistEngine.getStepContext}
+          setStepContextField={checklistEngine.setStepContextField}
+          onCompleteCurrentStep={checklistEngine.completeStep}
+          onResetChecklist={() => checklistEngine.resetChecklist(checklistEngine.selectedChecklistId)}
+          onResetAllChecklists={checklistEngine.resetAllChecklists}
+          isReadOnly={checklistEngine.isReadOnly}
+        />
+      );
+    }
+    return <ConfigurationView onDirtyChange={setConfigHasUnsavedChanges} />;
+  })();
 
   return (
     <div className="w-screen h-screen overflow-hidden bg-scada-app flex flex-col relative">
@@ -328,34 +377,15 @@ const App = () => {
           </div>
         )}
 
-        {view === 'DASHBOARD' ? (
-          <DashboardView telemetry={telemetry} actions={actions} commandsEnabled={commandsEnabled} />
-        ) : view === 'ANALYSIS' ? (
-          <AnalysisView
-            telemetry={telemetry}
-            actions={actions}
-            connectionStatus={connectionStatus}
-            isSimulating={isSimulating}
-            commandsEnabled={commandsEnabled}
-          />
-        ) : view === 'CHECKLIST' ? (
-          <ChecklistView
-            mode={checklistEngine.mode}
-            summaries={checklistEngine.summaries}
-            selectedChecklistId={checklistEngine.selectedChecklistId}
-            onSelectChecklist={checklistEngine.setSelectedChecklistId}
-            stepStates={checklistEngine.stepStates}
-            activeStep={checklistEngine.activeStep}
-            getStepContext={checklistEngine.getStepContext}
-            setStepContextField={checklistEngine.setStepContextField}
-            onCompleteCurrentStep={checklistEngine.completeStep}
-            onResetChecklist={() => checklistEngine.resetChecklist(checklistEngine.selectedChecklistId)}
-            onResetAllChecklists={checklistEngine.resetAllChecklists}
-            isReadOnly={checklistEngine.isReadOnly}
-          />
-        ) : (
-          <ConfigurationView onDirtyChange={setConfigHasUnsavedChanges} />
-        )}
+        <Suspense
+          fallback={
+            <div className="h-full w-full flex items-center justify-center text-scada-secondary text-sm tracking-wider">
+              LOADING VIEW...
+            </div>
+          }
+        >
+          {currentView}
+        </Suspense>
       </main>
 
       <nav className="fixed bottom-0 inset-x-0 z-20 md:hidden border-t border-scada-weak bg-scada-app-soft backdrop-blur-sm">

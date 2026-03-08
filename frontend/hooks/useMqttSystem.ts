@@ -1,6 +1,6 @@
 
 import { useEffect, useState, useRef, useCallback } from 'react';
-import mqtt from 'mqtt';
+import type { MqttClient } from 'mqtt';
 import { 
   SystemTelemetry, 
   SystemState, 
@@ -131,7 +131,7 @@ export const useMqttSystem = () => {
     Record<string, ChecklistPointRuntimeState>
   >({});
   
-  const clientRef = useRef<mqtt.MqttClient | null>(null);
+  const clientRef = useRef<MqttClient | null>(null);
   const telemetryRef = useRef<SystemTelemetry>(cloneTelemetry(DEFAULT_TELEMETRY));
   const telemetryVersionRef = useRef(0);
   const publishedTelemetryVersionRef = useRef(-1);
@@ -494,7 +494,7 @@ export const useMqttSystem = () => {
   // Keep ref up to date
   handleMessageRef.current = handleMessage;
 
-  const connect = useCallback((config: MqttConfig) => {
+  const connect = useCallback(async (config: MqttConfig) => {
     setCriticalError(null);
     if (clientRef.current) { clientRef.current.end(); clientRef.current = null; }
     
@@ -503,6 +503,17 @@ export const useMqttSystem = () => {
     setConnectionStatus(ConnectionState.CONNECTING);
     const connectionUrl = `ws://${config.host}:${config.port}`;
     console.log(`Connecting to ${connectionUrl}`);
+
+    let mqtt: (typeof import('mqtt'))['default'];
+    try {
+      mqtt = (await import('mqtt')).default;
+    } catch (error) {
+      console.error('Failed to load MQTT runtime', error);
+      setConnectionStatus(ConnectionState.DISCONNECTED);
+      appendStatusLogEntry('Failed to load MQTT runtime', 'connection');
+      telemetryVersionRef.current += 1;
+      return;
+    }
 
     const client = mqtt.connect(connectionUrl, {
         username: config.username,

@@ -148,11 +148,11 @@ export const ValueDisplay: React.FC<{
   unit?: string;
   color?: string;
 }> = ({ label, value, unit, color = "text-scada-accent" }) => (
-    <div className="flex justify-between items-end border-b border-scada pb-1 mb-1 last:border-0">
-      <span className="text-scada-secondary text-xs uppercase">{label}</span>
-      <span className={`text-xl font-mono font-bold ${color}`}>
+    <div className="flex justify-between items-center border-b border-scada pb-0.5 mb-0.5 last:border-0">
+      <span className="text-scada-secondary text-[11px] uppercase truncate pr-2">{label}</span>
+      <span className={`text-lg font-mono font-bold leading-none ${color}`}>
         {value}
-        <span className="text-xs text-scada-muted ml-1">{unit}</span>
+        <span className="text-[10px] text-scada-muted ml-1">{unit}</span>
       </span>
     </div>
   );

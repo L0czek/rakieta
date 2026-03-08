@@ -30,5 +30,6 @@ This file documents the `frontend/` app for coding agents.
 
 ## Current constraints
 
-- Styling still uses Tailwind via CDN script in `index.html`.
-- Bundle is currently monolithic (analysis/chart runtime eagerly loaded).
+- Tailwind is compiled locally through Vite (`@tailwindcss/vite`) from `index.css`.
+- Views are lazy-loaded from `App.tsx` to reduce initial payload.
+- MQTT runtime is loaded on demand in `useMqttSystem.connect()` (dynamic import).

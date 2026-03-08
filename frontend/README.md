@@ -25,7 +25,7 @@ Web SCADA dashboard for rocket-engine test telemetry and command/control over MQ
 - Icons: `lucide-react`
 - MQTT client: `mqtt`
 - Browser DB wrapper: `idb` (IndexedDB)
-- Styling: Tailwind utility classes via CDN script in `index.html`
+- Styling: locally compiled Tailwind CSS (Vite plugin) + SCADA design tokens in `index.css`
 
 ## Libraries used
 
@@ -35,7 +35,8 @@ Web SCADA dashboard for rocket-engine test telemetry and command/control over MQ
 - `mqtt`
 - `idb`
 - Dev: `vite`, `@vitejs/plugin-react`, `typescript`, `@types/node`, `vitest`,
-  `jsdom`, `@testing-library/react`, `@testing-library/jest-dom`, `fake-indexeddb`
+  `jsdom`, `@testing-library/react`, `@testing-library/jest-dom`, `fake-indexeddb`,
+  `tailwindcss`, `@tailwindcss/vite`
 
 ## Local run
 
@@ -101,5 +102,6 @@ Published commands:
 - Data is retained in browser IndexedDB database `rocket_telemetry_db` until reset.
 - IndexedDB storage is chunked by sensor and time window (`1000ms` chunks) rather than
   one-record-per-point, which reduces write amplification under high-rate telemetry.
+- Major views and MQTT transport runtime are lazy-loaded to reduce cold-start JS payload.
 - `Reset` in critical modal clears IndexedDB and in-memory telemetry.
 - `vite.config.ts` exposes `GEMINI_API_KEY` defines, but this frontend currently does not use Gemini APIs.
