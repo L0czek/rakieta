@@ -11,6 +11,9 @@ Web SCADA dashboard for rocket-engine test telemetry and command/control over MQ
   - `Dashboard` view for live operations
   - `Analysis` view for multi-series history and timeline navigation
   - `Checklist` view for aviation-style sequential procedures
+- Exports telemetry from a selected begin/end window as pandas-friendly CSV
+  (`timestamp_ms,sensor_id,value`)
+  Range inputs are in seconds, with a quick action to copy the currently displayed chart window.
 - Persists telemetry in browser IndexedDB for history playback
 - Includes an internal simulator that can:
   - Loop back directly into UI (no broker required), or
@@ -102,4 +105,3 @@ Published commands:
   one-record-per-point, which reduces write amplification under high-rate telemetry.
 - `Reset` in critical modal clears IndexedDB and in-memory telemetry.
 - `vite.config.ts` exposes `GEMINI_API_KEY` defines, but this frontend currently does not use Gemini APIs.
-

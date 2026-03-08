@@ -2,6 +2,7 @@ import { openDB, DBSchema, IDBPDatabase } from 'idb';
 import { SensorDataPoint } from '../types';
 
 export const MAX_CHUNK_DURATION_MS = 1000;
+const PANDAS_CSV_HEADER = 'timestamp_ms,sensor_id,value';
 
 export interface MeasurementChunk {
   sensorId: string;
@@ -21,6 +22,18 @@ interface RocketDB extends DBSchema {
     key: string;
     value: any;
   }
+}
+
+interface CsvExportRow {
+  timestamp: number;
+  sensorId: string;
+  value: number;
+}
+
+export interface PandasCsvExport {
+  csv: string;
+  rowCount: number;
+  sensorCount: number;
 }
 
 const DB_NAME = 'rocket_telemetry_db';
@@ -108,6 +121,79 @@ export const getMeasurementTimeRange = async (): Promise<{ start: number; end: n
   const end = lastCursor ? lastCursor.value.chunkEnd : 0;
 
   return { start, end };
+};
+
+const validateExportRange = (begin: number, end: number): void => {
+  if (!Number.isFinite(begin) || !Number.isFinite(end)) {
+    throw new Error('Invalid export range: begin/end must be finite numbers.');
+  }
+  if (begin > end) {
+    throw new Error(`Invalid export range: begin (${begin}) must be <= end (${end}).`);
+  }
+};
+
+const escapeCsvField = (field: string): string => {
+  if (/["\n,]/.test(field)) {
+    return `"${field.replaceAll('"', '""')}"`;
+  }
+  return field;
+};
+
+const normalizeSensorIds = (sensorIds: string[] | undefined): string[] => {
+  if (!sensorIds) return [];
+  const uniqueIds = new Set<string>();
+
+  for (const sensorId of sensorIds) {
+    const trimmed = sensorId.trim();
+    if (trimmed.length > 0) {
+      uniqueIds.add(trimmed);
+    }
+  }
+
+  return Array.from(uniqueIds);
+};
+
+const buildCsvLine = (row: CsvExportRow): string =>
+  `${row.timestamp},${escapeCsvField(row.sensorId)},${row.value}`;
+
+export const exportMeasurementsForPandas = async ({
+  begin,
+  end,
+  sensorIds,
+}: {
+  begin: number;
+  end: number;
+  sensorIds?: string[];
+}): Promise<PandasCsvExport> => {
+  validateExportRange(begin, end);
+
+  const normalizedBegin = Math.floor(begin);
+  const normalizedEnd = Math.ceil(end);
+  const requestedSensorIds = normalizeSensorIds(sensorIds);
+  const selectedSensorIds = requestedSensorIds.length > 0 ? requestedSensorIds : await getSensorIds();
+  const rows: CsvExportRow[] = [];
+
+  for (const sensorId of selectedSensorIds) {
+    const points = await getMeasurementsInRange(sensorId, normalizedBegin, normalizedEnd);
+    for (const point of points) {
+      if (!Number.isFinite(point.value)) continue;
+      rows.push({ timestamp: point.timestamp, sensorId, value: point.value });
+    }
+  }
+
+  rows.sort((left, right) => {
+    if (left.timestamp !== right.timestamp) {
+      return left.timestamp - right.timestamp;
+    }
+    return left.sensorId.localeCompare(right.sensorId);
+  });
+
+  const lines = [PANDAS_CSV_HEADER, ...rows.map(buildCsvLine)];
+  return {
+    csv: lines.join('\n'),
+    rowCount: rows.length,
+    sensorCount: selectedSensorIds.length,
+  };
 };
 
 export const getLastTimestamp = async (): Promise<number> => {

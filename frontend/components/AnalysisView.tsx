@@ -4,7 +4,7 @@ import { SystemTelemetry, SensorDataPoint } from '../types';
 import { ScadaPanel, ValueDisplay, SENSOR_COLORS, TEMP_COLORS, useChartSize, CHART_RANGES } from './Widgets';
 import { ControlPanel } from './ControlPanel';
 import { ServoPanel } from './ServoPanel';
-import { Pause, Play, ZoomIn, ZoomOut } from 'lucide-react';
+import { Download, Pause, Play, ZoomIn, ZoomOut } from 'lucide-react';
 import uPlot from 'uplot';
 import UplotReact from 'uplot-react';
 import * as DB from '../utils/db';
@@ -17,6 +17,17 @@ interface AnalysisViewProps {
         isSimulating: boolean;
         commandsEnabled: boolean;
 }
+
+const formatSecondsFromMs = (timestampMs: number): string => {
+    const seconds = timestampMs / 1000;
+    return seconds.toFixed(3).replace(/\.?0+$/, '');
+};
+
+const parseSecondsToMs = (rawSeconds: string): number | null => {
+    const parsed = Number(rawSeconds.trim());
+    if (!Number.isFinite(parsed)) return null;
+    return Math.round(parsed * 1000);
+};
 
 export const AnalysisView: React.FC<AnalysisViewProps> = ({
     telemetry,
@@ -37,10 +48,17 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
     const getSeriesLabel = (key: string) => sensorLabels[key] || (knownSensors.includes(key) ? `temp ${key}` : key);
 
   // View State
-    const [isLive, setIsLive] = useState(() => connectionStatus === ConnectionState.CONNECTED || isSimulating);
+  const [isLive, setIsLive] = useState(() => connectionStatus === ConnectionState.CONNECTED || isSimulating);
   const [windowSize, setWindowSize] = useState(30000); // 30 seconds default
   const [viewStart, setViewStart] = useState(0); 
   const [chartData, setChartData] = useState<Record<string, SensorDataPoint[]> | null>(null);
+  const [exportBeginSecondsInput, setExportBeginSecondsInput] = useState('');
+  const [exportEndSecondsInput, setExportEndSecondsInput] = useState('');
+  const [isExporting, setIsExporting] = useState(false);
+  const [exportStatus, setExportStatus] = useState<string | null>(null);
+
+  const timelineStart = telemetry.startTime;
+  const timelineEnd = Math.max(telemetry.startTime, telemetry.lastPacketTimestamp);
 
   const [visibleLines, setVisibleLines] = useState<Record<string, boolean>>({
     tensometer: true,
@@ -203,6 +221,19 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
       }
   }, [viewStart, windowSize, isLive, visibleLines]);
 
+  useEffect(() => {
+      if (timelineEnd <= 0) {
+          setExportBeginSecondsInput('');
+          setExportEndSecondsInput('');
+          return;
+      }
+      if (exportBeginSecondsInput.length > 0 || exportEndSecondsInput.length > 0) return;
+
+      const begin = Math.max(timelineStart, timelineEnd - windowSize);
+      setExportBeginSecondsInput(formatSecondsFromMs(begin));
+      setExportEndSecondsInput(formatSecondsFromMs(timelineEnd));
+  }, [timelineStart, timelineEnd, windowSize, exportBeginSecondsInput, exportEndSecondsInput]);
+
   // --- HELPERS ---
 
   const getLatestValue = (data: {value: number}[]) => data.length > 0 ? data[data.length - 1].value : 0;
@@ -279,6 +310,49 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
           const next = direction === 'in' ? prev / 2 : prev * 2;
           return Math.max(1000, Math.min(next, 600000));
       });
+  };
+
+  const handleUseDisplayedRange = () => {
+      setExportBeginSecondsInput(formatSecondsFromMs(viewStart));
+      setExportEndSecondsInput(formatSecondsFromMs(viewStart + windowSize));
+      setExportStatus(null);
+  };
+
+  const handleExportCsv = async () => {
+      const begin = parseSecondsToMs(exportBeginSecondsInput);
+      const end = parseSecondsToMs(exportEndSecondsInput);
+
+      if (begin === null || end === null) {
+          setExportStatus('Export failed: begin/end must be numeric seconds values.');
+          return;
+      }
+
+      if (begin > end) {
+          setExportStatus('Export failed: begin must be less than or equal to end.');
+          return;
+      }
+
+      setIsExporting(true);
+      setExportStatus(null);
+      try {
+          const result = await DB.exportMeasurementsForPandas({ begin, end });
+          const blob = new Blob([result.csv], { type: 'text/csv;charset=utf-8' });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `telemetry_pandas_${begin}_${end}.csv`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+          setExportStatus(`Exported ${result.rowCount} rows from ${result.sensorCount} sensors.`);
+      } catch (error) {
+          console.error('Export failed', error);
+          const reason = error instanceof Error ? error.message : 'unknown error';
+          setExportStatus(`Export failed: ${reason}`);
+      } finally {
+          setIsExporting(false);
+      }
   };
 
   // Visibility flags for axes
@@ -534,13 +608,58 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
                         <div className="relative h-6 w-full flex items-center">
                             <input 
                             type="range" 
-                            min={telemetry.startTime} 
-                            max={Math.max(telemetry.startTime, telemetry.lastPacketTimestamp - windowSize)} 
+                            min={timelineStart} 
+                            max={Math.max(timelineStart, timelineEnd - windowSize)} 
                             value={viewStart} 
                             onChange={handleScroll}
                             disabled={isLive}
                             className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-500 disabled:opacity-50"
                             />
+                        </div>
+
+                        <div className="flex flex-wrap items-end gap-2 border-t border-slate-700/70 pt-2">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                                Begin (s)
+                                <input
+                                    type="text"
+                                    inputMode="decimal"
+                                    value={exportBeginSecondsInput}
+                                    onChange={(event) => setExportBeginSecondsInput(event.target.value)}
+                                    className="mt-1 w-36 bg-slate-900 border border-slate-700 rounded px-2 py-1
+                                      text-xs font-mono text-slate-200 outline-none focus:border-cyan-500"
+                                />
+                            </label>
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                                End (s)
+                                <input
+                                    type="text"
+                                    inputMode="decimal"
+                                    value={exportEndSecondsInput}
+                                    onChange={(event) => setExportEndSecondsInput(event.target.value)}
+                                    className="mt-1 w-36 bg-slate-900 border border-slate-700 rounded px-2 py-1
+                                      text-xs font-mono text-slate-200 outline-none focus:border-cyan-500"
+                                />
+                            </label>
+                            <button
+                                onClick={handleUseDisplayedRange}
+                                className="h-8 px-3 border rounded text-xs font-bold uppercase flex items-center
+                                  border-slate-600 text-slate-300 bg-slate-800/70 hover:bg-slate-700/70"
+                            >
+                                Use Displayed Window
+                            </button>
+                            <button
+                                onClick={handleExportCsv}
+                                disabled={isExporting}
+                                className="h-8 px-3 border rounded text-xs font-bold uppercase flex items-center
+                                  gap-2 border-cyan-600 text-cyan-300 bg-cyan-900/30 disabled:opacity-50
+                                  disabled:cursor-not-allowed"
+                            >
+                                <Download size={14} />
+                                {isExporting ? 'Exporting...' : 'Export CSV'}
+                            </button>
+                            <div className="text-[11px] text-slate-500 font-mono">
+                                {exportStatus ?? 'CSV columns: timestamp_ms,sensor_id,value (seconds input)'}
+                            </div>
                         </div>
                 </div>
             </div>
