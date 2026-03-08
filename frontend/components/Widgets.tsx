@@ -4,24 +4,9 @@ import uPlot from 'uplot';
 import UplotReact from 'uplot-react';
 import 'uplot/dist/uPlot.min.css';
 import { SensorDataPoint } from '@/types';
+import { CHART_COLORS, SENSOR_COLORS, TEMP_COLORS } from '@/theme/tokens';
 
-export const SENSOR_COLORS: Record<string, string> = {
-  tensometer: '#c084fc',
-  pressureTank: '#22d3ee',
-  pressureCombustion: '#fb923c',
-  batteryStand: '#4ade80',
-  batteryComputer: '#2dd4bf',
-  boostVoltage: '#fbbf24',
-  starterSense: '#a78bfa',
-  servo: '#f472b6',
-};
-
-export const TEMP_COLORS = [
-  '#f87171',
-  '#fda4af',
-  '#e11d48',
-  '#be123c',
-];
+export { SENSOR_COLORS, TEMP_COLORS };
 
 export const CHART_RANGES = {
   thrust: [0, 700] as [number, number],
@@ -57,12 +42,12 @@ export const useChartSize = () => {
   return { ref, size };
 };
 
-const CHART_AXIS_COLOR = '#8fa3be';
-const CHART_GRID_COLOR = '#334155';
+const CHART_AXIS_COLOR = CHART_COLORS.axis;
+const CHART_GRID_COLOR = CHART_COLORS.grid;
 
 export const ScadaPanel = ({ title, children, className = "", danger = false, headerRight = null }: { title: string, children?: React.ReactNode, className?: string, danger?: boolean, headerRight?: React.ReactNode }) => (
-  <div className={`relative flex flex-col bg-[var(--scada-bg-surface-elevated)]/80 border ${danger ? 'border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.2)]' : 'border-cyan-500/30'} backdrop-blur-sm rounded-sm overflow-hidden ${className}`}>
-    <div className={`px-2 py-1 text-xs font-bold tracking-widest border-b flex justify-between items-center ${danger ? 'bg-red-900/40 text-red-200 border-red-500/50' : 'bg-cyan-900/20 text-cyan-400 border-cyan-500/30'}`}>
+  <div className={`relative flex flex-col bg-scada-surface-soft-strong border ${danger ? 'border-scada-danger shadow-scada-danger-soft' : 'border-scada-accent-soft'} backdrop-blur-sm rounded-sm overflow-hidden ${className}`}>
+    <div className={`px-2 py-1 text-xs font-bold tracking-widest border-b flex justify-between items-center ${danger ? 'bg-scada-danger-soft text-scada-danger-soft border-scada-danger' : 'bg-scada-accent-soft text-scada-accent border-scada-accent-soft'}`}>
       <span>{title.toUpperCase()}</span>
       {headerRight && <div className="font-mono">{headerRight}</div>}
     </div>
@@ -70,10 +55,10 @@ export const ScadaPanel = ({ title, children, className = "", danger = false, he
       {children}
     </div>
     {/* Corner accents */}
-    <div className={`absolute top-0 left-0 w-2 h-2 border-t border-l ${danger ? 'border-red-500' : 'border-cyan-400'}`}></div>
-    <div className={`absolute top-0 right-0 w-2 h-2 border-t border-r ${danger ? 'border-red-500' : 'border-cyan-400'}`}></div>
-    <div className={`absolute bottom-0 left-0 w-2 h-2 border-b border-l ${danger ? 'border-red-500' : 'border-cyan-400'}`}></div>
-    <div className={`absolute bottom-0 right-0 w-2 h-2 border-b border-r ${danger ? 'border-red-500' : 'border-cyan-400'}`}></div>
+    <div className={`absolute top-0 left-0 w-2 h-2 border-t border-l ${danger ? 'border-scada-danger' : 'border-scada-accent'}`}></div>
+    <div className={`absolute top-0 right-0 w-2 h-2 border-t border-r ${danger ? 'border-scada-danger' : 'border-scada-accent'}`}></div>
+    <div className={`absolute bottom-0 left-0 w-2 h-2 border-b border-l ${danger ? 'border-scada-danger' : 'border-scada-accent'}`}></div>
+    <div className={`absolute bottom-0 right-0 w-2 h-2 border-b border-r ${danger ? 'border-scada-danger' : 'border-scada-accent'}`}></div>
   </div>
 );
 
@@ -162,9 +147,9 @@ export const ValueDisplay: React.FC<{
   value: string | number;
   unit?: string;
   color?: string;
-}> = ({ label, value, unit, color = "text-cyan-400" }) => (
-    <div className="flex justify-between items-end border-b border-slate-700 pb-1 mb-1 last:border-0">
-      <span className="text-slate-400 text-xs uppercase">{label}</span>
+}> = ({ label, value, unit, color = "text-scada-accent" }) => (
+    <div className="flex justify-between items-end border-b border-scada pb-1 mb-1 last:border-0">
+      <span className="text-scada-secondary text-xs uppercase">{label}</span>
       <span className={`text-xl font-mono font-bold ${color}`}>
         {value}
         <span className="text-xs text-scada-muted ml-1">{unit}</span>
@@ -174,12 +159,12 @@ export const ValueDisplay: React.FC<{
 
 const DIGITAL_INDICATOR_STYLES = {
   success: {
-    activeContainer: 'border-green-500 bg-green-900/20',
-    activeDot: 'bg-green-500',
+    activeContainer: 'border-scada-success bg-scada-success-soft',
+    activeDot: 'bg-scada-success',
   },
   warning: {
-    activeContainer: 'border-amber-500 bg-amber-900/20',
-    activeDot: 'bg-amber-500',
+    activeContainer: 'border-scada-warning bg-scada-warning-soft',
+    activeDot: 'bg-scada-warning',
   },
 } as const;
 
@@ -197,15 +182,15 @@ export const DigitalIndicator = ({
   return (
     <div
       className={`flex items-center gap-2 rounded border p-2 ${
-        active ? style.activeContainer : 'border-slate-700 bg-slate-900/50 opacity-50'
+        active ? style.activeContainer : 'border-scada bg-scada-surface-soft opacity-50'
       }`}
     >
       <div
         className={`h-3 w-3 rounded-full ${
-          active ? `${style.activeDot} shadow-[0_0_8px_currentColor]` : 'bg-slate-700'
+          active ? `${style.activeDot} shadow-[0_0_8px_currentColor]` : 'bg-scada-surface-strong'
         }`}
       />
-      <span className={`text-xs font-bold tracking-wider ${active ? 'text-white' : 'text-scada-muted'}`}>
+      <span className={`text-xs font-bold tracking-wider ${active ? 'text-scada-inverse' : 'text-scada-muted'}`}>
         {label}
       </span>
     </div>

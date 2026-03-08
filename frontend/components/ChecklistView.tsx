@@ -20,28 +20,28 @@ interface ChecklistViewProps {
 
 const getStatusClassName = (step: ChecklistStepState): string => {
   if (!step.validation.isAutoRule) {
-    return 'text-amber-300 bg-amber-900/20 border-amber-600/40';
+    return 'text-scada-warning-soft bg-scada-warning-soft border-scada-warning';
   }
   if (step.validation.isValid) {
-    return 'text-green-300 bg-green-900/20 border-green-600/40';
+    return 'text-scada-success-soft bg-scada-success-soft border-scada-success';
   }
-  return 'text-red-300 bg-red-900/20 border-red-600/40';
+  return 'text-scada-danger-soft bg-scada-danger-soft border-scada-danger';
 };
 
 const getRowClassName = (step: ChecklistStepState): string => {
   const baseClass =
-    'grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_220px] text-sm font-mono border-b border-slate-800/90';
+    'grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_220px] text-sm font-mono border-b border-scada-weak';
 
   if (step.isCurrent) {
-    return `${baseClass} border-l-4 md:border-l-8 border-cyan-300 bg-slate-900/85 ` +
-      'shadow-[inset_0_0_0_1px_rgba(34,211,238,0.35),0_0_16px_rgba(34,211,238,0.15)]';
+    return `${baseClass} border-l-4 md:border-l-8 border-scada-accent bg-scada-surface-soft-strong ` +
+      'shadow-scada-accent-inset';
   }
 
   if (step.isCompleted) {
-    return `${baseClass} border-l-2 md:border-l-4 border-emerald-700/60 bg-emerald-950/15`;
+    return `${baseClass} border-l-2 md:border-l-4 border-scada-success bg-scada-success-soft`;
   }
 
-  return `${baseClass} border-l-2 md:border-l-4 border-slate-800 bg-slate-950/95`;
+  return `${baseClass} border-l-2 md:border-l-4 border-scada-weak bg-scada-app-soft`;
 };
 
 export const ChecklistView: React.FC<ChecklistViewProps> = ({
@@ -80,8 +80,8 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
   return (
     <div className="h-full min-h-0 flex flex-col gap-2">
       <div
-        className="bg-slate-950 border border-cyan-900/60 rounded-sm p-2 flex flex-wrap items-center gap-2
-          shadow-[inset_0_0_0_1px_rgba(56,189,248,0.08)]"
+        className="bg-scada-app border border-scada-accent-soft rounded-sm p-2 flex flex-wrap items-center gap-2
+          shadow-scada-accent-thin-inset"
       >
         <select
           aria-label="Select checklist"
@@ -96,16 +96,16 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
           ))}
         </select>
         <button
-          className="px-3 py-2.5 min-h-11 text-xs font-bold bg-slate-800 border border-slate-700 rounded-sm
-            text-slate-100 tracking-wider hover:border-cyan-700/70 disabled:opacity-50"
+          className="px-3 py-2.5 min-h-11 text-xs font-bold bg-scada-surface-elevated border border-scada rounded-sm
+            text-scada-primary tracking-wider hover:border-[var(--scada-border-accent-soft)] disabled:opacity-50"
           disabled={isReadOnly || isSubmitting}
           onClick={() => runAction(onResetChecklist)}
         >
           RESET CHECKLIST
         </button>
         <button
-          className="px-3 py-2.5 min-h-11 text-xs font-bold bg-slate-800 border border-slate-700 rounded-sm
-            text-slate-100 tracking-wider hover:border-cyan-700/70 disabled:opacity-50"
+          className="px-3 py-2.5 min-h-11 text-xs font-bold bg-scada-surface-elevated border border-scada rounded-sm
+            text-scada-primary tracking-wider hover:border-[var(--scada-border-accent-soft)] disabled:opacity-50"
           disabled={isReadOnly || isSubmitting}
           onClick={() => runAction(onResetAllChecklists)}
         >
@@ -114,18 +114,18 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
       </div>
 
       {errorMessage && (
-        <div className="bg-red-900/40 border border-red-700 text-red-100 px-3 py-2 rounded text-sm">
+        <div className="bg-scada-danger-soft border border-scada-danger text-scada-danger-soft px-3 py-2 rounded text-sm">
           {errorMessage}
         </div>
       )}
 
       <div
         className="flex-1 min-h-0 relative flex flex-col rounded-sm overflow-hidden
-          bg-slate-800/70 border border-cyan-500/30"
+          bg-scada-surface-soft-strong border border-scada-accent-soft"
       >
         <div
           className="px-2 py-1 text-xs font-bold tracking-widest border-b flex justify-between
-            items-center bg-cyan-900/20 text-cyan-300 border-cyan-500/30"
+            items-center bg-scada-accent-soft text-scada-accent-soft border-scada-accent-soft"
         >
           <span>CHECKLIST SEQUENCE</span>
         </div>
@@ -136,12 +136,12 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
             const inlineContext = getStepContext(step.point.id);
 
             return (
-              <div key={step.point.id} className="border-b border-slate-800/90 last:border-b-0">
+              <div key={step.point.id} className="border-b border-scada-weak last:border-b-0">
                 <div className={rowClass}>
-                  <div className="px-3 py-3 text-slate-200">
+                  <div className="px-3 py-3 text-scada-secondary">
                     <div className="font-semibold tracking-wide">{step.point.callout}</div>
                     {step.point.note && (
-                      <div className="text-xs text-slate-400 mt-1">{step.point.note}</div>
+                      <div className="text-xs text-scada-secondary mt-1">{step.point.note}</div>
                     )}
                   </div>
                   <div
@@ -150,7 +150,7 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
                   >
                     <div className="font-bold">{step.point.response}</div>
                     {step.isCurrent && (
-                      <div className="mt-1 text-[10px] font-bold tracking-wide text-cyan-200">
+                      <div className="mt-1 text-[10px] font-bold tracking-wide text-scada-accent-bright">
                         📡 {step.validation.displayValue}
                       </div>
                     )}
@@ -160,10 +160,10 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
                 {step.isCurrent && (
                   <div
                     data-testid="inline-current-step-controls"
-                    className="px-3 py-3 border-t border-slate-800 bg-slate-900/30 flex flex-col gap-3"
+                    className="px-3 py-3 border-t border-scada-weak bg-scada-surface-softer flex flex-col gap-3"
                   >
                     {(step.point.contextFields ?? []).map((field) => (
-                      <label key={field.id} className="text-xs text-slate-300 flex flex-col gap-1">
+                      <label key={field.id} className="text-xs text-scada-secondary flex flex-col gap-1">
                         {field.label}
                         <input
                           className="scada-input rounded-sm px-2"
@@ -180,8 +180,8 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
                     ))}
 
                     <button
-                      className="self-start px-3 py-2.5 min-h-11 rounded-sm bg-cyan-700 text-white font-bold text-sm
-                        tracking-wide border border-cyan-500/70 shadow-[0_0_10px_rgba(6,182,212,0.3)]
+                      className="self-start px-3 py-2.5 min-h-11 rounded-sm bg-scada-accent-strong text-scada-inverse font-bold text-sm
+                        tracking-wide border border-scada-accent shadow-scada-accent-sm
                         disabled:opacity-50"
                       disabled={
                         isReadOnly ||
@@ -199,13 +199,13 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
           })}
 
           {!activeStep && (
-            <div className="px-3 py-3 text-sm text-green-300 font-semibold">Checklist complete.</div>
+            <div className="px-3 py-3 text-sm text-scada-success-soft font-semibold">Checklist complete.</div>
           )}
         </div>
-        <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-cyan-400"></div>
-        <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-cyan-400"></div>
-        <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-cyan-400"></div>
-        <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-cyan-400"></div>
+        <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-scada-accent"></div>
+        <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-scada-accent"></div>
+        <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-scada-accent"></div>
+        <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-scada-accent"></div>
       </div>
     </div>
   );

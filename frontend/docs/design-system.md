@@ -53,7 +53,10 @@ Use these variables for chart styling instead of hard-coded hex values:
 - `--scada-chart-grid`
 - `--scada-chart-legend`
 
-Series colors are tokenized in `Widgets.tsx` and mapped to CSS vars:
+Chart/runtime color constants are centralized in `frontend/theme/tokens.ts`.
+Components should import chart colors from there instead of inlining hex values.
+
+Series colors are tokenized in `theme/tokens.ts` and consumed by `Widgets.tsx`:
 
 - Pressure/tensometer/power/servo: `--scada-series-*`
 - Temperature palette: `--scada-series-temp-*`
@@ -74,5 +77,6 @@ Series colors are tokenized in `Widgets.tsx` and mapped to CSS vars:
 ## File ownership
 
 - Global tokens and utility classes: `frontend/index.css`
+- Runtime chart color constants: `frontend/theme/tokens.ts`
 - Chart and panel primitives: `frontend/components/Widgets.tsx`
 - App-level shell surfaces: `frontend/App.tsx`

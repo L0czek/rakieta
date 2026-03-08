@@ -31,19 +31,19 @@ export const ServoPanel: React.FC<ServoPanelProps> = ({
                 <div className="flex flex-col justify-between">
                     <div>
                         <div className="mb-1 text-[10px] text-scada-muted">POSITION</div>
-                        <div className="text-3xl font-mono text-white">
+                        <div className="text-3xl font-mono text-scada-inverse">
                             {degrees.toFixed(0)}
                             <span className="ml-1 text-sm text-scada-muted">°</span>
                         </div>
                     </div>
                     
-                    <div className="w-full bg-slate-700 h-4 rounded-full overflow-hidden border border-slate-600 relative">
+                    <div className="w-full bg-scada-surface-strong h-4 rounded-full overflow-hidden border border-scada-strong relative">
                         {/* Tick marks */}
-                        <div className="absolute left-1/4 top-0 bottom-0 w-px bg-slate-500 opacity-30"></div>
-                        <div className="absolute left-1/2 top-0 bottom-0 w-px bg-slate-500 opacity-50"></div>
-                        <div className="absolute left-3/4 top-0 bottom-0 w-px bg-slate-500 opacity-30"></div>
+                        <div className="absolute left-1/4 top-0 bottom-0 w-px bg-scada-border-strong opacity-30"></div>
+                        <div className="absolute left-1/2 top-0 bottom-0 w-px bg-scada-border-strong opacity-50"></div>
+                        <div className="absolute left-3/4 top-0 bottom-0 w-px bg-scada-border-strong opacity-30"></div>
                         
-                        <div className="bg-cyan-500 h-full" style={{ width: `${percent}%` }}></div>
+                        <div className="bg-scada-accent h-full" style={{ width: `${percent}%` }}></div>
                     </div>
                 </div>
 
@@ -58,14 +58,14 @@ export const ServoPanel: React.FC<ServoPanelProps> = ({
                          <button 
                             onClick={() => actions.setServoCmd('OPEN')}
                             disabled={!canServo}
-                            className={`flex-1 min-h-11 rounded border border-cyan-500/50 flex items-center justify-center text-xs font-bold md:min-h-0 ${servoState === ServoState.OPEN ? 'bg-cyan-600 text-white' : 'bg-slate-800 text-cyan-400 hover:bg-slate-700'} disabled:opacity-50 disabled:cursor-not-allowed`}
+                            className={`flex-1 min-h-11 rounded border border-scada-accent flex items-center justify-center text-xs font-bold md:min-h-0 ${servoState === ServoState.OPEN ? 'bg-scada-accent text-scada-inverse' : 'bg-scada-surface-elevated text-scada-accent hover:bg-[var(--scada-bg-surface-strong)]'} disabled:opacity-50 disabled:cursor-not-allowed`}
                         >
                             OPEN
                         </button>
                         <button 
                             onClick={() => actions.setServoCmd('CLOSE')}
                             disabled={!canServo}
-                            className={`flex-1 min-h-11 rounded border border-cyan-500/50 flex items-center justify-center text-xs font-bold md:min-h-0 ${servoState === ServoState.CLOSED ? 'bg-cyan-900/50 text-white' : 'bg-slate-800 text-cyan-400 hover:bg-slate-700'} disabled:opacity-50 disabled:cursor-not-allowed`}
+                            className={`flex-1 min-h-11 rounded border border-scada-accent flex items-center justify-center text-xs font-bold md:min-h-0 ${servoState === ServoState.CLOSED ? 'bg-scada-accent-soft text-scada-inverse' : 'bg-scada-surface-elevated text-scada-accent hover:bg-[var(--scada-bg-surface-strong)]'} disabled:opacity-50 disabled:cursor-not-allowed`}
                         >
                             CLOSE
                         </button>

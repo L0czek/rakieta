@@ -12,6 +12,7 @@ import {
     setConversionSettings,
 } from '@/utils/conversions';
 import { ScadaPanel, useChartSize } from '@/components/Widgets';
+import { CHART_COLORS } from '@/theme/tokens';
 
 interface ConfigurationViewProps {
     onDirtyChange?: (isDirty: boolean) => void;
@@ -83,16 +84,16 @@ const LutChart: React.FC<{ points: LutPoint[]; onHoverIndexChange?: (index: numb
                 {},
                 {
                     label: 'LUT',
-                    stroke: '#22d3ee',
+                    stroke: CHART_COLORS.accent,
                     width: 2,
-                    points: { show: true, size: 7, stroke: '#22d3ee', fill: '#22d3ee' },
+                    points: { show: true, size: 7, stroke: CHART_COLORS.accent, fill: CHART_COLORS.accent },
                 },
             ],
             axes: [
                 {
-                    stroke: '#8fa3be',
-                    grid: { stroke: '#334155' },
-                    ticks: { stroke: '#334155' },
+                    stroke: CHART_COLORS.axis,
+                    grid: { stroke: CHART_COLORS.grid },
+                    ticks: { stroke: CHART_COLORS.grid },
                     splits: () => {
                         const splits: number[] = [];
                         for (let value = 0; value <= 4095; value += 256) {
@@ -104,9 +105,9 @@ const LutChart: React.FC<{ points: LutPoint[]; onHoverIndexChange?: (index: numb
                     values: (_u, vals) => vals.map((val) => `${Math.round(val)}`),
                 },
                 {
-                    stroke: '#8fa3be',
-                    grid: { stroke: '#334155' },
-                    ticks: { stroke: '#334155' },
+                    stroke: CHART_COLORS.axis,
+                    grid: { stroke: CHART_COLORS.grid },
+                    ticks: { stroke: CHART_COLORS.grid },
                     size: 72,
                     splits: () => {
                         const splits: number[] = [];
@@ -137,7 +138,7 @@ const LutChart: React.FC<{ points: LutPoint[]; onHoverIndexChange?: (index: numb
     }, [size.width, size.height, onHoverIndexChange, sortedPoints]);
 
     return (
-        <div ref={ref} className={`w-full h-full bg-slate-950 border border-slate-700 rounded p-2 ${className}`}>
+        <div ref={ref} className={`w-full h-full bg-scada-app border border-scada rounded p-2 ${className}`}>
             {size.width > 0 && size.height > 0 ? (
                 <UplotReact options={options} data={chartData} />
             ) : null}
@@ -166,9 +167,9 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
     const fileInputRef = useRef<HTMLInputElement | null>(null);
 
     const statusClass = useMemo(() => {
-        if (status.startsWith('ERROR')) return 'text-red-400';
-        if (status.startsWith('IMPORTED')) return 'text-green-400';
-        return 'text-cyan-400';
+        if (status.startsWith('ERROR')) return 'text-scada-danger';
+        if (status.startsWith('IMPORTED')) return 'text-scada-success';
+        return 'text-scada-accent';
     }, [status]);
 
     const selectedPoints = lutDrafts[selectedChannel];
@@ -314,7 +315,7 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
                         <div className="p-3 space-y-4">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                 <div>
-                                    <label className="text-xs text-slate-400 block mb-1">TENSOMETER DIVIDER RATIO</label>
+                                    <label className="text-xs text-scada-secondary block mb-1">TENSOMETER DIVIDER RATIO</label>
                                     <input
                                         type="number"
                                         step="any"
@@ -324,7 +325,7 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-xs text-slate-400 block mb-1">TENSOMETER KG/V</label>
+                                    <label className="text-xs text-scada-secondary block mb-1">TENSOMETER KG/V</label>
                                     <input
                                         type="number"
                                         step="any"
@@ -335,7 +336,7 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
                                 </div>
 
                                 <div>
-                                    <label className="text-xs text-slate-400 block mb-1">PRESSURE TANK DIVIDER RATIO</label>
+                                    <label className="text-xs text-scada-secondary block mb-1">PRESSURE TANK DIVIDER RATIO</label>
                                     <input
                                         type="number"
                                         step="any"
@@ -348,7 +349,7 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-xs text-slate-400 block mb-1">PRESSURE TANK BAR/V</label>
+                                    <label className="text-xs text-scada-secondary block mb-1">PRESSURE TANK BAR/V</label>
                                     <input
                                         type="number"
                                         step="any"
@@ -362,7 +363,7 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
                                 </div>
 
                                 <div>
-                                    <label className="text-xs text-slate-400 block mb-1">PRESSURE COMBUSTION DIVIDER RATIO</label>
+                                    <label className="text-xs text-scada-secondary block mb-1">PRESSURE COMBUSTION DIVIDER RATIO</label>
                                     <input
                                         type="number"
                                         step="any"
@@ -375,7 +376,7 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-xs text-slate-400 block mb-1">PRESSURE COMBUSTION BAR/V</label>
+                                    <label className="text-xs text-scada-secondary block mb-1">PRESSURE COMBUSTION BAR/V</label>
                                     <input
                                         type="number"
                                         step="any"
@@ -389,7 +390,7 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
                                 </div>
 
                                 <div>
-                                    <label className="text-xs text-slate-400 block mb-1">STAND BATTERY DIVIDER RATIO</label>
+                                    <label className="text-xs text-scada-secondary block mb-1">STAND BATTERY DIVIDER RATIO</label>
                                     <input
                                         type="number"
                                         step="any"
@@ -405,7 +406,7 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
                                 </div>
 
                                 <div>
-                                    <label className="text-xs text-slate-400 block mb-1">COMPUTER BATTERY DIVIDER RATIO</label>
+                                    <label className="text-xs text-scada-secondary block mb-1">COMPUTER BATTERY DIVIDER RATIO</label>
                                     <input
                                         type="number"
                                         step="any"
@@ -421,7 +422,7 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
                                 </div>
 
                                 <div>
-                                    <label className="text-xs text-slate-400 block mb-1">STARTER SENSE DIVIDER RATIO</label>
+                                    <label className="text-xs text-scada-secondary block mb-1">STARTER SENSE DIVIDER RATIO</label>
                                     <input
                                         type="number"
                                         step="any"
@@ -437,7 +438,7 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
                                 </div>
 
                                 <div>
-                                    <label className="text-xs text-slate-400 block mb-1">BOOST VOLTAGE DIVIDER RATIO</label>
+                                    <label className="text-xs text-scada-secondary block mb-1">BOOST VOLTAGE DIVIDER RATIO</label>
                                     <input
                                         type="number"
                                         step="any"
@@ -453,24 +454,24 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
                                 </div>
                             </div>
 
-                            <div className="pt-2 border-t border-slate-700 space-y-2">
+                            <div className="pt-2 border-t border-scada space-y-2">
                                 <div className="flex gap-2">
-                                    <button onClick={handleSaveAll} disabled={!hasUnsavedChanges} className="flex-1 bg-cyan-700 hover:bg-cyan-600 text-white font-bold py-2.5 min-h-11 text-sm disabled:opacity-40 disabled:cursor-not-allowed">
+                                    <button onClick={handleSaveAll} disabled={!hasUnsavedChanges} className="flex-1 bg-scada-accent-strong hover:bg-[var(--scada-bg-accent)] text-scada-inverse font-bold py-2.5 min-h-11 text-sm disabled:opacity-40 disabled:cursor-not-allowed">
                                         SAVE SETTINGS
                                     </button>
-                                    <button onClick={handleRevert} disabled={!hasUnsavedChanges} className="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-bold py-2.5 min-h-11 text-sm disabled:opacity-40 disabled:cursor-not-allowed">
+                                    <button onClick={handleRevert} disabled={!hasUnsavedChanges} className="flex-1 bg-scada-surface-strong hover:bg-[var(--scada-bg-surface-strong)] text-scada-inverse font-bold py-2.5 min-h-11 text-sm disabled:opacity-40 disabled:cursor-not-allowed">
                                         REVERT CHANGES
                                     </button>
                                 </div>
                                 <div className="flex gap-2">
-                                    <button onClick={handleExport} className="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-bold py-2.5 min-h-11 text-sm">
+                                    <button onClick={handleExport} className="flex-1 bg-scada-surface-strong hover:bg-[var(--scada-bg-surface-strong)] text-scada-inverse font-bold py-2.5 min-h-11 text-sm">
                                         EXPORT JSON
                                     </button>
-                                    <button onClick={() => fileInputRef.current?.click()} className="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-bold py-2.5 min-h-11 text-sm">
+                                    <button onClick={() => fileInputRef.current?.click()} className="flex-1 bg-scada-surface-strong hover:bg-[var(--scada-bg-surface-strong)] text-scada-inverse font-bold py-2.5 min-h-11 text-sm">
                                         IMPORT JSON
                                     </button>
                                 </div>
-                                <button onClick={handleReset} className="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-2.5 min-h-11 text-sm">
+                                <button onClick={handleReset} className="w-full bg-scada-surface-strong hover:bg-[var(--scada-bg-surface-strong)] text-scada-inverse font-bold py-2.5 min-h-11 text-sm">
                                     RESET TO DEFAULTS
                                 </button>
                                 <input
@@ -494,7 +495,7 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
                     <ScadaPanel title="ADC LUT" className="h-full">
                         <div className="p-3 h-full flex flex-col gap-3 min-h-0">
                             <div>
-                                <label className="text-xs text-slate-400 block mb-1">SELECT CHANNEL</label>
+                                <label className="text-xs text-scada-secondary block mb-1">SELECT CHANNEL</label>
                                 <select
                                     value={selectedChannel}
                                     onChange={e => setSelectedChannel(e.target.value as AnalogChannel)}
@@ -506,15 +507,15 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
                                 </select>
                             </div>
 
-                            <div className="flex-1 min-h-0 border border-slate-700 rounded p-2 bg-slate-900/30 flex flex-col lg:flex-row gap-3">
+                            <div className="flex-1 min-h-0 border border-scada rounded p-2 bg-scada-surface-softer flex flex-col lg:flex-row gap-3">
                                 <div className="flex-1 min-h-0 flex flex-col lg:flex-row gap-3">
                                     <div className="lg:h-full lg:aspect-square lg:w-auto w-full aspect-square shrink-0">
                                         <LutChart points={normalizeLutForUi(selectedPoints)} onHoverIndexChange={setHoveredPointIndex} />
                                     </div>
                                     <div className="flex-1 min-h-0 flex flex-col">
-                                        <div className="border border-slate-700 rounded overflow-auto flex-1 min-h-0">
+                                        <div className="border border-scada rounded overflow-auto flex-1 min-h-0">
                                             <table className="w-full text-xs font-mono">
-                                        <thead className="bg-slate-950 text-slate-400">
+                                        <thead className="bg-scada-app text-scada-secondary">
                                             <tr>
                                                 <th className="text-left px-2 py-1">ADC X</th>
                                                 <th className="text-left px-2 py-1">mV Y</th>
@@ -523,7 +524,7 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
                                         </thead>
                                         <tbody>
                                             {selectedPoints.map((point, idx) => (
-                                                <tr key={`${selectedChannel}-${idx}`} className={`border-t border-slate-800 ${hoveredPointIndex === idx ? 'bg-cyan-950/40' : ''}`}>
+                                                <tr key={`${selectedChannel}-${idx}`} className={`border-t border-scada-weak ${hoveredPointIndex === idx ? 'bg-scada-accent-strong' : ''}`}>
                                                     <td className="px-2 py-1">
                                                         <input
                                                             type="number"
@@ -532,7 +533,7 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
                                                             max={4095}
                                                             value={point.x}
                                                             onChange={e => updateLutPoint(selectedChannel, idx, 'x', e.target.value)}
-                                                            className={`w-full border bg-slate-900 px-2 py-2 min-h-11 text-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/30 ${hoveredPointIndex === idx ? 'border-cyan-500 text-cyan-200' : 'border-slate-700'}`}
+                                                            className={`w-full border bg-scada-surface px-2 py-2 min-h-11 text-scada-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/30 ${hoveredPointIndex === idx ? 'border-scada-accent text-scada-accent-bright' : 'border-scada'}`}
                                                         />
                                                     </td>
                                                     <td className="px-2 py-1">
@@ -543,13 +544,13 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
                                                             max={1500}
                                                             value={point.y}
                                                             onChange={e => updateLutPoint(selectedChannel, idx, 'y', e.target.value)}
-                                                            className={`w-full border bg-slate-900 px-2 py-2 min-h-11 text-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/30 ${hoveredPointIndex === idx ? 'border-cyan-500 text-cyan-200' : 'border-slate-700'}`}
+                                                            className={`w-full border bg-scada-surface px-2 py-2 min-h-11 text-scada-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/30 ${hoveredPointIndex === idx ? 'border-scada-accent text-scada-accent-bright' : 'border-scada'}`}
                                                         />
                                                     </td>
                                                     <td className="px-2 py-1">
                                                         <button
                                                             onClick={() => removeLutPoint(selectedChannel, idx)}
-                                                            className="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 px-2 py-2 min-h-11 disabled:opacity-40"
+                                                            className="w-full bg-scada-surface-elevated hover:bg-[var(--scada-bg-surface-strong)] text-scada-secondary px-2 py-2 min-h-11 disabled:opacity-40"
                                                             disabled={selectedPoints.length <= 2}
                                                         >
                                                             X
@@ -562,7 +563,7 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
                                         </div>
                                         <button
                                             onClick={() => addLutPoint(selectedChannel)}
-                                            className="mt-2 w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold py-2.5 min-h-11 text-xs"
+                                            className="mt-2 w-full bg-scada-surface-elevated hover:bg-[var(--scada-bg-surface-strong)] text-scada-secondary font-bold py-2.5 min-h-11 text-xs"
                                         >
                                             ADD LUT POINT
                                         </button>

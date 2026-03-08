@@ -9,6 +9,7 @@ import uPlot from 'uplot';
 import UplotReact from 'uplot-react';
 import * as DB from '@/utils/db';
 import { ConnectionState } from '@/types';
+import { CHART_COLORS } from '@/theme/tokens';
 
 interface AnalysisViewProps {
     telemetry: SystemTelemetry;
@@ -362,9 +363,9 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
   const axes = React.useMemo<uPlot.Axis[]>(() => {
       return [
           {
-              stroke: '#8fa3be',
-              grid: { stroke: '#334155' },
-              ticks: { stroke: '#334155' },
+              stroke: CHART_COLORS.axis,
+              grid: { stroke: CHART_COLORS.grid },
+              ticks: { stroke: CHART_COLORS.grid },
               values: (_u, ticks) => ticks.map((val) => `${(val / 1000).toFixed(0)}s`),
           },
           { scale: 'thrust', side: 3, stroke: SENSOR_COLORS.tensometer, show: visibleLines.tensometer, label: 'kg' },
@@ -450,23 +451,23 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
             <ScadaPanel title="LIVE VALUES" className="flex-1">
                 <div className="p-2 space-y-1 overflow-y-auto h-full pr-1 scrollbar-thin">
                     {/* Primary */}
-                    <ValueDisplay label={getSeriesLabel('tensometer')} value={vals.thrust} unit=" KG" color="text-purple-400" />
-                    <ValueDisplay label={getSeriesLabel('pressureTank')} value={vals.tank} unit=" BAR" color="text-cyan-400" />
-                    <ValueDisplay label={getSeriesLabel('pressureCombustion')} value={vals.combustion} unit=" BAR" color="text-orange-400" />
+                    <ValueDisplay label={getSeriesLabel('tensometer')} value={vals.thrust} unit=" KG" color="text-scada-series-violet" />
+                    <ValueDisplay label={getSeriesLabel('pressureTank')} value={vals.tank} unit=" BAR" color="text-scada-accent" />
+                    <ValueDisplay label={getSeriesLabel('pressureCombustion')} value={vals.combustion} unit=" BAR" color="text-scada-series-orange" />
                     
-                    <div className="my-2 border-t border-slate-700/50"></div>
+                    <div className="my-2 border-t border-scada-soft"></div>
                     
                     {/* Power */}
-                    <ValueDisplay label={getSeriesLabel('batteryStand')} value={vals.batStand} unit=" V" color="text-green-400" />
-                    <ValueDisplay label={getSeriesLabel('batteryComputer')} value={vals.batComp} unit=" V" color="text-green-400" />
-                    <ValueDisplay label={getSeriesLabel('boostVoltage')} value={vals.boost} unit=" V" color="text-amber-400" />
-                    <ValueDisplay label={getSeriesLabel('starterSense')} value={vals.starter} unit=" V" color="text-purple-400" />
+                    <ValueDisplay label={getSeriesLabel('batteryStand')} value={vals.batStand} unit=" V" color="text-scada-success" />
+                    <ValueDisplay label={getSeriesLabel('batteryComputer')} value={vals.batComp} unit=" V" color="text-scada-success" />
+                    <ValueDisplay label={getSeriesLabel('boostVoltage')} value={vals.boost} unit=" V" color="text-scada-warning" />
+                    <ValueDisplay label={getSeriesLabel('starterSense')} value={vals.starter} unit=" V" color="text-scada-series-violet" />
 
-                    <div className="my-2 border-t border-slate-700/50"></div>
+                    <div className="my-2 border-t border-scada-soft"></div>
 
                     {/* Thermal */}
                     {latestTemperatures.map(({ id, value: temp }) => (
-                        <ValueDisplay key={id} label={getSeriesLabel(id)} value={temp.toFixed(1)} unit=" °C" color="text-rose-400" />
+                        <ValueDisplay key={id} label={getSeriesLabel(id)} value={temp.toFixed(1)} unit=" °C" color="text-scada-series-temp" />
                     ))}
                     {latestTemperatures.length === 0 && <div className="text-[10px] text-scada-muted text-center py-2">NO THERMAL DATA</div>}
                 </div>
@@ -482,7 +483,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
                                             .map((entry, index) => (
                                                 <div
                                                   key={`${entry.receivedAt}-${index}`}
-                                                  className={`break-all ${entry.type === 'connection' ? 'text-cyan-300' : 'text-amber-300'}`}
+                                                  className={`break-all ${entry.type === 'connection' ? 'text-scada-accent-soft' : 'text-scada-warning-soft'}`}
                                                 >
                                                         <span className="text-scada-muted">[{new Date(entry.receivedAt).toLocaleString()}]</span>{' '}
                                                         &gt; {entry.message}
@@ -499,7 +500,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
                 {/* Series Toggles */}
                 <div className="flex flex-wrap gap-2">
                     {Object.entries(visibleLines).map(([key, active]) => (
-                        <button key={key} onClick={() => toggleLine(key)} className={`px-3 py-2 min-h-11 border rounded text-[10px] font-bold uppercase flex items-center gap-2 md:min-h-0 md:px-2 md:py-1 ${active ? 'bg-slate-700 text-white border-slate-500' : 'bg-slate-900 text-scada-muted border-slate-800'}`}>
+                        <button key={key} onClick={() => toggleLine(key)} className={`px-3 py-2 min-h-11 border rounded text-[10px] font-bold uppercase flex items-center gap-2 md:min-h-0 md:px-2 md:py-1 ${active ? 'bg-scada-surface-strong text-scada-inverse border-scada-strong' : 'bg-scada-surface text-scada-muted border-scada-weak'}`}>
                             <div className="w-2 h-2 rounded-full" style={{backgroundColor: SENSOR_COLORS[key] || TEMP_COLORS[0]}}></div>
                             {getSeriesLabel(key)}
                         </button>
@@ -507,21 +508,21 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
                 </div>
                 
                 {/* Navigation Bar */}
-                <div className="mt-auto bg-slate-900/50 p-2 rounded border border-slate-700 flex flex-col gap-2">
+                <div className="mt-auto bg-scada-surface-soft p-2 rounded border border-scada flex flex-col gap-2">
                         <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-4">
                             <button 
                             onClick={() => setIsLive(!isLive)} 
-                            className={`flex min-h-11 items-center justify-center gap-2 px-3 py-2 rounded text-xs font-bold border shadow-lg md:min-h-0 md:py-1 ${isLive ? 'bg-cyan-900/80 border-cyan-500 text-cyan-400' : 'bg-slate-700/80 border-slate-500 text-slate-300'}`}
+                            className={`flex min-h-11 items-center justify-center gap-2 px-3 py-2 rounded text-xs font-bold border shadow-lg md:min-h-0 md:py-1 ${isLive ? 'bg-scada-accent-strong border-scada-accent text-scada-accent' : 'bg-scada-surface-soft-strong border-scada-strong text-scada-secondary'}`}
                             >
                             {isLive ? <Pause size={14} fill="currentColor"/> : <Play size={14} fill="currentColor"/>}
                             {isLive ? 'LIVE' : 'PAUSED'}
                             </button>
 
-                            <div className="hidden h-6 w-px bg-slate-700 md:block"></div>
+                            <div className="hidden h-6 w-px bg-scada-surface-strong md:block"></div>
 
                             <div className="flex items-center gap-1">
-                                <button aria-label="Zoom in analysis window" onClick={() => handleZoom('in')} className="h-11 w-11 flex items-center justify-center hover:bg-slate-700 rounded md:h-8 md:w-8"><ZoomIn size={16} className="text-slate-400"/></button>
-                                <button aria-label="Zoom out analysis window" onClick={() => handleZoom('out')} className="h-11 w-11 flex items-center justify-center hover:bg-slate-700 rounded md:h-8 md:w-8"><ZoomOut size={16} className="text-slate-400"/></button>
+                                <button aria-label="Zoom in analysis window" onClick={() => handleZoom('in')} className="h-11 w-11 flex items-center justify-center hover:bg-[var(--scada-bg-surface-strong)] rounded md:h-8 md:w-8"><ZoomIn size={16} className="text-scada-secondary"/></button>
+                                <button aria-label="Zoom out analysis window" onClick={() => handleZoom('out')} className="h-11 w-11 flex items-center justify-center hover:bg-[var(--scada-bg-surface-strong)] rounded md:h-8 md:w-8"><ZoomOut size={16} className="text-scada-secondary"/></button>
                                 <span className="text-xs font-mono text-scada-muted ml-2">WINDOW: {(windowSize/1000).toFixed(1)}s</span>
                             </div>
                             
@@ -539,7 +540,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
                             value={viewStart} 
                             onChange={handleScroll}
                             disabled={isLive}
-                            className="w-full h-11 bg-slate-800/80 rounded-lg appearance-none cursor-pointer accent-cyan-500 disabled:opacity-50"
+                            className="w-full h-11 bg-scada-surface-soft-strong rounded-lg appearance-none cursor-pointer accent-[var(--scada-accent)] disabled:opacity-50"
                             />
                         </div>
                 </div>

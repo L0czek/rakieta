@@ -5,14 +5,56 @@
   --scada-bg-app: #0b1220;
   --scada-bg-surface: #111b30;
   --scada-bg-surface-elevated: #17233a;
+  --scada-bg-surface-strong: #24324d;
+  --scada-bg-surface-soft: rgba(17, 27, 48, 0.5);
+  --scada-bg-surface-soft-strong: rgba(23, 35, 58, 0.8);
+  --scada-bg-app-soft: rgba(11, 18, 32, 0.95);
+  --scada-bg-surface-softer: rgba(17, 27, 48, 0.3);
   --scada-bg-overlay: rgba(11, 18, 32, 0.9);
+  --scada-bg-danger-soft: rgba(127, 29, 29, 0.3);
+  --scada-bg-danger: #dc2626;
+  --scada-bg-danger-strong: rgba(153, 27, 27, 0.8);
+  --scada-bg-danger-overlay: rgba(69, 10, 10, 0.9);
+  --scada-bg-warning-soft: rgba(120, 53, 15, 0.2);
+  --scada-bg-warning: #d97706;
+  --scada-bg-warning-strong: rgba(120, 53, 15, 0.9);
+  --scada-bg-warning-overlay: rgba(69, 26, 3, 0.9);
+  --scada-bg-success-soft: rgba(20, 83, 45, 0.25);
+  --scada-bg-success: #16a34a;
+  --scada-bg-success-strong: rgba(20, 83, 45, 0.8);
+  --scada-bg-info-soft: rgba(30, 58, 138, 0.2);
+  --scada-bg-accent: #0891b2;
+  --scada-bg-accent-soft: rgba(8, 47, 73, 0.5);
+  --scada-bg-accent-strong: rgba(8, 47, 73, 0.8);
 
   --scada-border-subtle: #334155;
   --scada-border-strong: #4b6385;
+  --scada-border-weak: #1e293b;
+  --scada-border-soft: rgba(51, 65, 85, 0.6);
+  --scada-border-accent: #22d3ee;
+  --scada-border-accent-soft: rgba(34, 211, 238, 0.6);
+  --scada-border-danger: #f87171;
+  --scada-border-warning: #fbbf24;
+  --scada-border-success: #4ade80;
+  --scada-border-info: #93c5fd;
 
   --scada-text-primary: #e2e8f0;
   --scada-text-secondary: #cbd5e1;
   --scada-text-muted: #9fb0c8;
+  --scada-text-accent: #22d3ee;
+  --scada-text-accent-soft: #67e8f9;
+  --scada-text-accent-bright: #a5f3fc;
+  --scada-text-success: #4ade80;
+  --scada-text-success-soft: #86efac;
+  --scada-text-warning: #fbbf24;
+  --scada-text-warning-soft: #fcd34d;
+  --scada-text-danger: #f87171;
+  --scada-text-danger-soft: #fca5a5;
+  --scada-text-info: #93c5fd;
+  --scada-text-inverse: #ffffff;
+  --scada-text-series-violet: #c084fc;
+  --scada-text-series-orange: #fb923c;
+  --scada-text-series-temp: #fb7185;
 
   --scada-accent: #22d3ee;
   --scada-accent-soft: rgba(34, 211, 238, 0.2);
@@ -81,16 +123,236 @@ body {
   color: var(--scada-text-secondary);
 }
 
+.text-scada-primary {
+  color: var(--scada-text-primary);
+}
+
+.text-scada-accent {
+  color: var(--scada-text-accent);
+}
+
+.text-scada-accent-soft {
+  color: var(--scada-text-accent-soft);
+}
+
+.text-scada-accent-bright {
+  color: var(--scada-text-accent-bright);
+}
+
+.text-scada-success {
+  color: var(--scada-text-success);
+}
+
+.text-scada-success-soft {
+  color: var(--scada-text-success-soft);
+}
+
+.text-scada-warning {
+  color: var(--scada-text-warning);
+}
+
+.text-scada-warning-soft {
+  color: var(--scada-text-warning-soft);
+}
+
+.text-scada-danger {
+  color: var(--scada-text-danger);
+}
+
+.text-scada-danger-soft {
+  color: var(--scada-text-danger-soft);
+}
+
+.text-scada-info {
+  color: var(--scada-text-info);
+}
+
+.text-scada-inverse {
+  color: var(--scada-text-inverse);
+}
+
+.text-scada-series-violet {
+  color: var(--scada-text-series-violet);
+}
+
+.text-scada-series-orange {
+  color: var(--scada-text-series-orange);
+}
+
+.text-scada-series-temp {
+  color: var(--scada-text-series-temp);
+}
+
 .bg-scada-app {
   background-color: var(--scada-bg-app);
+}
+
+.bg-scada-app-soft {
+  background-color: var(--scada-bg-app-soft);
 }
 
 .bg-scada-surface {
   background-color: var(--scada-bg-surface);
 }
 
+.bg-scada-surface-elevated {
+  background-color: var(--scada-bg-surface-elevated);
+}
+
+.bg-scada-surface-strong {
+  background-color: var(--scada-bg-surface-strong);
+}
+
+.bg-scada-surface-soft {
+  background-color: var(--scada-bg-surface-soft);
+}
+
+.bg-scada-surface-softer {
+  background-color: var(--scada-bg-surface-softer);
+}
+
+.bg-scada-surface-soft-strong {
+  background-color: var(--scada-bg-surface-soft-strong);
+}
+
+.bg-scada-accent-soft {
+  background-color: var(--scada-bg-accent-soft);
+}
+
+.bg-scada-accent {
+  background-color: var(--scada-bg-accent);
+}
+
+.bg-scada-accent-strong {
+  background-color: var(--scada-bg-accent-strong);
+}
+
+.bg-scada-danger {
+  background-color: var(--scada-bg-danger);
+}
+
+.bg-scada-danger-soft {
+  background-color: var(--scada-bg-danger-soft);
+}
+
+.bg-scada-danger-strong {
+  background-color: var(--scada-bg-danger-strong);
+}
+
+.bg-scada-danger-overlay {
+  background-color: var(--scada-bg-danger-overlay);
+}
+
+.bg-scada-warning-soft {
+  background-color: var(--scada-bg-warning-soft);
+}
+
+.bg-scada-warning {
+  background-color: var(--scada-bg-warning);
+}
+
+.bg-scada-warning-strong {
+  background-color: var(--scada-bg-warning-strong);
+}
+
+.bg-scada-warning-overlay {
+  background-color: var(--scada-bg-warning-overlay);
+}
+
+.bg-scada-success-soft {
+  background-color: var(--scada-bg-success-soft);
+}
+
+.bg-scada-success {
+  background-color: var(--scada-bg-success);
+}
+
+.bg-scada-success-strong {
+  background-color: var(--scada-bg-success-strong);
+}
+
+.bg-scada-info-soft {
+  background-color: var(--scada-bg-info-soft);
+}
+
+.bg-scada-border-strong {
+  background-color: var(--scada-border-strong);
+}
+
 .border-scada {
   border-color: var(--scada-border-subtle);
+}
+
+.border-scada-soft {
+  border-color: var(--scada-border-soft);
+}
+
+.border-scada-strong {
+  border-color: var(--scada-border-strong);
+}
+
+.border-scada-weak {
+  border-color: var(--scada-border-weak);
+}
+
+.border-scada-accent {
+  border-color: var(--scada-border-accent);
+}
+
+.border-scada-accent-soft {
+  border-color: var(--scada-border-accent-soft);
+}
+
+.border-scada-danger {
+  border-color: var(--scada-border-danger);
+}
+
+.border-scada-warning {
+  border-color: var(--scada-border-warning);
+}
+
+.border-scada-success {
+  border-color: var(--scada-border-success);
+}
+
+.border-scada-info {
+  border-color: var(--scada-border-info);
+}
+
+.shadow-scada-danger-soft {
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.2);
+}
+
+.shadow-scada-danger-md {
+  box-shadow: 0 0 20px rgba(220, 38, 38, 0.5);
+}
+
+.shadow-scada-danger-xl {
+  box-shadow: 0 0 100px rgba(220, 38, 38, 0.5);
+}
+
+.shadow-scada-warning-md {
+  box-shadow: 0 0 24px rgba(251, 191, 36, 0.35);
+}
+
+.shadow-scada-warning-lg {
+  box-shadow: 0 0 80px rgba(245, 158, 11, 0.35);
+}
+
+.shadow-scada-accent-sm {
+  box-shadow: 0 0 10px rgba(6, 182, 212, 0.3);
+}
+
+.shadow-scada-accent-md {
+  box-shadow: 0 0 50px rgba(6, 182, 212, 0.2);
+}
+
+.shadow-scada-accent-inset {
+  box-shadow: inset 0 0 0 1px rgba(34, 211, 238, 0.35), 0 0 16px rgba(34, 211, 238, 0.15);
+}
+
+.shadow-scada-accent-thin-inset {
+  box-shadow: inset 0 0 0 1px rgba(56, 189, 248, 0.08);
 }
 
 .scada-input {

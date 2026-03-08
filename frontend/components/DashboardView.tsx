@@ -102,32 +102,32 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ telemetry, actions
             <div className="flex flex-col gap-2 md:col-span-4 md:row-span-4">
                     <ScadaPanel title="POWER SYSTEMS" className="flex-1">
                         <div className="p-2 space-y-2">
-                        <div className="flex items-center justify-between border-b border-slate-700 pb-1 mb-1 gap-2 min-w-0">
-                            <div className="text-slate-400 text-xs uppercase truncate min-w-0">{getSeriesLabel('batteryStand')}</div>
+                        <div className="flex items-center justify-between border-b border-scada pb-1 mb-1 gap-2 min-w-0">
+                            <div className="text-scada-secondary text-xs uppercase truncate min-w-0">{getSeriesLabel('batteryStand')}</div>
                             <div className="flex items-center gap-2 shrink-0">
                                 <MiniTrendChart data={telemetry.batteryStand} color={SENSOR_COLORS.batteryStand} xDomain={chartXDomain} />
-                                <div className="text-xl font-mono font-bold text-green-400 text-right leading-none">{vals.batStand}<span className="text-xs text-scada-muted ml-1"> V</span></div>
+                                <div className="text-xl font-mono font-bold text-scada-success text-right leading-none">{vals.batStand}<span className="text-xs text-scada-muted ml-1"> V</span></div>
                             </div>
                         </div>
-                        <div className="flex items-center justify-between border-b border-slate-700 pb-1 mb-1 gap-2 min-w-0">
-                            <div className="text-slate-400 text-xs uppercase truncate min-w-0">{getSeriesLabel('batteryComputer')}</div>
+                        <div className="flex items-center justify-between border-b border-scada pb-1 mb-1 gap-2 min-w-0">
+                            <div className="text-scada-secondary text-xs uppercase truncate min-w-0">{getSeriesLabel('batteryComputer')}</div>
                             <div className="flex items-center gap-2 shrink-0">
                                 <MiniTrendChart data={telemetry.batteryComputer} color={SENSOR_COLORS.batteryComputer} xDomain={chartXDomain} />
-                                <div className="text-xl font-mono font-bold text-green-400 text-right leading-none">{vals.batComp}<span className="text-xs text-scada-muted ml-1"> V</span></div>
+                                <div className="text-xl font-mono font-bold text-scada-success text-right leading-none">{vals.batComp}<span className="text-xs text-scada-muted ml-1"> V</span></div>
                             </div>
                         </div>
-                        <div className="flex items-center justify-between border-b border-slate-700 pb-1 mb-1 gap-2 min-w-0">
-                            <div className="text-slate-400 text-xs uppercase truncate min-w-0">{getSeriesLabel('boostVoltage')}</div>
+                        <div className="flex items-center justify-between border-b border-scada pb-1 mb-1 gap-2 min-w-0">
+                            <div className="text-scada-secondary text-xs uppercase truncate min-w-0">{getSeriesLabel('boostVoltage')}</div>
                             <div className="flex items-center gap-2 shrink-0">
                                 <MiniTrendChart data={telemetry.boostVoltage} color={SENSOR_COLORS.boostVoltage} xDomain={chartXDomain} />
-                                <div className="text-xl font-mono font-bold text-amber-400 text-right leading-none">{vals.boost}<span className="text-xs text-scada-muted ml-1"> V</span></div>
+                                <div className="text-xl font-mono font-bold text-scada-warning text-right leading-none">{vals.boost}<span className="text-xs text-scada-muted ml-1"> V</span></div>
                             </div>
                         </div>
-                        <div className="flex items-center justify-between border-b border-slate-700 pb-1 mb-1 last:border-0 gap-2 min-w-0">
-                            <div className="text-slate-400 text-xs uppercase truncate min-w-0">{getSeriesLabel('starterSense')}</div>
+                        <div className="flex items-center justify-between border-b border-scada pb-1 mb-1 last:border-0 gap-2 min-w-0">
+                            <div className="text-scada-secondary text-xs uppercase truncate min-w-0">{getSeriesLabel('starterSense')}</div>
                             <div className="flex items-center gap-2 shrink-0">
                                 <MiniTrendChart data={telemetry.starterSense} color={SENSOR_COLORS.starterSense} xDomain={chartXDomain} />
-                                <div className="text-xl font-mono font-bold text-purple-400 text-right leading-none">{vals.starter}<span className="text-xs text-scada-muted ml-1"> V</span></div>
+                                <div className="text-xl font-mono font-bold text-scada-series-violet text-right leading-none">{vals.starter}<span className="text-xs text-scada-muted ml-1"> V</span></div>
                             </div>
                         </div>
                         </div>
@@ -143,7 +143,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ telemetry, actions
                                                             .map((entry, index) => (
                                                                 <div
                                                                   key={`${entry.receivedAt}-${index}`}
-                                                                  className={`break-all ${entry.type === 'connection' ? 'text-cyan-300' : 'text-amber-300'}`}
+                                                                  className={`break-all ${entry.type === 'connection' ? 'text-scada-accent-soft' : 'text-scada-warning-soft'}`}
                                                                 >
                                                                     <span className="text-scada-muted">[{new Date(entry.receivedAt).toLocaleString()}]</span>{' '}
                                                                     &gt; {entry.message}
@@ -166,7 +166,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ telemetry, actions
                     <ScadaPanel title="THERMAL SENSORS (°C)" className="h-full">
                             <div className="p-2 grid grid-cols-1 sm:grid-cols-2 gap-2 overflow-y-auto">
                                 {latestTemperatures.map(({ id, value: temp }, index) => (
-                                    <div key={id} className="bg-slate-900/50 p-2 border border-slate-700 rounded flex items-center justify-between gap-2 min-w-0">
+                                    <div key={id} className="bg-scada-surface-soft p-2 border border-scada rounded flex items-center justify-between gap-2 min-w-0">
                                         <div className="text-[10px] text-scada-muted truncate min-w-0">{getSeriesLabel(id)}</div>
                                         <div className="flex items-center gap-2 shrink-0">
                                             <MiniTrendChart
@@ -174,7 +174,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ telemetry, actions
                                                 color={TEMP_COLORS[index % TEMP_COLORS.length]}
                                                 xDomain={chartXDomain}
                                             />
-                                            <div className="text-xl font-mono font-bold text-rose-400 text-right leading-none">{temp.toFixed(1)}<span className="text-xs text-scada-muted ml-1"> °C</span></div>
+                                            <div className="text-xl font-mono font-bold text-scada-series-temp text-right leading-none">{temp.toFixed(1)}<span className="text-xs text-scada-muted ml-1"> °C</span></div>
                                         </div>
                                     </div>
                                 ))}

@@ -20,6 +20,7 @@ This file documents the `frontend/` app for coding agents.
 ## Styling and design system
 
 - Global tokens and utility classes live in `index.css`.
+- Shared runtime color constants live in `theme/tokens.ts`.
 - Design system reference: `docs/design-system.md`.
 - Prefer semantic classes and CSS variables:
   - `scada-input`
