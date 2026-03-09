@@ -114,4 +114,70 @@ describe('ChecklistView', () => {
     expect(within(container).getByTestId('inline-current-step-controls')).toBeInTheDocument();
     expect(within(container).getByRole('button', { name: 'COMPLETE STEP' })).toBeInTheDocument();
   });
+
+  it('shows mobile active-step dock and mismatch explainer for failed auto checks', () => {
+    const mode: ChecklistMode = 'MQTT_SYNC';
+    render(
+      <ChecklistView
+        mode={mode}
+        summaries={[{ checklistId: 'pressurization', label: 'PRESSURIZATION', done: 0, total: 1 }]}
+        selectedChecklistId="pressurization"
+        onSelectChecklist={vi.fn()}
+        stepStates={[
+          {
+            index: 0,
+            point: {
+              id: 'tank_pressure',
+              callout: 'Tank pressure',
+              response: '40-50 BAR',
+              rule: { type: 'number_range', source: 'pressureTank', min: 40, max: 50, unit: 'bar', decimals: 1 },
+            },
+            runtimeState: {
+              completed: false,
+              completedAtWall: null,
+              completedAtTelemetry: null,
+              context: {},
+            },
+            validation: { isAutoRule: true, isValid: false, displayValue: '35.2' },
+            isCurrent: true,
+            isCompleted: false,
+            isLocked: false,
+          },
+        ]}
+        activeStep={{
+          index: 0,
+          point: {
+            id: 'tank_pressure',
+            callout: 'Tank pressure',
+            response: '40-50 BAR',
+            rule: { type: 'number_range', source: 'pressureTank', min: 40, max: 50, unit: 'bar', decimals: 1 },
+          },
+          runtimeState: {
+            completed: false,
+            completedAtWall: null,
+            completedAtTelemetry: null,
+            context: {},
+          },
+          validation: { isAutoRule: true, isValid: false, displayValue: '35.2' },
+          isCurrent: true,
+          isCompleted: false,
+          isLocked: false,
+        }}
+        getStepContext={() => ({})}
+        setStepContextField={vi.fn()}
+        onCompleteCurrentStep={vi.fn(async () => ({ ok: true }))}
+        onResetChecklist={vi.fn(async () => ({ ok: true }))}
+        onResetAllChecklists={vi.fn(async () => ({ ok: true }))}
+        isReadOnly={false}
+      />,
+    );
+
+    const docks = screen.getAllByTestId('mobile-active-step-dock');
+    const dock = docks[docks.length - 1];
+    expect(dock).toBeInTheDocument();
+    expect(within(dock).getByText(/ACTIVE STEP 01/i)).toBeInTheDocument();
+    expect(within(dock).getByText(/AUTO CHECK PENDING/i)).toBeInTheDocument();
+    expect(within(dock).getByRole('button', { name: 'COMPLETE ACTIVE STEP' })).toBeInTheDocument();
+    expect(screen.getByText(/LIVE 35.2 BAR \| REQUIRED 40.0-50.0 BAR \| DELTA -4.8 BAR/i)).toBeInTheDocument();
+  });
 });

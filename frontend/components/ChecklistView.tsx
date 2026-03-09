@@ -30,18 +30,59 @@ const getStatusClassName = (step: ChecklistStepState): string => {
 
 const getRowClassName = (step: ChecklistStepState): string => {
   const baseClass =
-    'grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_220px] text-sm font-mono border-b border-scada-weak';
+    'grid grid-cols-[3.25rem_minmax(0,1fr)] text-sm font-mono border-b border-scada-weak';
 
   if (step.isCurrent) {
-    return `${baseClass} border-l-4 md:border-l-8 border-scada-accent bg-scada-surface-soft-strong ` +
-      'shadow-scada-accent-inset';
+    return `${baseClass} border-l-4 border-scada-accent bg-scada-surface-soft-strong shadow-scada-accent-inset`;
   }
 
   if (step.isCompleted) {
-    return `${baseClass} border-l-2 md:border-l-4 border-scada-success bg-scada-success-soft`;
+    return `${baseClass} border-l-2 border-scada-success bg-scada-success-soft`;
   }
 
-  return `${baseClass} border-l-2 md:border-l-4 border-scada-weak bg-scada-app-soft`;
+  return `${baseClass} border-l-2 border-scada-weak bg-scada-app-soft`;
+};
+
+const getStepNumber = (index: number): string => String(index + 1).padStart(2, '0');
+
+const formatDelta = (value: number, decimals: number): string => {
+  const sign = value >= 0 ? '+' : '';
+  return `${sign}${value.toFixed(decimals)}`;
+};
+
+const getAutoValidationSummary = (step: ChecklistStepState): string | null => {
+  if (!step.validation.isAutoRule) return null;
+
+  const rule = step.point.rule;
+  if (rule.type === 'number_range') {
+    const decimals = rule.decimals ?? 1;
+    const rawCurrent = Number(step.validation.displayValue);
+    const unit = rule.unit ? ` ${rule.unit.toUpperCase()}` : '';
+    const required = `${rule.min.toFixed(decimals)}-${rule.max.toFixed(decimals)}${unit}`;
+
+    if (!Number.isFinite(rawCurrent)) {
+      return `LIVE -- | REQUIRED ${required}`;
+    }
+
+    if (step.validation.isValid) {
+      return `LIVE ${rawCurrent.toFixed(decimals)}${unit} | REQUIRED ${required} | OK`;
+    }
+
+    const nearestBound = rawCurrent < rule.min ? rule.min : rule.max;
+    const delta = rawCurrent - nearestBound;
+    return `LIVE ${rawCurrent.toFixed(decimals)}${unit} | REQUIRED ${required} | DELTA ${formatDelta(delta, decimals)}${unit}`;
+  }
+
+  if (rule.type === 'boolean_equals') {
+    const expected = rule.equals ? 'TRUE' : 'FALSE';
+    return `LIVE ${step.validation.displayValue} | REQUIRED ${expected} | ${step.validation.isValid ? 'OK' : 'MISMATCH'}`;
+  }
+
+  if (rule.type === 'enum_equals') {
+    return `LIVE ${step.validation.displayValue} | REQUIRED ${String(rule.equals)} | ${step.validation.isValid ? 'OK' : 'MISMATCH'}`;
+  }
+
+  return null;
 };
 
 export const ChecklistView: React.FC<ChecklistViewProps> = ({
@@ -77,40 +118,60 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
     }
   };
 
+  const selectedSummary = summaries.find((summary) => summary.checklistId === selectedChecklistId) ?? null;
+  const doneCount = selectedSummary?.done ?? 0;
+  const totalCount = selectedSummary?.total ?? stepStates.length;
+  const progressPercent = totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0;
+
   return (
     <div className="h-full min-h-0 flex flex-col gap-2">
       <div
-        className="bg-scada-app border border-scada-accent-soft rounded-sm p-2 flex flex-wrap items-center gap-2
+        className="bg-scada-app border border-scada-accent-soft rounded-sm p-2 flex flex-col gap-2
           shadow-scada-accent-thin-inset"
       >
-        <select
-          aria-label="Select checklist"
-          className="scada-input min-w-[190px] flex-1 rounded-sm text-sm tracking-wide"
-          value={selectedChecklistId}
-          onChange={(event) => onSelectChecklist(event.target.value)}
-        >
-          {summaries.map((summary) => (
-            <option key={summary.checklistId} value={summary.checklistId}>
-              {summary.label} ({summary.done}/{summary.total})
-            </option>
-          ))}
-        </select>
-        <button
-          className="px-3 py-2.5 min-h-11 text-xs font-bold bg-scada-surface-elevated border border-scada rounded-sm
-            text-scada-primary tracking-wider hover-border-scada-accent-soft disabled:opacity-50"
-          disabled={isReadOnly || isSubmitting}
-          onClick={() => runAction(onResetChecklist)}
-        >
-          RESET CHECKLIST
-        </button>
-        <button
-          className="px-3 py-2.5 min-h-11 text-xs font-bold bg-scada-surface-elevated border border-scada rounded-sm
-            text-scada-primary tracking-wider hover-border-scada-accent-soft disabled:opacity-50"
-          disabled={isReadOnly || isSubmitting}
-          onClick={() => runAction(onResetAllChecklists)}
-        >
-          RESET ALL CHECKLISTS
-        </button>
+        <div className="flex flex-wrap items-center gap-2">
+          <select
+            aria-label="Select checklist"
+            className="scada-input min-w-[190px] flex-1 rounded-sm text-sm tracking-wide"
+            value={selectedChecklistId}
+            onChange={(event) => onSelectChecklist(event.target.value)}
+          >
+            {summaries.map((summary) => (
+              <option key={summary.checklistId} value={summary.checklistId}>
+                {summary.label} ({summary.done}/{summary.total})
+              </option>
+            ))}
+          </select>
+          <button
+            className="delight-press px-3 py-2.5 min-h-11 text-xs font-bold bg-scada-surface-elevated border border-scada rounded-sm
+              text-scada-primary tracking-wider hover-border-scada-accent-soft disabled:opacity-50"
+            disabled={isReadOnly || isSubmitting}
+            onClick={() => runAction(onResetChecklist)}
+          >
+            RESET CHECKLIST
+          </button>
+          <button
+            className="delight-press px-3 py-2.5 min-h-11 text-xs font-bold bg-scada-surface-elevated border border-scada rounded-sm
+              text-scada-primary tracking-wider hover-border-scada-accent-soft disabled:opacity-50"
+            disabled={isReadOnly || isSubmitting}
+            onClick={() => runAction(onResetAllChecklists)}
+          >
+            RESET ALL CHECKLISTS
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 gap-2 md:grid-cols-[minmax(0,1fr)_auto]">
+          <div className="h-2 rounded-sm bg-scada-surface-elevated border border-scada-weak overflow-hidden">
+            <div
+              className="h-full bg-scada-accent transition-[width] duration-200"
+              style={{ width: `${progressPercent}%` }}
+            ></div>
+          </div>
+          <div className="flex items-center gap-3 text-[10px] tracking-[0.16em] text-scada-muted">
+            <span>PROGRESS {doneCount}/{totalCount}</span>
+            <span>ACTIVE {activeStep ? `STEP ${getStepNumber(activeStep.index)}` : 'COMPLETE'}</span>
+          </div>
+        </div>
       </div>
 
       {errorMessage && (
@@ -128,72 +189,124 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
             items-center bg-scada-accent-soft text-scada-accent-soft border-scada-accent-soft"
         >
           <span>CHECKLIST SEQUENCE</span>
+          <span className="text-[10px] tracking-[0.18em] text-scada-accent-bright">CALL / RESPONSE</span>
         </div>
-        <div className="flex-1 min-h-0 overflow-auto">
+        <div className="flex-1 min-h-0 overflow-auto pb-28 md:pb-0">
           {stepStates.map((step) => {
             const statusClassName = getStatusClassName(step);
             const rowClass = getRowClassName(step);
             const inlineContext = getStepContext(step.point.id);
+            const stepNumber = getStepNumber(step.index);
+            const autoValidationSummary = getAutoValidationSummary(step);
 
             return (
-              <div key={step.point.id} className="border-b border-scada-weak last:border-b-0">
+              <div key={step.point.id}>
                 <div className={rowClass}>
-                  <div className="px-3 py-3 text-scada-secondary">
-                    <div className="font-semibold tracking-wide">{step.point.callout}</div>
-                    {step.point.note && (
-                      <div className="text-xs text-scada-secondary mt-1">{step.point.note}</div>
-                    )}
+                  <div className="px-2 py-3 border-r border-scada-weak flex justify-center">
+                    <div
+                      className={`h-8 w-8 rounded-full border text-[11px] font-bold tracking-[0.08em]
+                        flex items-center justify-center ${
+                          step.isCurrent
+                            ? 'border-scada-accent text-scada-accent bg-scada-accent-soft'
+                            : step.isCompleted
+                              ? 'border-scada-success text-scada-success-soft bg-scada-success-soft'
+                              : 'border-scada text-scada-muted bg-scada-surface-elevated'
+                        }`}
+                    >
+                      {stepNumber}
+                    </div>
                   </div>
-                  <div
-                    className={`px-3 py-3 md:border-l border-t md:border-t-0 text-left md:text-right
-                      ${statusClassName} ${step.isLocked ? 'opacity-50' : ''}`}
-                  >
-                    <div className="font-bold">{step.point.response}</div>
+
+                  <div className={`px-3 py-3 ${step.isLocked ? 'opacity-50' : ''}`}>
+                    <div className="grid grid-cols-1 gap-2 md:grid-cols-[minmax(0,1fr)_220px] md:gap-3">
+                      <div className="text-scada-secondary">
+                        <div className="flex flex-wrap items-center gap-2 text-[10px] tracking-[0.16em]">
+                          {step.isCurrent && (
+                            <span className="px-1.5 py-0.5 rounded-sm border border-scada-accent text-scada-accent-bright bg-scada-accent-soft">
+                              CURRENT
+                            </span>
+                          )}
+                          {step.isCompleted && (
+                            <span className="px-1.5 py-0.5 rounded-sm border border-scada-success text-scada-success-soft bg-scada-success-soft">
+                              COMPLETE
+                            </span>
+                          )}
+                          {step.isLocked && (
+                            <span className="px-1.5 py-0.5 rounded-sm border border-scada text-scada-muted bg-scada-surface-elevated">
+                              LOCKED
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="mt-1 font-semibold tracking-wide text-scada-primary">{step.point.callout}</div>
+                        {step.point.note && (
+                          <div className="text-xs text-scada-secondary mt-1">{step.point.note}</div>
+                        )}
+                      </div>
+
+                      <div
+                        className={`rounded-sm border px-3 py-2 text-left md:text-right
+                          ${statusClassName}`}
+                      >
+                        <div className="text-[10px] tracking-[0.16em] opacity-80">RESPONSE</div>
+                        <div className="font-bold">{step.point.response}</div>
+                        {autoValidationSummary && (
+                          <div
+                            className={`mt-2 text-[10px] leading-snug tracking-[0.04em] ${
+                              step.validation.isValid ? 'text-scada-success-soft' : 'text-scada-warning-soft'
+                            }`}
+                          >
+                            {autoValidationSummary}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
                     {step.isCurrent && (
-                      <div className="mt-1 text-[10px] font-bold tracking-wide text-scada-accent-bright">
-                        📡 {step.validation.displayValue}
+                      <div
+                        data-testid="inline-current-step-controls"
+                        className="mt-3 rounded-sm border border-scada-accent-soft bg-scada-surface-softer overflow-hidden"
+                      >
+                        <div className="px-3 py-1.5 border-b border-scada-weak bg-scada-accent-soft text-scada-accent-bright text-[10px] tracking-[0.16em] font-bold">
+                          CURRENT ACTION
+                        </div>
+
+                        <div className="px-3 py-3 flex flex-col gap-3">
+                          {(step.point.contextFields ?? []).map((field) => (
+                            <label key={field.id} className="text-xs text-scada-secondary flex flex-col gap-1">
+                              {field.label}
+                              <input
+                                className="scada-input rounded-sm px-2"
+                                type={field.type}
+                                placeholder={field.placeholder}
+                                value={String(inlineContext[field.id] ?? '')}
+                                onChange={(event) => {
+                                  const raw = event.target.value;
+                                  const value = field.type === 'number' && raw !== '' ? Number(raw) : raw;
+                                  setStepContextField(step.point.id, field.id, value);
+                                }}
+                              />
+                            </label>
+                          ))}
+
+                          <button
+                            className="delight-press self-start px-3 py-2.5 min-h-11 rounded-sm bg-scada-accent-strong text-scada-inverse font-bold text-sm
+                              tracking-wide border border-scada-accent shadow-scada-accent-sm
+                              disabled:opacity-50"
+                            disabled={
+                              isReadOnly ||
+                              isSubmitting ||
+                              (step.validation.isAutoRule && !step.validation.isValid)
+                            }
+                            onClick={() => runAction(() => onCompleteCurrentStep(step.index))}
+                          >
+                            COMPLETE STEP
+                          </button>
+                        </div>
                       </div>
                     )}
                   </div>
                 </div>
-
-                {step.isCurrent && (
-                  <div
-                    data-testid="inline-current-step-controls"
-                    className="px-3 py-3 border-t border-scada-weak bg-scada-surface-softer flex flex-col gap-3"
-                  >
-                    {(step.point.contextFields ?? []).map((field) => (
-                      <label key={field.id} className="text-xs text-scada-secondary flex flex-col gap-1">
-                        {field.label}
-                        <input
-                          className="scada-input rounded-sm px-2"
-                          type={field.type}
-                          placeholder={field.placeholder}
-                          value={String(inlineContext[field.id] ?? '')}
-                          onChange={(event) => {
-                            const raw = event.target.value;
-                            const value = field.type === 'number' && raw !== '' ? Number(raw) : raw;
-                            setStepContextField(step.point.id, field.id, value);
-                          }}
-                        />
-                      </label>
-                    ))}
-
-                    <button
-                      className="self-start px-3 py-2.5 min-h-11 rounded-sm bg-scada-accent-strong text-scada-inverse font-bold text-sm
-                        tracking-wide border border-scada-accent shadow-scada-accent-sm
-                        disabled:opacity-50"
-                      disabled={
-                        isReadOnly ||
-                        isSubmitting ||
-                        (step.validation.isAutoRule && !step.validation.isValid)
-                      }
-                      onClick={() => runAction(() => onCompleteCurrentStep(step.index))}
-                    >
-                      COMPLETE STEP
-                    </button>
-                  </div>
-                )}
               </div>
             );
           })}
@@ -207,6 +320,42 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
         <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-scada-accent"></div>
         <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-scada-accent"></div>
       </div>
+
+      {activeStep && (
+        <div
+          data-testid="mobile-active-step-dock"
+          className="md:hidden fixed inset-x-2 bottom-[calc(4rem+env(safe-area-inset-bottom)+0.5rem)] z-30 rounded-sm border border-scada-accent-soft
+            bg-scada-surface-soft-strong shadow-scada-accent-thin-inset"
+        >
+          <div className="px-3 py-1.5 border-b border-scada-weak bg-scada-accent-soft text-scada-accent-bright text-[10px] tracking-[0.16em] font-bold">
+            ACTIVE STEP {getStepNumber(activeStep.index)}
+          </div>
+          <div className="px-3 py-2 flex items-center justify-between gap-2">
+            <div className="min-w-0">
+              <div className="text-xs text-scada-primary font-semibold truncate">{activeStep.point.callout}</div>
+              <div className="text-[10px] tracking-[0.14em] text-scada-muted">
+                {activeStep.validation.isAutoRule
+                  ? activeStep.validation.isValid
+                    ? 'AUTO CHECK PASS'
+                    : 'AUTO CHECK PENDING'
+                  : 'MANUAL CONFIRM'}
+              </div>
+            </div>
+            <button
+              className="delight-press px-3 py-2 min-h-11 rounded-sm bg-scada-accent-strong text-scada-inverse font-bold text-xs
+                tracking-wide border border-scada-accent shadow-scada-accent-sm disabled:opacity-50 shrink-0"
+              disabled={
+                isReadOnly ||
+                isSubmitting ||
+                (activeStep.validation.isAutoRule && !activeStep.validation.isValid)
+              }
+              onClick={() => runAction(() => onCompleteCurrentStep(activeStep.index))}
+            >
+              COMPLETE ACTIVE STEP
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
