@@ -30,7 +30,7 @@ const getStatusClassName = (step: ChecklistStepState): string => {
 
 const getRowClassName = (step: ChecklistStepState): string => {
   const baseClass =
-    'grid grid-cols-[3.25rem_minmax(0,1fr)] text-sm font-mono border-b border-scada-weak';
+    'grid grid-cols-[2.5rem_minmax(0,1fr)] md:grid-cols-[3.25rem_minmax(0,1fr)] text-sm font-mono border-b border-scada-weak';
 
   if (step.isCurrent) {
     return `${baseClass} border-l-4 border-scada-accent bg-scada-surface-soft-strong shadow-scada-accent-inset`;
@@ -101,6 +101,8 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
 }) => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isMobileActionsOpen, setIsMobileActionsOpen] = useState(false);
+  const [expandedStepIds, setExpandedStepIds] = useState<Record<string, boolean>>({});
 
   const runAction = async (action: () => Promise<{ ok: boolean; error?: string }>): Promise<void> => {
     setIsSubmitting(true);
@@ -118,15 +120,22 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
     }
   };
 
+  const toggleStepExpanded = (stepId: string): void => {
+    setExpandedStepIds((previous) => ({
+      ...previous,
+      [stepId]: !previous[stepId],
+    }));
+  };
+
   const selectedSummary = summaries.find((summary) => summary.checklistId === selectedChecklistId) ?? null;
   const doneCount = selectedSummary?.done ?? 0;
   const totalCount = selectedSummary?.total ?? stepStates.length;
   const progressPercent = totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0;
 
   return (
-    <div className="h-full min-h-0 flex flex-col gap-2">
+    <div className="h-full min-h-0 flex flex-col gap-1 md:gap-2">
       <div
-        className="bg-scada-app border border-scada-accent-soft rounded-sm p-2 flex flex-col gap-2
+        className="bg-scada-app border border-scada-accent-soft rounded-sm p-1.5 md:p-2 flex flex-col gap-1.5 md:gap-2
           shadow-scada-accent-thin-inset"
       >
         <div className="flex flex-wrap items-center gap-2">
@@ -142,23 +151,56 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
               </option>
             ))}
           </select>
+
           <button
-            className="delight-press px-3 py-2.5 min-h-11 text-xs font-bold bg-scada-surface-elevated border border-scada rounded-sm
-              text-scada-primary tracking-wider hover-border-scada-accent-soft disabled:opacity-50"
-            disabled={isReadOnly || isSubmitting}
-            onClick={() => runAction(onResetChecklist)}
+            className="delight-press md:hidden px-3 py-2.5 min-h-11 text-xs font-bold bg-scada-surface-elevated border border-scada rounded-sm
+              text-scada-primary tracking-wider hover-border-scada-accent-soft"
+            aria-expanded={isMobileActionsOpen}
+            onClick={() => setIsMobileActionsOpen((previous) => !previous)}
           >
-            RESET CHECKLIST
+            {isMobileActionsOpen ? 'HIDE ACTIONS' : 'MAINTENANCE'}
           </button>
-          <button
-            className="delight-press px-3 py-2.5 min-h-11 text-xs font-bold bg-scada-surface-elevated border border-scada rounded-sm
-              text-scada-primary tracking-wider hover-border-scada-accent-soft disabled:opacity-50"
-            disabled={isReadOnly || isSubmitting}
-            onClick={() => runAction(onResetAllChecklists)}
-          >
-            RESET ALL CHECKLISTS
-          </button>
+
+          <div className="hidden md:flex items-center gap-2">
+            <button
+              className="delight-press px-3 py-2.5 min-h-11 text-xs font-bold bg-scada-surface-elevated border border-scada rounded-sm
+                text-scada-primary tracking-wider hover-border-scada-accent-soft disabled:opacity-50"
+              disabled={isReadOnly || isSubmitting}
+              onClick={() => runAction(onResetChecklist)}
+            >
+              RESET CHECKLIST
+            </button>
+            <button
+              className="delight-press px-3 py-2.5 min-h-11 text-xs font-bold bg-scada-surface-elevated border border-scada rounded-sm
+                text-scada-primary tracking-wider hover-border-scada-accent-soft disabled:opacity-50"
+              disabled={isReadOnly || isSubmitting}
+              onClick={() => runAction(onResetAllChecklists)}
+            >
+              RESET ALL CHECKLISTS
+            </button>
+          </div>
         </div>
+
+        {isMobileActionsOpen && (
+          <div className="md:hidden grid grid-cols-1 gap-2">
+            <button
+              className="delight-press px-3 py-2.5 min-h-11 text-xs font-bold bg-scada-surface-elevated border border-scada rounded-sm
+                text-scada-primary tracking-wider hover-border-scada-accent-soft disabled:opacity-50"
+              disabled={isReadOnly || isSubmitting}
+              onClick={() => runAction(onResetChecklist)}
+            >
+              RESET CHECKLIST
+            </button>
+            <button
+              className="delight-press px-3 py-2.5 min-h-11 text-xs font-bold bg-scada-surface-elevated border border-scada rounded-sm
+                text-scada-primary tracking-wider hover-border-scada-accent-soft disabled:opacity-50"
+              disabled={isReadOnly || isSubmitting}
+              onClick={() => runAction(onResetAllChecklists)}
+            >
+              RESET ALL CHECKLISTS
+            </button>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 gap-2 md:grid-cols-[minmax(0,1fr)_auto]">
           <div className="h-2 rounded-sm bg-scada-surface-elevated border border-scada-weak overflow-hidden">
@@ -191,20 +233,23 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
           <span>CHECKLIST SEQUENCE</span>
           <span className="text-[10px] tracking-[0.18em] text-scada-accent-bright">CALL / RESPONSE</span>
         </div>
-        <div className="flex-1 min-h-0 overflow-auto pb-28 md:pb-0">
+        <div className={`flex-1 min-h-0 overflow-auto ${activeStep ? 'pb-24' : 'pb-16'} md:pb-0`}>
           {stepStates.map((step) => {
             const statusClassName = getStatusClassName(step);
             const rowClass = getRowClassName(step);
             const inlineContext = getStepContext(step.point.id);
             const stepNumber = getStepNumber(step.index);
             const autoValidationSummary = getAutoValidationSummary(step);
+            const isExpanded = expandedStepIds[step.point.id] ?? false;
+            const showStepDetails = step.isCurrent || isExpanded;
+            const compactStateLabel = step.isCompleted ? 'COMPLETE' : step.isLocked ? 'LOCKED' : 'PENDING';
 
             return (
               <div key={step.point.id}>
                 <div className={rowClass}>
-                  <div className="px-2 py-3 border-r border-scada-weak flex justify-center">
+                  <div className="px-1.5 py-2 md:px-2 md:py-3 border-r border-scada-weak flex justify-center">
                     <div
-                      className={`h-8 w-8 rounded-full border text-[11px] font-bold tracking-[0.08em]
+                      className={`h-7 w-7 md:h-8 md:w-8 rounded-full border text-[10px] md:text-[11px] font-bold tracking-[0.08em]
                         flex items-center justify-center ${
                           step.isCurrent
                             ? 'border-scada-accent text-scada-accent bg-scada-accent-soft'
@@ -217,61 +262,90 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
                     </div>
                   </div>
 
-                  <div className={`px-3 py-3 ${step.isLocked ? 'opacity-50' : ''}`}>
-                    <div className="grid grid-cols-1 gap-2 md:grid-cols-[minmax(0,1fr)_220px] md:gap-3">
-                      <div className="text-scada-secondary">
-                        <div className="flex flex-wrap items-center gap-2 text-[10px] tracking-[0.16em]">
-                          {step.isCurrent && (
-                            <span className="px-1.5 py-0.5 rounded-sm border border-scada-accent text-scada-accent-bright bg-scada-accent-soft">
-                              CURRENT
-                            </span>
-                          )}
-                          {step.isCompleted && (
-                            <span className="px-1.5 py-0.5 rounded-sm border border-scada-success text-scada-success-soft bg-scada-success-soft">
-                              COMPLETE
-                            </span>
-                          )}
-                          {step.isLocked && (
-                            <span className="px-1.5 py-0.5 rounded-sm border border-scada text-scada-muted bg-scada-surface-elevated">
-                              LOCKED
-                            </span>
+                  <div className={`px-2 py-2 md:px-3 md:py-3 ${step.isLocked ? 'opacity-50' : ''}`}>
+                    {!step.isCurrent && (
+                      <button
+                        type="button"
+                        className="md:hidden w-full rounded-sm border border-scada-weak bg-scada-surface-elevated px-2 py-2 text-left"
+                        onClick={() => toggleStepExpanded(step.point.id)}
+                        aria-expanded={isExpanded}
+                      >
+                        <div className="flex items-center gap-2">
+                          <div className="min-w-0 flex-1">
+                            <div className="truncate text-xs font-semibold text-scada-primary tracking-wide">
+                              {step.point.callout} | {step.point.response}
+                            </div>
+                          </div>
+                          <span
+                            className={`text-[10px] tracking-[0.16em] ${
+                              step.isCompleted ? 'text-scada-success-soft' : 'text-scada-muted'
+                            }`}
+                          >
+                            {compactStateLabel}
+                          </span>
+                          <span className="text-[10px] tracking-[0.16em] text-scada-accent-bright">
+                            {isExpanded ? 'HIDE' : 'MORE'}
+                          </span>
+                        </div>
+                      </button>
+                    )}
+
+                    <div className={`${showStepDetails ? 'block' : 'hidden'} md:block`}>
+                      <div className={`grid grid-cols-1 gap-2 md:grid-cols-[minmax(0,1fr)_280px] md:gap-3 ${step.isCurrent ? '' : 'mt-2 md:mt-0'}`}>
+                        <div className="text-scada-secondary">
+                          <div className="flex flex-wrap items-center gap-2 text-[10px] tracking-[0.16em]">
+                            {step.isCurrent && (
+                              <span className="px-1.5 py-0.5 rounded-sm border border-scada-accent text-scada-accent-bright bg-scada-accent-soft">
+                                CURRENT
+                              </span>
+                            )}
+                            {step.isCompleted && (
+                              <span className="px-1.5 py-0.5 rounded-sm border border-scada-success text-scada-success-soft bg-scada-success-soft">
+                                COMPLETE
+                              </span>
+                            )}
+                            {step.isLocked && (
+                              <span className="px-1.5 py-0.5 rounded-sm border border-scada text-scada-muted bg-scada-surface-elevated">
+                                LOCKED
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="mt-0.5 font-semibold tracking-wide text-scada-primary">{step.point.callout}</div>
+                          {step.point.note && (
+                            <div className="text-xs text-scada-secondary mt-1">{step.point.note}</div>
                           )}
                         </div>
 
-                        <div className="mt-1 font-semibold tracking-wide text-scada-primary">{step.point.callout}</div>
-                        {step.point.note && (
-                          <div className="text-xs text-scada-secondary mt-1">{step.point.note}</div>
-                        )}
-                      </div>
-
-                      <div
-                        className={`rounded-sm border px-3 py-2 text-left md:text-right
-                          ${statusClassName}`}
-                      >
-                        <div className="text-[10px] tracking-[0.16em] opacity-80">RESPONSE</div>
-                        <div className="font-bold">{step.point.response}</div>
-                        {autoValidationSummary && (
-                          <div
-                            className={`mt-2 text-[10px] leading-snug tracking-[0.04em] ${
-                              step.validation.isValid ? 'text-scada-success-soft' : 'text-scada-warning-soft'
-                            }`}
-                          >
-                            {autoValidationSummary}
-                          </div>
-                        )}
+                        <div
+                          className={`rounded-sm border px-3 py-2 text-left md:text-right
+                            ${statusClassName}`}
+                        >
+                          <div className="text-[10px] tracking-[0.16em] opacity-80">RESPONSE</div>
+                          <div className="font-bold">{step.point.response}</div>
+                          {autoValidationSummary && (
+                            <div
+                              className={`mt-2 text-[10px] leading-snug tracking-[0.04em] ${
+                                step.validation.isValid ? 'text-scada-success-soft' : 'text-scada-warning-soft'
+                              } md:whitespace-nowrap`}
+                            >
+                              {autoValidationSummary}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
 
                     {step.isCurrent && (
                       <div
                         data-testid="inline-current-step-controls"
-                        className="mt-3 rounded-sm border border-scada-accent-soft bg-scada-surface-softer overflow-hidden"
+                        className="mt-2 md:mt-3 rounded-sm border border-scada-accent-soft bg-scada-surface-softer overflow-hidden"
                       >
                         <div className="px-3 py-1.5 border-b border-scada-weak bg-scada-accent-soft text-scada-accent-bright text-[10px] tracking-[0.16em] font-bold">
                           CURRENT ACTION
                         </div>
 
-                        <div className="px-3 py-3 flex flex-col gap-3">
+                        <div className="px-2 py-2 md:px-3 md:py-3 flex flex-col gap-2 md:gap-3">
                           {(step.point.contextFields ?? []).map((field) => (
                             <label key={field.id} className="text-xs text-scada-secondary flex flex-col gap-1">
                               {field.label}
@@ -330,9 +404,11 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
           <div className="px-3 py-1.5 border-b border-scada-weak bg-scada-accent-soft text-scada-accent-bright text-[10px] tracking-[0.16em] font-bold">
             ACTIVE STEP {getStepNumber(activeStep.index)}
           </div>
-          <div className="px-3 py-2 flex items-center justify-between gap-2">
+          <div className="px-3 py-2">
             <div className="min-w-0">
-              <div className="text-xs text-scada-primary font-semibold truncate">{activeStep.point.callout}</div>
+              <div className="text-xs text-scada-primary font-semibold truncate">
+                {activeStep.point.callout} | {activeStep.point.response}
+              </div>
               <div className="text-[10px] tracking-[0.14em] text-scada-muted">
                 {activeStep.validation.isAutoRule
                   ? activeStep.validation.isValid
@@ -341,18 +417,6 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
                   : 'MANUAL CONFIRM'}
               </div>
             </div>
-            <button
-              className="delight-press px-3 py-2 min-h-11 rounded-sm bg-scada-accent-strong text-scada-inverse font-bold text-xs
-                tracking-wide border border-scada-accent shadow-scada-accent-sm disabled:opacity-50 shrink-0"
-              disabled={
-                isReadOnly ||
-                isSubmitting ||
-                (activeStep.validation.isAutoRule && !activeStep.validation.isValid)
-              }
-              onClick={() => runAction(() => onCompleteCurrentStep(activeStep.index))}
-            >
-              COMPLETE ACTIVE STEP
-            </button>
           </div>
         </div>
       )}

@@ -385,12 +385,11 @@ const App = () => {
           </div>
         )}
 
-        {view === 'CHECKLIST' && checklistEngine.isReadOnly && (
+        {checklistEngine.isReadOnly && (
           <div
-            className="pointer-events-none absolute bottom-16 left-1/2 z-40 w-max max-w-[calc(100%-1rem)]
+            className="pointer-events-none fixed left-1/2 top-[calc(3.75rem+env(safe-area-inset-top)+0.25rem)] z-40 w-max max-w-[calc(100%-1rem)]
               -translate-x-1/2 rounded border-2 border-scada-warning bg-scada-warning-strong px-4 py-2 text-center
-              text-xs font-bold tracking-widest text-scada-warning-soft shadow-scada-warning-md
-              md:bottom-4 md:px-6 md:py-3 md:text-sm"
+              text-xs font-bold tracking-widest text-scada-warning-soft shadow-scada-warning-md md:px-6 md:py-3 md:text-sm"
           >
             <div className="flex items-center justify-center gap-2">
               <Lock size={14} />
