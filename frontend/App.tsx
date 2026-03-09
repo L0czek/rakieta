@@ -201,7 +201,7 @@ const App = () => {
             <div className="w-3 h-3 bg-scada-danger-strong rounded-full absolute opacity-20"></div>
             <Rocket className="text-scada-accent" />
             <div className="min-w-0">
-              <h1 className="text-scada-accent font-bold tracking-wide text-sm leading-none neon-text whitespace-nowrap md:text-base xl:tracking-widest xl:text-lg">
+              <h1 className="text-scada-accent font-bold tracking-wide text-sm leading-none whitespace-nowrap md:text-base xl:tracking-widest xl:text-lg">
                 ROCKET TEST STAND
               </h1>
               <span className="hidden text-scada-muted text-[10px] tracking-[0.2em] xl:inline">
@@ -388,7 +388,7 @@ const App = () => {
         </Suspense>
       </main>
 
-      <nav className="fixed bottom-0 inset-x-0 z-20 md:hidden border-t border-scada-weak bg-scada-app-soft backdrop-blur-sm">
+      <nav className="fixed bottom-0 inset-x-0 z-20 md:hidden border-t border-scada-weak bg-scada-app-soft">
         <div className="grid grid-cols-4 gap-px bg-scada-surface-elevated">
           <button
             onClick={() => handleViewChange('DASHBOARD')}

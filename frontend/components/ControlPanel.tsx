@@ -106,7 +106,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                 <button 
                 onClick={() => actions.setFireState('FIRE_END')}
                 disabled={!canAbort}
-                className="flex-1 bg-scada-warning hover-bg-scada-warning text-scada-inverse font-bold text-2xl border-4 border-scada-warning rounded flex flex-col items-center justify-center animate-pulse disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 bg-scada-warning hover-bg-scada-warning text-scada-inverse font-bold text-2xl border-4 border-scada-warning rounded flex flex-col items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                >
                 <div className="flex items-center gap-2">
                     <AlertOctagon className="w-8 h-8" />

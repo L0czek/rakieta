@@ -46,7 +46,7 @@ const CHART_AXIS_COLOR = CHART_COLORS.axis;
 const CHART_GRID_COLOR = CHART_COLORS.grid;
 
 export const ScadaPanel = ({ title, children, className = "", danger = false, headerRight = null }: { title: string, children?: React.ReactNode, className?: string, danger?: boolean, headerRight?: React.ReactNode }) => (
-  <div className={`relative flex flex-col bg-scada-surface-soft-strong border ${danger ? 'border-scada-danger shadow-scada-danger-soft' : 'border-scada-accent-soft'} backdrop-blur-sm rounded-sm overflow-hidden ${className}`}>
+  <div className={`relative flex flex-col bg-scada-surface-soft-strong border ${danger ? 'border-scada-danger shadow-scada-danger-soft' : 'border-scada-accent-soft'} rounded-sm overflow-hidden ${className}`}>
     <div className={`px-2 py-1 text-xs font-bold tracking-widest border-b flex justify-between items-center ${danger ? 'bg-scada-danger-soft text-scada-danger-soft border-scada-danger' : 'bg-scada-accent-soft text-scada-accent border-scada-accent-soft'}`}>
       <span>{title.toUpperCase()}</span>
       {headerRight && <div className="font-mono">{headerRight}</div>}

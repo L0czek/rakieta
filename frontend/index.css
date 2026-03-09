@@ -418,15 +418,17 @@ body {
   box-shadow: 0 0 0 2px var(--scada-focus-ring);
 }
 
-.neon-text {
-  text-shadow: 0 0 5px rgba(34, 211, 238, 0.5);
-}
-
 .crt-lines {
   background:
-    linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+    repeating-linear-gradient(
+      to bottom,
+      rgba(18, 16, 16, 0) 0px,
+      rgba(18, 16, 16, 0) 2px,
+      rgba(0, 0, 0, 0.35) 2px,
+      rgba(0, 0, 0, 0.35) 4px
+    ),
     linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-  background-size: 100% 2px, 3px 100%;
+  background-size: auto, 3px 100%;
   pointer-events: none;
 }
 
