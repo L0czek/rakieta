@@ -53,7 +53,7 @@ export const ServoPanel: React.FC<ServoPanelProps> = ({
                         <button 
                             onClick={() => actions.setServoCmd('OPEN')}
                             disabled={!canServo}
-                            className={`flex-1 min-h-11 rounded border border-scada-accent flex flex-col items-center justify-center text-xs font-bold lg:min-h-0 ${servoState === ServoState.OPEN ? 'bg-scada-accent text-scada-inverse' : 'bg-scada-surface-elevated text-scada-accent hover-bg-scada-surface-strong'} disabled:opacity-50 disabled:cursor-not-allowed`}
+                            className={`delight-press flex-1 min-h-11 rounded border border-scada-accent flex flex-col items-center justify-center text-xs font-bold lg:min-h-0 ${servoState === ServoState.OPEN ? 'bg-scada-accent text-scada-inverse' : 'bg-scada-surface-elevated text-scada-accent hover-bg-scada-surface-strong'} disabled:opacity-50 disabled:cursor-not-allowed`}
                         >
                             <span className="leading-none">OPEN</span>
                             <span className="mt-1 flex items-center gap-1 text-[10px] leading-none">
@@ -64,7 +64,7 @@ export const ServoPanel: React.FC<ServoPanelProps> = ({
                         <button 
                             onClick={() => actions.setServoCmd('CLOSE')}
                             disabled={!canServo}
-                            className={`flex-1 min-h-11 rounded border border-scada-accent flex flex-col items-center justify-center text-xs font-bold lg:min-h-0 ${servoState === ServoState.CLOSED ? 'bg-scada-accent-soft text-scada-inverse' : 'bg-scada-surface-elevated text-scada-accent hover-bg-scada-surface-strong'} disabled:opacity-50 disabled:cursor-not-allowed`}
+                            className={`delight-press flex-1 min-h-11 rounded border border-scada-accent flex flex-col items-center justify-center text-xs font-bold lg:min-h-0 ${servoState === ServoState.CLOSED ? 'bg-scada-accent-soft text-scada-inverse' : 'bg-scada-surface-elevated text-scada-accent hover-bg-scada-surface-strong'} disabled:opacity-50 disabled:cursor-not-allowed`}
                         >
                             <span className="leading-none">CLOSE</span>
                             <span className="mt-1 flex items-center gap-1 text-[10px] leading-none">

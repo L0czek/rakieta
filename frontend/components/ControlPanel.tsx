@@ -60,7 +60,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
             <div className="flex gap-3">
               <button
                 onClick={() => setShowShutdownConfirm(false)}
-                className="flex-1 py-3 bg-scada-surface-strong hover-bg-scada-surface-strong text-scada-primary font-bold rounded border border-scada-strong transition-colors"
+                className="delight-press flex-1 py-3 bg-scada-surface-strong hover-bg-scada-surface-strong text-scada-primary font-bold rounded border border-scada-strong transition-colors"
               >
                 CANCEL
               </button>
@@ -70,9 +70,9 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                   setShowShutdownConfirm(false);
                 }}
                 disabled={!commandsEnabled}
-                className="flex-1 py-3 bg-scada-warning hover-bg-scada-warning text-scada-inverse font-bold rounded border border-scada-warning transition-colors flex items-center justify-center gap-2"
+                className="delight-press flex-1 py-3 bg-scada-warning hover-bg-scada-warning text-scada-inverse font-bold rounded border border-scada-warning transition-colors flex items-center justify-center gap-2"
               >
-                <Power className="w-4 h-4" /> SHUTDOWN
+                <Power className="w-4 h-4 delight-icon-shift" /> SHUTDOWN
               </button>
             </div>
           </div>
@@ -106,10 +106,10 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                 <button 
                 onClick={() => actions.setFireState('FIRE_END')}
                 disabled={!canAbort}
-                className="flex-1 bg-scada-warning hover-bg-scada-warning text-scada-inverse font-bold text-2xl border-4 border-scada-warning rounded flex flex-col items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                className="delight-press flex-1 bg-scada-warning hover-bg-scada-warning text-scada-inverse font-bold text-2xl border-4 border-scada-warning rounded flex flex-col items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                >
                 <div className="flex items-center gap-2">
-                    <AlertOctagon className="w-8 h-8" />
+                    <AlertOctagon className="w-8 h-8 delight-icon-shift" />
                     ABORT
                 </div>
                </button>
@@ -117,14 +117,14 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                <button 
                 onClick={() => actions.setFireState('FIRE')}
                 disabled={!canFire}
-                className={`flex-1 font-bold text-2xl border-2 rounded flex flex-col items-center justify-center transition-colors transition-shadow ${
+                className={`delight-press flex-1 font-bold text-2xl border-2 rounded flex flex-col items-center justify-center transition-colors transition-shadow ${
                     canFire 
                     ? 'bg-scada-danger hover-bg-scada-danger-strong border-scada-danger text-scada-inverse shadow-scada-danger-md' 
                     : 'bg-scada-surface-elevated border-scada text-scada-muted cursor-not-allowed'
                 }`}
                >
                 <div className="flex items-center gap-2">
-                     <Flame className="w-8 h-8" />
+                     <Flame className="w-8 h-8 delight-icon-shift" />
                      FIRE
                 </div>
                 <div className={`mt-1 text-xs font-normal ${canFire ? 'text-scada-danger-soft' : 'text-scada-muted'}`}>
@@ -139,16 +139,16 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
             <button
               onClick={() => actions.setFireState('FIRE_RESET')}
               disabled={!commandsEnabled}
-              className="min-h-11 bg-scada-surface-strong hover-bg-scada-surface-strong text-scada-secondary font-mono text-xs border border-scada-strong rounded flex items-center justify-center gap-2"
+              className="delight-press min-h-11 bg-scada-surface-strong hover-bg-scada-surface-strong text-scada-secondary font-mono text-xs border border-scada-strong rounded flex items-center justify-center gap-2"
             >
-              <RefreshCcw className="w-3 h-3" /> RESET STATE
+              <RefreshCcw className="w-3 h-3 delight-icon-shift" /> RESET STATE
             </button>
             <button
               onClick={() => setShowShutdownConfirm(true)}
               disabled={!canShutdown}
-              className="min-h-11 bg-scada-warning-strong hover-bg-scada-warning text-scada-warning-soft font-mono text-xs border border-scada-warning rounded flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="delight-press min-h-11 bg-scada-warning-strong hover-bg-scada-warning text-scada-warning-soft font-mono text-xs border border-scada-warning rounded flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <Power className="w-3 h-3" /> SHUTDOWN
+              <Power className="w-3 h-3 delight-icon-shift" /> SHUTDOWN
             </button>
           </div>
 

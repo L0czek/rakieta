@@ -500,7 +500,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
                 {/* Series Toggles */}
                 <div className="flex flex-wrap gap-2">
                     {Object.entries(visibleLines).map(([key, active]) => (
-                        <button key={key} onClick={() => toggleLine(key)} className={`px-3 py-2 min-h-11 border rounded text-[10px] font-bold uppercase flex items-center gap-2 lg:min-h-0 lg:px-2 lg:py-1 ${active ? 'bg-scada-surface-strong text-scada-inverse border-scada-strong' : 'bg-scada-surface text-scada-muted border-scada-weak'}`}>
+                        <button key={key} onClick={() => toggleLine(key)} className={`delight-press px-3 py-2 min-h-11 border rounded text-[10px] font-bold uppercase flex items-center gap-2 lg:min-h-0 lg:px-2 lg:py-1 ${active ? 'bg-scada-surface-strong text-scada-inverse border-scada-strong' : 'bg-scada-surface text-scada-muted border-scada-weak'}`}>
                             <div className="w-2 h-2 rounded-full" style={{backgroundColor: SENSOR_COLORS[key] || TEMP_COLORS[0]}}></div>
                             {getSeriesLabel(key)}
                         </button>
@@ -512,17 +512,17 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
                         <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-4">
                             <button 
                             onClick={() => setIsLive(!isLive)} 
-                            className={`flex min-h-11 items-center justify-center gap-2 px-3 py-2 rounded text-xs font-bold border shadow-lg lg:min-h-0 lg:py-1 ${isLive ? 'bg-scada-accent-strong border-scada-accent text-scada-accent' : 'bg-scada-surface-soft-strong border-scada-strong text-scada-secondary'}`}
+                            className={`delight-press flex min-h-11 items-center justify-center gap-2 px-3 py-2 rounded text-xs font-bold border shadow-lg lg:min-h-0 lg:py-1 ${isLive ? 'bg-scada-accent-strong border-scada-accent text-scada-accent' : 'bg-scada-surface-soft-strong border-scada-strong text-scada-secondary'}`}
                             >
-                            {isLive ? <Pause size={14} fill="currentColor"/> : <Play size={14} fill="currentColor"/>}
+                            {isLive ? <Pause size={14} fill="currentColor" className="delight-icon-shift"/> : <Play size={14} fill="currentColor" className="delight-icon-shift"/>}
                             {isLive ? 'LIVE' : 'PAUSED'}
                             </button>
 
                             <div className="hidden h-6 w-px bg-scada-surface-strong md:block"></div>
 
                             <div className="flex items-center gap-1">
-                                <button aria-label="Zoom in analysis window" onClick={() => handleZoom('in')} className="h-11 w-11 flex items-center justify-center hover-bg-scada-surface-strong rounded lg:h-8 lg:w-8"><ZoomIn size={16} className="text-scada-secondary"/></button>
-                                <button aria-label="Zoom out analysis window" onClick={() => handleZoom('out')} className="h-11 w-11 flex items-center justify-center hover-bg-scada-surface-strong rounded lg:h-8 lg:w-8"><ZoomOut size={16} className="text-scada-secondary"/></button>
+                                <button aria-label="Zoom in analysis window" onClick={() => handleZoom('in')} className="delight-press h-11 w-11 flex items-center justify-center hover-bg-scada-surface-strong rounded lg:h-8 lg:w-8"><ZoomIn size={16} className="text-scada-secondary delight-icon-shift"/></button>
+                                <button aria-label="Zoom out analysis window" onClick={() => handleZoom('out')} className="delight-press h-11 w-11 flex items-center justify-center hover-bg-scada-surface-strong rounded lg:h-8 lg:w-8"><ZoomOut size={16} className="text-scada-secondary delight-icon-shift"/></button>
                                 <span className="text-xs font-mono text-scada-muted ml-2">WINDOW: {(windowSize/1000).toFixed(1)}s</span>
                             </div>
                             

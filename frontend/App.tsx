@@ -76,6 +76,31 @@ const loadStoredMqttConfig = (): MqttConfig => {
   }
 };
 
+const LOADING_VIEW_MESSAGES = [
+  'SYNCING TELEMETRY BUS...',
+  'VERIFYING CONTROL LINK...',
+  'ARMING UI PANELS...',
+] as const;
+
+const LoadingFallback: React.FC = () => {
+  const [messageIndex, setMessageIndex] = useState(0);
+
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      setMessageIndex((prev) => (prev + 1) % LOADING_VIEW_MESSAGES.length);
+    }, 1400);
+
+    return () => window.clearInterval(intervalId);
+  }, []);
+
+  return (
+    <div className="h-full w-full flex flex-col items-center justify-center text-scada-secondary">
+      <div className="text-sm tracking-wider delight-view-enter">{LOADING_VIEW_MESSAGES[messageIndex]}</div>
+      <div className="mt-2 text-[10px] tracking-[0.24em] text-scada-muted">STANDBY</div>
+    </div>
+  );
+};
+
 const App = () => {
   const {
     connectionStatus,
@@ -186,9 +211,9 @@ const App = () => {
             <div className="flex gap-4">
               <button
                 onClick={resetData}
-                className="flex-1 py-4 bg-scada-danger hover-bg-scada-danger-strong text-scada-inverse font-bold rounded text-xl shadow-lg transition-colors flex items-center justify-center gap-2"
+                className="delight-press flex-1 py-4 bg-scada-danger hover-bg-scada-danger-strong text-scada-inverse font-bold rounded text-xl shadow-lg transition-colors flex items-center justify-center gap-2"
               >
-                <Trash2 /> WIPE DATA & RESET
+                <Trash2 className="delight-icon-shift" /> WIPE DATA & RESET
               </button>
             </div>
           </div>
@@ -214,35 +239,35 @@ const App = () => {
             <div className="flex min-w-max bg-scada-surface rounded border border-scada p-1">
               <button
                 onClick={() => handleViewChange('DASHBOARD')}
-                className={`flex min-h-11 items-center gap-2 px-3 py-2 text-xs font-bold rounded transition-colors lg:min-h-0 lg:py-1 ${
+                className={`delight-press flex min-h-11 items-center gap-2 px-3 py-2 text-xs font-bold rounded transition-colors lg:min-h-0 lg:py-1 ${
                   view === 'DASHBOARD' ? 'bg-scada-accent-soft text-scada-accent' : 'text-scada-muted hover-text-scada-secondary'
                 }`}
               >
-                <LayoutDashboard size={14} /> DASHBOARD
+                <LayoutDashboard size={14} className="delight-icon-shift" /> DASHBOARD
               </button>
               <button
                 onClick={() => handleViewChange('ANALYSIS')}
-                className={`flex min-h-11 items-center gap-2 px-3 py-2 text-xs font-bold rounded transition-colors lg:min-h-0 lg:py-1 ${
+                className={`delight-press flex min-h-11 items-center gap-2 px-3 py-2 text-xs font-bold rounded transition-colors lg:min-h-0 lg:py-1 ${
                   view === 'ANALYSIS' ? 'bg-scada-accent-soft text-scada-accent' : 'text-scada-muted hover-text-scada-secondary'
                 }`}
               >
-                <LineChartIcon size={14} /> ANALYSIS
+                <LineChartIcon size={14} className="delight-icon-shift" /> ANALYSIS
               </button>
               <button
                 onClick={() => handleViewChange('CHECKLIST')}
-                className={`flex min-h-11 items-center gap-2 px-3 py-2 text-xs font-bold rounded transition-colors lg:min-h-0 lg:py-1 ${
+                className={`delight-press flex min-h-11 items-center gap-2 px-3 py-2 text-xs font-bold rounded transition-colors lg:min-h-0 lg:py-1 ${
                   view === 'CHECKLIST' ? 'bg-scada-accent-soft text-scada-accent' : 'text-scada-muted hover-text-scada-secondary'
                 }`}
               >
-                <ListChecks size={14} /> CHECKLIST
+                <ListChecks size={14} className="delight-icon-shift" /> CHECKLIST
               </button>
               <button
                 onClick={() => handleViewChange('CONFIGURATION')}
-                className={`flex min-h-11 items-center gap-2 px-3 py-2 text-xs font-bold rounded transition-colors lg:min-h-0 lg:py-1 ${
+                className={`delight-press flex min-h-11 items-center gap-2 px-3 py-2 text-xs font-bold rounded transition-colors lg:min-h-0 lg:py-1 ${
                   view === 'CONFIGURATION' ? 'bg-scada-accent-soft text-scada-accent' : 'text-scada-muted hover-text-scada-secondary'
                 }`}
               >
-                <SlidersHorizontal size={14} /> CONFIGURATION
+                <SlidersHorizontal size={14} className="delight-icon-shift" /> CONFIGURATION
               </button>
             </div>
           </div>
@@ -251,18 +276,18 @@ const App = () => {
             <div className="flex items-center gap-2">
               <button
                 onClick={handleSimToggle}
-                className={`flex min-h-11 items-center gap-2 px-3 py-2 text-xs font-bold rounded transition-colors border lg:min-h-0 lg:py-1 ${
+                className={`delight-press flex min-h-11 items-center gap-2 px-3 py-2 text-xs font-bold rounded transition-colors border lg:min-h-0 lg:py-1 ${
                   isSimulating
                     ? 'bg-scada-accent-soft border-scada-accent text-scada-accent'
                     : 'border-scada text-scada-muted hover-text-scada-secondary'
                 }`}
               >
-                <Beaker size={14} /> {isSimulating ? 'STOP SIM' : 'SIM'}
+                <Beaker size={14} className="delight-icon-shift" /> {isSimulating ? 'STOP SIM' : 'SIM'}
               </button>
               {isSimulating && (
                 <button
                   onClick={actions.toggleSimSafety}
-                  className={`flex min-h-11 items-center gap-2 px-3 py-2 rounded text-xs font-bold border lg:min-h-0 lg:py-1 ${
+                  className={`delight-press flex min-h-11 items-center gap-2 px-3 py-2 rounded text-xs font-bold border lg:min-h-0 lg:py-1 ${
                     telemetry.isUnsafe
                       ? 'bg-scada-danger-strong border-scada-danger text-scada-inverse'
                       : 'bg-scada-success-strong border-scada-success text-scada-inverse'
@@ -290,9 +315,9 @@ const App = () => {
             <button
               aria-label="Toggle connection config"
               onClick={() => setShowConfig(!showConfig)}
-              className="h-11 w-11 flex items-center justify-center rounded text-scada-secondary hover-text-scada-inverse hover-bg-scada-surface-elevated transition-colors"
+              className="delight-press h-11 w-11 flex items-center justify-center rounded text-scada-secondary hover-text-scada-inverse hover-bg-scada-surface-elevated transition-colors"
             >
-              <Settings size={20} />
+              <Settings size={20} className="delight-icon-shift" />
             </button>
 
             <div
@@ -352,7 +377,7 @@ const App = () => {
                   />
                 </div>
 
-                <button onClick={handleConnect} className="w-full min-h-11 bg-scada-accent hover-bg-scada-accent text-scada-inverse font-bold py-2 mt-2">
+                <button onClick={handleConnect} className="delight-press w-full min-h-11 bg-scada-accent hover-bg-scada-accent text-scada-inverse font-bold py-2 mt-2">
                   CONNECT
                 </button>
               </div>
@@ -377,14 +402,10 @@ const App = () => {
           </div>
         )}
 
-        <Suspense
-          fallback={
-            <div className="h-full w-full flex items-center justify-center text-scada-secondary text-sm tracking-wider">
-              LOADING VIEW...
-            </div>
-          }
-        >
-          {currentView}
+        <Suspense fallback={<LoadingFallback />}>
+          <div key={view} className="h-full delight-view-enter">
+            {currentView}
+          </div>
         </Suspense>
       </main>
 
@@ -392,38 +413,38 @@ const App = () => {
         <div className="grid grid-cols-4 gap-px bg-scada-surface-elevated">
           <button
             onClick={() => handleViewChange('DASHBOARD')}
-            className={`min-h-14 bg-scada-app px-2 py-1 flex flex-col items-center justify-center text-[10px] font-bold tracking-wide ${
+            className={`delight-press min-h-14 bg-scada-app px-2 py-1 flex flex-col items-center justify-center text-[10px] font-bold tracking-wide ${
               view === 'DASHBOARD' ? 'text-scada-accent' : 'text-scada-muted'
             }`}
           >
-            <LayoutDashboard size={16} />
+            <LayoutDashboard size={16} className="delight-icon-shift" />
             <span>DASH</span>
           </button>
           <button
             onClick={() => handleViewChange('ANALYSIS')}
-            className={`min-h-14 bg-scada-app px-2 py-1 flex flex-col items-center justify-center text-[10px] font-bold tracking-wide ${
+            className={`delight-press min-h-14 bg-scada-app px-2 py-1 flex flex-col items-center justify-center text-[10px] font-bold tracking-wide ${
               view === 'ANALYSIS' ? 'text-scada-accent' : 'text-scada-muted'
             }`}
           >
-            <LineChartIcon size={16} />
+            <LineChartIcon size={16} className="delight-icon-shift" />
             <span>ANALYSIS</span>
           </button>
           <button
             onClick={() => handleViewChange('CHECKLIST')}
-            className={`min-h-14 bg-scada-app px-2 py-1 flex flex-col items-center justify-center text-[10px] font-bold tracking-wide ${
+            className={`delight-press min-h-14 bg-scada-app px-2 py-1 flex flex-col items-center justify-center text-[10px] font-bold tracking-wide ${
               view === 'CHECKLIST' ? 'text-scada-accent' : 'text-scada-muted'
             }`}
           >
-            <ListChecks size={16} />
+            <ListChecks size={16} className="delight-icon-shift" />
             <span>CHECK</span>
           </button>
           <button
             onClick={() => handleViewChange('CONFIGURATION')}
-            className={`min-h-14 bg-scada-app px-2 py-1 flex flex-col items-center justify-center text-[10px] font-bold tracking-wide ${
+            className={`delight-press min-h-14 bg-scada-app px-2 py-1 flex flex-col items-center justify-center text-[10px] font-bold tracking-wide ${
               view === 'CONFIGURATION' ? 'text-scada-accent' : 'text-scada-muted'
             }`}
           >
-            <SlidersHorizontal size={16} />
+            <SlidersHorizontal size={16} className="delight-icon-shift" />
             <span>CONFIG</span>
           </button>
         </div>
