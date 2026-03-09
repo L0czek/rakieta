@@ -447,7 +447,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
         </div>
 
         {/* Top-Right: Current Values (Rows 1-8, Cols 10-12) */}
-        <div className="order-3 flex flex-col gap-2 lg:order-none lg:col-start-2 lg:row-start-1 lg:min-h-0">
+        <div className="order-3 hidden flex-col gap-2 md:flex lg:order-none lg:col-start-2 lg:row-start-1 lg:min-h-0">
             <ScadaPanel title="LIVE VALUES" className="flex-1">
                 <div className="p-2 space-y-1 overflow-y-auto h-full pr-1 scrollbar-thin">
                     {/* Primary */}
@@ -549,7 +549,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
         </div>
 
         {/* Bottom-Right: Master Control & Servo (Rows 9-12, Cols 10-12) */}
-        <div className="order-4 grid gap-2 lg:order-none lg:col-start-2 lg:row-start-2 lg:grid-rows-[120px_minmax(0,1fr)]">
+        <div className="order-4 hidden gap-2 md:grid lg:order-none lg:col-start-2 lg:row-start-2 lg:grid-rows-[120px_minmax(0,1fr)]">
             <div className="min-h-[120px] lg:min-h-0">
                 <ServoPanel 
                     servoPositionDegrees={servoPositionDegrees} 

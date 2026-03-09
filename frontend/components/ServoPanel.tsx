@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScadaPanel, DigitalIndicator } from '@/components/Widgets';
+import { ScadaPanel } from '@/components/Widgets';
 import { ServoState, SystemState } from '@/types';
 
 interface ServoPanelProps {
@@ -47,27 +47,30 @@ export const ServoPanel: React.FC<ServoPanelProps> = ({
                     </div>
                 </div>
 
-                {/* Right: State & Controls */}
+                {/* Right: Controls with integrated state indication */}
                 <div className="flex flex-col gap-2">
-                    <div className="flex gap-1 justify-center">
-                        <DigitalIndicator active={servoState === ServoState.OPEN} label="OPN" tone="success" />
-                        <DigitalIndicator active={servoState === ServoState.CLOSED} label="CLS" tone="warning" />
-                    </div>
-
                     <div className="flex-1 flex gap-1 mt-1">
                         <button 
                             onClick={() => actions.setServoCmd('OPEN')}
                             disabled={!canServo}
-                            className={`flex-1 min-h-11 rounded border border-scada-accent flex items-center justify-center text-xs font-bold lg:min-h-0 ${servoState === ServoState.OPEN ? 'bg-scada-accent text-scada-inverse' : 'bg-scada-surface-elevated text-scada-accent hover-bg-scada-surface-strong'} disabled:opacity-50 disabled:cursor-not-allowed`}
+                            className={`flex-1 min-h-11 rounded border border-scada-accent flex flex-col items-center justify-center text-xs font-bold lg:min-h-0 ${servoState === ServoState.OPEN ? 'bg-scada-accent text-scada-inverse' : 'bg-scada-surface-elevated text-scada-accent hover-bg-scada-surface-strong'} disabled:opacity-50 disabled:cursor-not-allowed`}
                         >
-                            OPEN
+                            <span className="leading-none">OPEN</span>
+                            <span className="mt-1 flex items-center gap-1 text-[10px] leading-none">
+                                <span className={`h-1.5 w-1.5 rounded-full ${servoState === ServoState.OPEN ? 'bg-scada-success' : 'bg-scada-surface-strong'}`}></span>
+                                OPN
+                            </span>
                         </button>
                         <button 
                             onClick={() => actions.setServoCmd('CLOSE')}
                             disabled={!canServo}
-                            className={`flex-1 min-h-11 rounded border border-scada-accent flex items-center justify-center text-xs font-bold lg:min-h-0 ${servoState === ServoState.CLOSED ? 'bg-scada-accent-soft text-scada-inverse' : 'bg-scada-surface-elevated text-scada-accent hover-bg-scada-surface-strong'} disabled:opacity-50 disabled:cursor-not-allowed`}
+                            className={`flex-1 min-h-11 rounded border border-scada-accent flex flex-col items-center justify-center text-xs font-bold lg:min-h-0 ${servoState === ServoState.CLOSED ? 'bg-scada-accent-soft text-scada-inverse' : 'bg-scada-surface-elevated text-scada-accent hover-bg-scada-surface-strong'} disabled:opacity-50 disabled:cursor-not-allowed`}
                         >
-                            CLOSE
+                            <span className="leading-none">CLOSE</span>
+                            <span className="mt-1 flex items-center gap-1 text-[10px] leading-none">
+                                <span className={`h-1.5 w-1.5 rounded-full ${servoState === ServoState.CLOSED ? 'bg-scada-warning' : 'bg-scada-surface-strong'}`}></span>
+                                CLS
+                            </span>
                         </button>
                     </div>
                 </div>
