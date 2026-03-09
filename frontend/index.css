@@ -1,1 +1,510 @@
-/* Intentionally minimal: runtime theme styles are defined in index.html. */
+@import "tailwindcss";
+
+:root {
+  --scada-font-primary: "IBM Plex Mono", "JetBrains Mono", "SFMono-Regular", Menlo, Consolas,
+    "Liberation Mono", monospace;
+
+  --scada-bg-app: #0b1220;
+  --scada-bg-surface: #111b30;
+  --scada-bg-surface-elevated: #17233a;
+  --scada-bg-surface-strong: #24324d;
+  --scada-bg-surface-soft: rgba(17, 27, 48, 0.5);
+  --scada-bg-surface-soft-strong: rgba(23, 35, 58, 0.8);
+  --scada-bg-app-soft: rgba(11, 18, 32, 0.95);
+  --scada-bg-surface-softer: rgba(17, 27, 48, 0.3);
+  --scada-bg-overlay: rgba(11, 18, 32, 0.9);
+  --scada-bg-danger-soft: rgba(127, 29, 29, 0.3);
+  --scada-bg-danger: #dc2626;
+  --scada-bg-danger-strong: rgba(153, 27, 27, 0.8);
+  --scada-bg-danger-overlay: rgba(69, 10, 10, 0.9);
+  --scada-bg-warning-soft: rgba(120, 53, 15, 0.2);
+  --scada-bg-warning: #d97706;
+  --scada-bg-warning-strong: rgba(120, 53, 15, 0.9);
+  --scada-bg-warning-overlay: rgba(69, 26, 3, 0.9);
+  --scada-bg-success-soft: rgba(20, 83, 45, 0.25);
+  --scada-bg-success: #16a34a;
+  --scada-bg-success-strong: rgba(20, 83, 45, 0.8);
+  --scada-bg-info-soft: rgba(30, 58, 138, 0.2);
+  --scada-bg-accent: #0c7b99;
+  --scada-bg-accent-soft: rgba(8, 47, 73, 0.5);
+  --scada-bg-accent-strong: rgba(8, 47, 73, 0.8);
+
+  --scada-border-subtle: #334155;
+  --scada-border-strong: #4b6385;
+  --scada-border-weak: #1e293b;
+  --scada-border-soft: rgba(51, 65, 85, 0.6);
+  --scada-border-accent: #22d3ee;
+  --scada-border-accent-soft: rgba(34, 211, 238, 0.6);
+  --scada-border-danger: #f87171;
+  --scada-border-warning: #fbbf24;
+  --scada-border-success: #4ade80;
+  --scada-border-info: #93c5fd;
+
+  --scada-text-primary: #e2e8f0;
+  --scada-text-secondary: #cbd5e1;
+  --scada-text-muted: #9fb0c8;
+  --scada-text-accent: #22d3ee;
+  --scada-text-accent-soft: #67e8f9;
+  --scada-text-accent-bright: #a5f3fc;
+  --scada-text-success: #4ade80;
+  --scada-text-success-soft: #86efac;
+  --scada-text-warning: #fbbf24;
+  --scada-text-warning-soft: #fcd34d;
+  --scada-text-danger: #f87171;
+  --scada-text-danger-soft: #fca5a5;
+  --scada-text-info: #93c5fd;
+  --scada-text-inverse: #ffffff;
+  --scada-text-series-violet: #c084fc;
+  --scada-text-series-orange: #fb923c;
+  --scada-text-series-temp: #fb7185;
+
+  --scada-accent: #22d3ee;
+  --scada-accent-soft: rgba(34, 211, 238, 0.2);
+
+  --scada-success: #4ade80;
+  --scada-warning: #fbbf24;
+  --scada-danger: #f87171;
+
+  --scada-chart-axis: #8fa3be;
+  --scada-chart-grid: #334155;
+  --scada-chart-legend: rgba(11, 18, 32, 0.88);
+
+  --scada-focus-ring: rgba(34, 211, 238, 0.35);
+
+  --scada-series-tensometer: #c084fc;
+  --scada-series-pressure-tank: #22d3ee;
+  --scada-series-pressure-combustion: #fb923c;
+  --scada-series-battery-stand: #4ade80;
+  --scada-series-battery-computer: #2dd4bf;
+  --scada-series-boost-voltage: #fbbf24;
+  --scada-series-starter-sense: #a78bfa;
+  --scada-series-servo: #f472b6;
+
+  --scada-series-temp-1: #f87171;
+  --scada-series-temp-2: #fda4af;
+  --scada-series-temp-3: #e11d48;
+  --scada-series-temp-4: #be123c;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: var(--scada-bg-app);
+  color: var(--scada-text-primary);
+  font-family: var(--scada-font-primary);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--scada-bg-surface);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scada-border-strong);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scada-text-muted);
+}
+
+.text-scada-muted {
+  color: var(--scada-text-muted);
+}
+
+.text-scada-secondary {
+  color: var(--scada-text-secondary);
+}
+
+.text-scada-primary {
+  color: var(--scada-text-primary);
+}
+
+.text-scada-accent {
+  color: var(--scada-text-accent);
+}
+
+.text-scada-accent-soft {
+  color: var(--scada-text-accent-soft);
+}
+
+.text-scada-accent-bright {
+  color: var(--scada-text-accent-bright);
+}
+
+.text-scada-success {
+  color: var(--scada-text-success);
+}
+
+.text-scada-success-soft {
+  color: var(--scada-text-success-soft);
+}
+
+.text-scada-warning {
+  color: var(--scada-text-warning);
+}
+
+.text-scada-warning-soft {
+  color: var(--scada-text-warning-soft);
+}
+
+.text-scada-danger {
+  color: var(--scada-text-danger);
+}
+
+.text-scada-danger-soft {
+  color: var(--scada-text-danger-soft);
+}
+
+.text-scada-info {
+  color: var(--scada-text-info);
+}
+
+.text-scada-inverse {
+  color: var(--scada-text-inverse);
+}
+
+.text-scada-series-violet {
+  color: var(--scada-text-series-violet);
+}
+
+.text-scada-series-orange {
+  color: var(--scada-text-series-orange);
+}
+
+.text-scada-series-temp {
+  color: var(--scada-text-series-temp);
+}
+
+.bg-scada-app {
+  background-color: var(--scada-bg-app);
+}
+
+.bg-scada-app-soft {
+  background-color: var(--scada-bg-app-soft);
+}
+
+.bg-scada-surface {
+  background-color: var(--scada-bg-surface);
+}
+
+.bg-scada-surface-elevated {
+  background-color: var(--scada-bg-surface-elevated);
+}
+
+.bg-scada-surface-strong {
+  background-color: var(--scada-bg-surface-strong);
+}
+
+.bg-scada-surface-soft {
+  background-color: var(--scada-bg-surface-soft);
+}
+
+.bg-scada-surface-softer {
+  background-color: var(--scada-bg-surface-softer);
+}
+
+.bg-scada-surface-soft-strong {
+  background-color: var(--scada-bg-surface-soft-strong);
+}
+
+.bg-scada-accent-soft {
+  background-color: var(--scada-bg-accent-soft);
+}
+
+.bg-scada-accent {
+  background-color: var(--scada-bg-accent);
+}
+
+.bg-scada-accent-strong {
+  background-color: var(--scada-bg-accent-strong);
+}
+
+.bg-scada-danger {
+  background-color: var(--scada-bg-danger);
+}
+
+.bg-scada-danger-soft {
+  background-color: var(--scada-bg-danger-soft);
+}
+
+.bg-scada-danger-strong {
+  background-color: var(--scada-bg-danger-strong);
+}
+
+.bg-scada-danger-overlay {
+  background-color: var(--scada-bg-danger-overlay);
+}
+
+.bg-scada-warning-soft {
+  background-color: var(--scada-bg-warning-soft);
+}
+
+.bg-scada-warning {
+  background-color: var(--scada-bg-warning);
+}
+
+.bg-scada-warning-strong {
+  background-color: var(--scada-bg-warning-strong);
+}
+
+.bg-scada-warning-overlay {
+  background-color: var(--scada-bg-warning-overlay);
+}
+
+.bg-scada-success-soft {
+  background-color: var(--scada-bg-success-soft);
+}
+
+.bg-scada-success {
+  background-color: var(--scada-bg-success);
+}
+
+.bg-scada-success-strong {
+  background-color: var(--scada-bg-success-strong);
+}
+
+.bg-scada-info-soft {
+  background-color: var(--scada-bg-info-soft);
+}
+
+.bg-scada-border-strong {
+  background-color: var(--scada-border-strong);
+}
+
+.border-scada {
+  border-color: var(--scada-border-subtle);
+}
+
+.border-scada-soft {
+  border-color: var(--scada-border-soft);
+}
+
+.border-scada-strong {
+  border-color: var(--scada-border-strong);
+}
+
+.border-scada-weak {
+  border-color: var(--scada-border-weak);
+}
+
+.border-scada-accent {
+  border-color: var(--scada-border-accent);
+}
+
+.border-scada-accent-soft {
+  border-color: var(--scada-border-accent-soft);
+}
+
+.border-scada-danger {
+  border-color: var(--scada-border-danger);
+}
+
+.border-scada-warning {
+  border-color: var(--scada-border-warning);
+}
+
+.border-scada-success {
+  border-color: var(--scada-border-success);
+}
+
+.border-scada-info {
+  border-color: var(--scada-border-info);
+}
+
+.bg-scada-overlay {
+  background-color: var(--scada-bg-overlay);
+}
+
+.hover-bg-scada-surface-elevated:hover {
+  background-color: var(--scada-bg-surface-elevated);
+}
+
+.hover-bg-scada-surface-strong:hover {
+  background-color: var(--scada-bg-surface-strong);
+}
+
+.hover-bg-scada-accent:hover {
+  background-color: var(--scada-bg-accent);
+}
+
+.hover-bg-scada-warning:hover {
+  background-color: var(--scada-bg-warning);
+}
+
+.hover-bg-scada-danger-strong:hover {
+  background-color: var(--scada-bg-danger-strong);
+}
+
+.hover-text-scada-secondary:hover {
+  color: var(--scada-text-secondary);
+}
+
+.hover-text-scada-inverse:hover {
+  color: var(--scada-text-inverse);
+}
+
+.hover-border-scada-accent-soft:hover {
+  border-color: var(--scada-border-accent-soft);
+}
+
+.focus-ring-scada:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--scada-focus-ring);
+}
+
+.accent-scada {
+  accent-color: var(--scada-accent);
+}
+
+.shadow-scada-danger-soft {
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.2);
+}
+
+.shadow-scada-danger-md {
+  box-shadow: 0 0 20px rgba(220, 38, 38, 0.5);
+}
+
+.shadow-scada-danger-xl {
+  box-shadow: 0 0 100px rgba(220, 38, 38, 0.5);
+}
+
+.shadow-scada-warning-md {
+  box-shadow: 0 0 24px rgba(251, 191, 36, 0.35);
+}
+
+.shadow-scada-warning-lg {
+  box-shadow: 0 0 80px rgba(245, 158, 11, 0.35);
+}
+
+.shadow-scada-accent-sm {
+  box-shadow: 0 0 10px rgba(6, 182, 212, 0.3);
+}
+
+.shadow-scada-accent-md {
+  box-shadow: 0 0 50px rgba(6, 182, 212, 0.2);
+}
+
+.shadow-scada-accent-inset {
+  box-shadow: inset 0 0 0 1px rgba(34, 211, 238, 0.35), 0 0 16px rgba(34, 211, 238, 0.15);
+}
+
+.shadow-scada-accent-thin-inset {
+  box-shadow: inset 0 0 0 1px rgba(56, 189, 248, 0.08);
+}
+
+.scada-input {
+  width: 100%;
+  background: var(--scada-bg-app);
+  border: 1px solid var(--scada-border-subtle);
+  color: var(--scada-text-primary);
+  padding: 0.625rem 0.75rem;
+  min-height: 2.75rem;
+  font-family: var(--scada-font-primary);
+}
+
+.scada-input:focus-visible {
+  outline: none;
+  border-color: var(--scada-accent);
+  box-shadow: 0 0 0 2px var(--scada-focus-ring);
+}
+
+@keyframes delightViewEnter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 6px, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.delight-view-enter {
+  animation: delightViewEnter 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.delight-press {
+  transition: transform 120ms ease-out, filter 160ms ease-out, box-shadow 160ms ease-out;
+}
+
+.delight-press:hover {
+  transform: translate3d(0, -1px, 0);
+  filter: brightness(1.04);
+}
+
+.delight-press:active {
+  transform: translate3d(0, 1px, 0) scale(0.995);
+  filter: brightness(0.98);
+}
+
+.delight-icon-shift {
+  transition: transform 140ms ease-out;
+}
+
+.delight-press:hover .delight-icon-shift {
+  transform: translate3d(0, -1px, 0);
+}
+
+.crt-lines {
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      rgba(18, 16, 16, 0) 0px,
+      rgba(18, 16, 16, 0) 2px,
+      rgba(0, 0, 0, 0.35) 2px,
+      rgba(0, 0, 0, 0.35) 4px
+    ),
+    linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+  background-size: auto, 3px 100%;
+  pointer-events: none;
+}
+
+.uplot {
+  font-family: var(--scada-font-primary);
+  color: var(--scada-text-muted);
+  background: transparent;
+}
+
+.uplot .u-grid line {
+  stroke: var(--scada-chart-grid);
+}
+
+.uplot .u-axis line,
+.uplot .u-axis path,
+.uplot .u-tick {
+  stroke: var(--scada-chart-grid);
+}
+
+.uplot .u-legend {
+  background: var(--scada-chart-legend);
+  border: 1px solid var(--scada-border-subtle);
+  color: var(--scada-text-secondary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .delight-view-enter {
+    animation: none;
+  }
+
+  .delight-press,
+  .delight-icon-shift {
+    transition: none;
+  }
+
+  .delight-press:hover,
+  .delight-press:active {
+    transform: none;
+    filter: none;
+  }
+}

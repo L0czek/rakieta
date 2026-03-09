@@ -1,14 +1,15 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { SystemTelemetry, SensorDataPoint } from '../types';
-import { ScadaPanel, ValueDisplay, SENSOR_COLORS, TEMP_COLORS, useChartSize, CHART_RANGES } from './Widgets';
-import { ControlPanel } from './ControlPanel';
-import { ServoPanel } from './ServoPanel';
+import { SystemTelemetry, SensorDataPoint } from '@/types';
+import { ScadaPanel, ValueDisplay, SENSOR_COLORS, TEMP_COLORS, useChartSize, CHART_RANGES } from '@/components/Widgets';
+import { ControlPanel } from '@/components/ControlPanel';
+import { ServoPanel } from '@/components/ServoPanel';
 import { Download, Pause, Play, ZoomIn, ZoomOut } from 'lucide-react';
 import uPlot from 'uplot';
 import UplotReact from 'uplot-react';
-import * as DB from '../utils/db';
-import { ConnectionState } from '../types';
+import * as DB from '@/utils/db';
+import { ConnectionState } from '@/types';
+import { CHART_COLORS } from '@/theme/tokens';
 
 interface AnalysisViewProps {
     telemetry: SystemTelemetry;
@@ -436,9 +437,9 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
   const axes = React.useMemo<uPlot.Axis[]>(() => {
       return [
           {
-              stroke: '#64748b',
-              grid: { stroke: '#334155' },
-              ticks: { stroke: '#334155' },
+              stroke: CHART_COLORS.axis,
+              grid: { stroke: CHART_COLORS.grid },
+              ticks: { stroke: CHART_COLORS.grid },
               values: (_u, ticks) => ticks.map((val) => `${(val / 1000).toFixed(0)}s`),
           },
           { scale: 'thrust', side: 3, stroke: SENSOR_COLORS.tensometer, show: visibleLines.tensometer, label: 'kg' },
@@ -505,47 +506,47 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
   }, []);
 
   return (
-    <div className="grid grid-cols-12 grid-rows-12 gap-2 h-full">
+    <div className="grid grid-cols-1 gap-2 auto-rows-[minmax(220px,auto)] min-h-full lg:h-full lg:grid-cols-[minmax(0,1fr)_minmax(18rem,22rem)] lg:grid-rows-[minmax(0,1fr)_360px]">
         {/* Top-Left: Big Chart (Rows 1-8, Cols 1-9) */}
-        <div className="col-span-9 row-span-8">
+        <div className="order-1 min-h-[320px] lg:order-none lg:col-start-1 lg:row-start-1 lg:min-h-0">
             <ScadaPanel title="ANALYSIS" className="h-full">
             <div ref={chartRef} className="w-full h-full relative overflow-hidden">
                 {chartSize.width > 0 && chartSize.height > 0 && seriesMeta.length > 0 ? (
                     <UplotReact options={chartOptions} data={alignedData} resetScales={false} onCreate={handleChartCreate} />
                 ) : (
-                    <div className="w-full h-full flex items-center justify-center text-slate-500 text-xs">NO DATA</div>
+                    <div className="w-full h-full flex items-center justify-center text-scada-muted text-xs">NO DATA</div>
                 )}
             </div>
             </ScadaPanel>
         </div>
 
         {/* Top-Right: Current Values (Rows 1-8, Cols 10-12) */}
-        <div className="col-span-3 row-span-8 flex flex-col gap-2">
+        <div className="order-3 hidden flex-col gap-2 md:flex lg:order-none lg:col-start-2 lg:row-start-1 lg:min-h-0">
             <ScadaPanel title="LIVE VALUES" className="flex-1">
                 <div className="p-2 space-y-1 overflow-y-auto h-full pr-1 scrollbar-thin">
                     {/* Primary */}
-                    <ValueDisplay label={getSeriesLabel('tensometer')} value={vals.thrust} unit=" KG" color="text-purple-400" />
-                    <ValueDisplay label={getSeriesLabel('pressureTank')} value={vals.tank} unit=" BAR" color="text-cyan-400" />
-                    <ValueDisplay label={getSeriesLabel('pressureCombustion')} value={vals.combustion} unit=" BAR" color="text-orange-400" />
+                    <ValueDisplay label={getSeriesLabel('tensometer')} value={vals.thrust} unit=" KG" color="text-scada-series-violet" />
+                    <ValueDisplay label={getSeriesLabel('pressureTank')} value={vals.tank} unit=" BAR" color="text-scada-accent" />
+                    <ValueDisplay label={getSeriesLabel('pressureCombustion')} value={vals.combustion} unit=" BAR" color="text-scada-series-orange" />
                     
-                    <div className="my-2 border-t border-slate-700/50"></div>
+                    <div className="my-2 border-t border-scada-soft"></div>
                     
                     {/* Power */}
-                    <ValueDisplay label={getSeriesLabel('batteryStand')} value={vals.batStand} unit=" V" color="text-green-400" />
-                    <ValueDisplay label={getSeriesLabel('batteryComputer')} value={vals.batComp} unit=" V" color="text-green-400" />
-                    <ValueDisplay label={getSeriesLabel('boostVoltage')} value={vals.boost} unit=" V" color="text-amber-400" />
-                    <ValueDisplay label={getSeriesLabel('starterSense')} value={vals.starter} unit=" V" color="text-purple-400" />
+                    <ValueDisplay label={getSeriesLabel('batteryStand')} value={vals.batStand} unit=" V" color="text-scada-success" />
+                    <ValueDisplay label={getSeriesLabel('batteryComputer')} value={vals.batComp} unit=" V" color="text-scada-success" />
+                    <ValueDisplay label={getSeriesLabel('boostVoltage')} value={vals.boost} unit=" V" color="text-scada-warning" />
+                    <ValueDisplay label={getSeriesLabel('starterSense')} value={vals.starter} unit=" V" color="text-scada-series-violet" />
 
-                    <div className="my-2 border-t border-slate-700/50"></div>
+                    <div className="my-2 border-t border-scada-soft"></div>
 
                     {/* Thermal */}
                     {latestTemperatures.map(({ id, value: temp }) => (
-                        <ValueDisplay key={id} label={getSeriesLabel(id)} value={temp.toFixed(1)} unit=" °C" color="text-rose-400" />
+                        <ValueDisplay key={id} label={getSeriesLabel(id)} value={temp.toFixed(1)} unit=" °C" color="text-scada-series-temp" />
                     ))}
-                    {latestTemperatures.length === 0 && <div className="text-[10px] text-slate-600 text-center py-2">NO THERMAL DATA</div>}
+                    {latestTemperatures.length === 0 && <div className="text-[10px] text-scada-muted text-center py-2">NO THERMAL DATA</div>}
                 </div>
             </ScadaPanel>
-            <ScadaPanel title="STATUS LOG" className="h-32">
+            <ScadaPanel title="STATUS LOG" className="h-40 md:h-32">
                                 <div className="font-mono text-xs p-2 h-full overflow-y-auto pr-1 scrollbar-thin space-y-1">
                                         {(telemetry.statusLog.length > 0
                                             ? telemetry.statusLog
@@ -556,9 +557,9 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
                                             .map((entry, index) => (
                                                 <div
                                                   key={`${entry.receivedAt}-${index}`}
-                                                  className={`break-all ${entry.type === 'connection' ? 'text-cyan-300' : 'text-amber-300'}`}
+                                                  className={`break-all ${entry.type === 'connection' ? 'text-scada-accent-soft' : 'text-scada-warning-soft'}`}
                                                 >
-                                                        <span className="text-slate-500">[{new Date(entry.receivedAt).toLocaleString()}]</span>{' '}
+                                                        <span className="text-scada-muted">[{new Date(entry.receivedAt).toLocaleString()}]</span>{' '}
                                                         &gt; {entry.message}
                                                 </div>
                                             ))}
@@ -567,13 +568,13 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
         </div>
 
         {/* Bottom-Left: Data Controls & Navigation (Rows 9-12, Cols 10-12) */}
-        <div className="col-span-9 row-span-4">
+        <div className="order-2 lg:order-none lg:col-start-1 lg:row-start-2">
         <ScadaPanel title="DATA CONTROL" className="h-full">
             <div className="flex flex-col h-full p-2 gap-2">
                 {/* Series Toggles */}
                 <div className="flex flex-wrap gap-2">
                     {Object.entries(visibleLines).map(([key, active]) => (
-                        <button key={key} onClick={() => toggleLine(key)} className={`px-2 py-1 border rounded text-[10px] font-bold uppercase flex items-center gap-2 ${active ? 'bg-slate-700 text-white border-slate-500' : 'bg-slate-900 text-slate-600 border-slate-800'}`}>
+                        <button key={key} onClick={() => toggleLine(key)} className={`delight-press px-3 py-2 min-h-11 border rounded text-[10px] font-bold uppercase flex items-center gap-2 lg:min-h-0 lg:px-2 lg:py-1 ${active ? 'bg-scada-surface-strong text-scada-inverse border-scada-strong' : 'bg-scada-surface text-scada-muted border-scada-weak'}`}>
                             <div className="w-2 h-2 rounded-full" style={{backgroundColor: SENSOR_COLORS[key] || TEMP_COLORS[0]}}></div>
                             {getSeriesLabel(key)}
                         </button>
@@ -581,31 +582,31 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
                 </div>
                 
                 {/* Navigation Bar */}
-                <div className="mt-auto bg-slate-900/50 p-2 rounded border border-slate-700 flex flex-col gap-2">
-                        <div className="flex items-center gap-4">
+                <div className="mt-auto bg-scada-surface-soft p-2 rounded border border-scada flex flex-col gap-2">
+                        <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-4">
                             <button 
                             onClick={() => setIsLive(!isLive)} 
-                            className={`flex items-center gap-2 px-3 py-1 rounded text-xs font-bold border shadow-lg ${isLive ? 'bg-cyan-900/80 border-cyan-500 text-cyan-400' : 'bg-slate-700/80 border-slate-500 text-slate-300'}`}
+                            className={`delight-press flex min-h-11 items-center justify-center gap-2 px-3 py-2 rounded text-xs font-bold border shadow-lg lg:min-h-0 lg:py-1 ${isLive ? 'bg-scada-accent-strong border-scada-accent text-scada-accent' : 'bg-scada-surface-soft-strong border-scada-strong text-scada-secondary'}`}
                             >
-                            {isLive ? <Pause size={14} fill="currentColor"/> : <Play size={14} fill="currentColor"/>}
+                            {isLive ? <Pause size={14} fill="currentColor" className="delight-icon-shift"/> : <Play size={14} fill="currentColor" className="delight-icon-shift"/>}
                             {isLive ? 'LIVE' : 'PAUSED'}
                             </button>
 
-                            <div className="h-6 w-px bg-slate-700"></div>
+                            <div className="hidden h-6 w-px bg-scada-surface-strong md:block"></div>
 
                             <div className="flex items-center gap-1">
-                                <button onClick={() => handleZoom('in')} className="p-1 hover:bg-slate-700 rounded"><ZoomIn size={16} className="text-slate-400"/></button>
-                                <button onClick={() => handleZoom('out')} className="p-1 hover:bg-slate-700 rounded"><ZoomOut size={16} className="text-slate-400"/></button>
-                                <span className="text-xs font-mono text-slate-500 ml-2">WINDOW: {(windowSize/1000).toFixed(1)}s</span>
+                                <button aria-label="Zoom in analysis window" onClick={() => handleZoom('in')} className="delight-press h-11 w-11 flex items-center justify-center hover-bg-scada-surface-strong rounded lg:h-8 lg:w-8"><ZoomIn size={16} className="text-scada-secondary delight-icon-shift"/></button>
+                                <button aria-label="Zoom out analysis window" onClick={() => handleZoom('out')} className="delight-press h-11 w-11 flex items-center justify-center hover-bg-scada-surface-strong rounded lg:h-8 lg:w-8"><ZoomOut size={16} className="text-scada-secondary delight-icon-shift"/></button>
+                                <span className="text-xs font-mono text-scada-muted ml-2">WINDOW: {(windowSize/1000).toFixed(1)}s</span>
                             </div>
                             
-                            <div className="ml-auto text-xs font-mono text-slate-500">
+                            <div className="text-xs font-mono text-scada-muted md:ml-auto">
                                 CURSOR: T+{viewStart}
                             </div>
                         </div>
 
                         {/* History Scrollbar */}
-                        <div className="relative h-6 w-full flex items-center">
+                        <div className="relative h-11 w-full flex items-center">
                             <input 
                             type="range" 
                             min={timelineStart} 
@@ -613,7 +614,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
                             value={viewStart} 
                             onChange={handleScroll}
                             disabled={isLive}
-                            className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-500 disabled:opacity-50"
+                            className="w-full h-11 bg-scada-surface-soft-strong rounded-lg appearance-none cursor-pointer accent-scada disabled:opacity-50"
                             />
                         </div>
 
@@ -667,8 +668,8 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
         </div>
 
         {/* Bottom-Right: Master Control & Servo (Rows 9-12, Cols 10-12) */}
-        <div className="col-span-3 row-span-8 flex flex-col gap-2">
-            <div className="flex-1">
+        <div className="order-4 hidden gap-2 md:grid lg:order-none lg:col-start-2 lg:row-start-2 lg:grid-rows-[120px_minmax(0,1fr)]">
+            <div className="min-h-[120px] lg:min-h-0">
                 <ServoPanel 
                     servoPositionDegrees={servoPositionDegrees} 
                     servoState={telemetry.servoState}
@@ -677,7 +678,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
                     commandsEnabled={commandsEnabled}
                 />
             </div>
-            <div className="flex-1">
+            <div className="min-h-[220px] lg:min-h-0">
                 <ControlPanel 
                     systemState={telemetry.state} 
                     isUnsafe={telemetry.isUnsafe} 

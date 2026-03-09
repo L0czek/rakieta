@@ -70,6 +70,8 @@ This is a single-page React+TypeScript application built on Vite. The architectu
   - IndexedDB storage adapter with chunked time-series rows (`measurements`, `meta` stores).
 - `index.html`
   - Tailwind CDN injection + global SCADA CSS effects.
+- `docs/design-system.md`
+  - Design system source of truth: semantic tokens, chart palette, and component conventions.
 - `vite.config.ts`
   - Host/port dev-server config, alias `@`, env define passthrough.
 
@@ -160,4 +162,3 @@ This is a single-page React+TypeScript application built on Vite. The architectu
 2. Add `index.css` or remove stale reference.
 3. Expand checklist test coverage to include multi-client MQTT sync integration tests.
 4. Expand broker config with protocol/TLS/credentials UX where needed.
-

@@ -1,12 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { Suspense, lazy, useEffect, useState } from 'react';
 
-import { AnalysisView } from './components/AnalysisView';
-import { ChecklistView } from './components/ChecklistView';
-import { ConfigurationView } from './components/ConfigurationView';
-import { DashboardView } from './components/DashboardView';
-import { useChecklistEngine } from './hooks/useChecklistEngine';
-import { useMqttSystem } from './hooks/useMqttSystem';
-import { ConnectionState, MqttConfig } from './types';
+import { useChecklistEngine } from '@/hooks/useChecklistEngine';
+import { useMqttSystem } from '@/hooks/useMqttSystem';
+import { ConnectionState, MqttConfig } from '@/types';
 import {
   AlertOctagon,
   Beaker,
@@ -27,6 +23,26 @@ type AppView = 'DASHBOARD' | 'ANALYSIS' | 'CHECKLIST' | 'CONFIGURATION';
 
 const MQTT_CONFIG_STORAGE_KEY = 'rocket.mqtt.config';
 const DEFAULT_MQTT_PORT = 8000;
+
+const DashboardView = lazy(async () => {
+  const module = await import('@/components/DashboardView');
+  return { default: module.DashboardView };
+});
+
+const AnalysisView = lazy(async () => {
+  const module = await import('@/components/AnalysisView');
+  return { default: module.AnalysisView };
+});
+
+const ChecklistView = lazy(async () => {
+  const module = await import('@/components/ChecklistView');
+  return { default: module.ChecklistView };
+});
+
+const ConfigurationView = lazy(async () => {
+  const module = await import('@/components/ConfigurationView');
+  return { default: module.ConfigurationView };
+});
 
 const getDefaultMqttConfig = (): MqttConfig => ({
   host: window.location.hostname,
@@ -58,6 +74,31 @@ const loadStoredMqttConfig = (): MqttConfig => {
   } catch {
     return defaults;
   }
+};
+
+const LOADING_VIEW_MESSAGES = [
+  'SYNCING TELEMETRY BUS...',
+  'VERIFYING CONTROL LINK...',
+  'ARMING UI PANELS...',
+] as const;
+
+const LoadingFallback: React.FC = () => {
+  const [messageIndex, setMessageIndex] = useState(0);
+
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      setMessageIndex((prev) => (prev + 1) % LOADING_VIEW_MESSAGES.length);
+    }, 1400);
+
+    return () => window.clearInterval(intervalId);
+  }, []);
+
+  return (
+    <div className="h-full w-full flex flex-col items-center justify-center text-scada-secondary">
+      <div className="text-sm tracking-wider delight-view-enter">{LOADING_VIEW_MESSAGES[messageIndex]}</div>
+      <div className="mt-2 text-[10px] tracking-[0.24em] text-scada-muted">STANDBY</div>
+    </div>
+  );
 };
 
 const App = () => {
@@ -107,9 +148,10 @@ const App = () => {
 
   const commandsEnabled =
     connectionStatus === ConnectionState.CONNECTED || isSimulating;
-
-  useEffect(() => {
-  });
+  const mobileMainPaddingBottomClass =
+    view === 'DASHBOARD'
+      ? 'pb-[calc(6.5rem+env(safe-area-inset-bottom)+0.75rem)]'
+      : 'pb-[calc(4rem+env(safe-area-inset-bottom)+0.75rem)]';
 
   useEffect(() => {
     try {
@@ -117,184 +159,229 @@ const App = () => {
     } catch {}
   }, [mqttConfig]);
 
+  const currentView = (() => {
+    if (view === 'DASHBOARD') {
+      return <DashboardView telemetry={telemetry} actions={actions} commandsEnabled={commandsEnabled} />;
+    }
+    if (view === 'ANALYSIS') {
+      return (
+        <AnalysisView
+          telemetry={telemetry}
+          actions={actions}
+          connectionStatus={connectionStatus}
+          isSimulating={isSimulating}
+          commandsEnabled={commandsEnabled}
+        />
+      );
+    }
+    if (view === 'CHECKLIST') {
+      return (
+        <ChecklistView
+          mode={checklistEngine.mode}
+          summaries={checklistEngine.summaries}
+          selectedChecklistId={checklistEngine.selectedChecklistId}
+          onSelectChecklist={checklistEngine.setSelectedChecklistId}
+          stepStates={checklistEngine.stepStates}
+          activeStep={checklistEngine.activeStep}
+          getStepContext={checklistEngine.getStepContext}
+          setStepContextField={checklistEngine.setStepContextField}
+          onCompleteCurrentStep={checklistEngine.completeStep}
+          onResetChecklist={() => checklistEngine.resetChecklist(checklistEngine.selectedChecklistId)}
+          onResetAllChecklists={checklistEngine.resetAllChecklists}
+          isReadOnly={checklistEngine.isReadOnly}
+        />
+      );
+    }
+    return <ConfigurationView onDirtyChange={setConfigHasUnsavedChanges} />;
+  })();
+
   return (
-    <div className="w-screen h-screen overflow-hidden bg-slate-900 flex flex-col relative">
+    <div className="w-screen h-screen overflow-hidden bg-scada-app flex flex-col relative">
       <div className="absolute inset-0 pointer-events-none z-50 crt-lines opacity-20"></div>
 
       {criticalError && (
-        <div className="absolute inset-0 z-[100] bg-red-950/90 backdrop-blur-md flex items-center justify-center p-8">
-          <div className="bg-red-900 border-4 border-red-500 rounded-lg p-8 max-w-2xl shadow-[0_0_100px_rgba(220,38,38,0.5)] animate-bounce-short">
-            <div className="flex items-center gap-4 mb-4 text-white">
+        <div className="absolute inset-0 z-[100] bg-scada-danger-overlay backdrop-blur-md flex items-center justify-center p-8">
+          <div className="bg-scada-danger-strong border-4 border-scada-danger rounded-lg p-8 max-w-2xl shadow-scada-danger-xl">
+            <div className="flex items-center gap-4 mb-4 text-scada-inverse">
               <ShieldAlert size={64} className="animate-pulse" />
               <div>
                 <h1 className="text-4xl font-bold tracking-widest">CRITICAL FAILURE</h1>
                 <p className="text-xl opacity-80">SAFETY PROTOCOL ENGAGED</p>
               </div>
             </div>
-            <div className="bg-black/50 p-4 rounded border border-red-500/50 font-mono text-red-200 mb-6">
+            <div className="bg-scada-surface-soft p-4 rounded border border-scada-danger font-mono text-scada-danger-soft mb-6">
               {criticalError}
             </div>
             <div className="flex gap-4">
               <button
                 onClick={resetData}
-                className="flex-1 py-4 bg-red-600 hover:bg-red-500 text-white font-bold rounded text-xl shadow-lg transition-colors flex items-center justify-center gap-2"
+                className="delight-press flex-1 py-4 bg-scada-danger hover-bg-scada-danger-strong text-scada-inverse font-bold rounded text-xl shadow-lg transition-colors flex items-center justify-center gap-2"
               >
-                <Trash2 /> WIPE DATA & RESET
+                <Trash2 className="delight-icon-shift" /> WIPE DATA & RESET
               </button>
             </div>
           </div>
         </div>
       )}
 
-      <header className="h-14 bg-slate-950 border-b border-slate-800 flex items-center px-4 justify-between shrink-0 z-10">
-        <div className="flex items-center gap-4">
-          <div className="w-3 h-3 bg-red-500 rounded-full animate-ping absolute opacity-20"></div>
-          <Rocket className="text-cyan-400" />
-          <div>
-            <h1 className="text-cyan-400 font-bold tracking-widest text-lg leading-none neon-text">
-              ROCKET TEST STAND
-            </h1>
-            <span className="text-slate-500 text-[10px] tracking-[0.2em]">TELEMETRY & CONTROL LINK</span>
+      <header className="bg-scada-app border-b border-scada-weak px-2 py-2 md:px-4 md:py-0 shrink-0 z-10">
+        <div className="flex flex-wrap items-center gap-2 md:gap-3 xl:gap-4 md:min-h-14">
+          <div className="flex items-center gap-2 min-w-0 md:gap-3">
+            <div className="w-3 h-3 bg-scada-danger-strong rounded-full absolute opacity-20"></div>
+            <Rocket className="text-scada-accent" />
+            <div className="min-w-0">
+              <h1 className="text-scada-accent font-bold tracking-wide text-sm leading-none whitespace-nowrap md:text-base xl:tracking-widest xl:text-lg">
+                ROCKET TEST STAND
+              </h1>
+              <span className="hidden text-scada-muted text-[10px] tracking-[0.2em] xl:inline">
+                TELEMETRY & CONTROL LINK
+              </span>
+            </div>
           </div>
-        </div>
 
-        <div className="flex bg-slate-900 rounded border border-slate-700 p-1">
-          <button
-            onClick={() => handleViewChange('DASHBOARD')}
-            className={`flex items-center gap-2 px-3 py-1 text-xs font-bold rounded transition-colors ${
-              view === 'DASHBOARD' ? 'bg-cyan-900/50 text-cyan-400' : 'text-slate-500 hover:text-slate-300'
-            }`}
-          >
-            <LayoutDashboard size={14} /> DASHBOARD
-          </button>
-          <button
-            onClick={() => handleViewChange('ANALYSIS')}
-            className={`flex items-center gap-2 px-3 py-1 text-xs font-bold rounded transition-colors ${
-              view === 'ANALYSIS' ? 'bg-cyan-900/50 text-cyan-400' : 'text-slate-500 hover:text-slate-300'
-            }`}
-          >
-            <LineChartIcon size={14} /> ANALYSIS
-          </button>
-          <button
-            onClick={() => handleViewChange('CHECKLIST')}
-            className={`flex items-center gap-2 px-3 py-1 text-xs font-bold rounded transition-colors ${
-              view === 'CHECKLIST' ? 'bg-cyan-900/50 text-cyan-400' : 'text-slate-500 hover:text-slate-300'
-            }`}
-          >
-            <ListChecks size={14} /> CHECKLIST
-          </button>
-          <button
-            onClick={() => handleViewChange('CONFIGURATION')}
-            className={`flex items-center gap-2 px-3 py-1 text-xs font-bold rounded transition-colors ${
-              view === 'CONFIGURATION' ? 'bg-cyan-900/50 text-cyan-400' : 'text-slate-500 hover:text-slate-300'
-            }`}
-          >
-            <SlidersHorizontal size={14} /> CONFIGURATION
-          </button>
-        </div>
-
-        <div className="flex items-center gap-6">
-          <div className="flex items-center gap-2">
-            <button
-              onClick={handleSimToggle}
-              className={`flex items-center gap-2 px-3 py-1 text-xs font-bold rounded transition-colors border ${
-                isSimulating
-                  ? 'bg-cyan-900/50 border-cyan-500 text-cyan-400'
-                  : 'border-slate-700 text-slate-500 hover:text-slate-300'
-              }`}
-            >
-              <Beaker size={14} /> {isSimulating ? 'STOP SIM' : 'SIMULATOR'}
-            </button>
-            {isSimulating && (
+          <div className="hidden md:block order-3 basis-full xl:order-none xl:basis-auto">
+            <div className="flex min-w-max bg-scada-surface rounded border border-scada p-1">
               <button
-                onClick={actions.toggleSimSafety}
-                className={`flex items-center gap-2 px-3 py-1 rounded text-xs font-bold border ${
-                  telemetry.isUnsafe
-                    ? 'bg-red-900/80 border-red-500 text-white'
-                    : 'bg-green-900/80 border-green-500 text-white'
+                onClick={() => handleViewChange('DASHBOARD')}
+                className={`delight-press flex min-h-11 items-center gap-2 px-3 py-2 text-xs font-bold rounded transition-colors lg:min-h-0 lg:py-1 ${
+                  view === 'DASHBOARD' ? 'bg-scada-accent-soft text-scada-accent' : 'text-scada-muted hover-text-scada-secondary'
                 }`}
               >
-                {telemetry.isUnsafe ? <AlertOctagon size={14} /> : <Lock size={14} />}
-                SIM: {telemetry.isUnsafe ? 'PHYSICAL SWITCH ARMED' : 'PHYSICAL SWITCH SAFE'}
+                <LayoutDashboard size={14} className="delight-icon-shift" /> DASHBOARD
               </button>
-            )}
+              <button
+                onClick={() => handleViewChange('ANALYSIS')}
+                className={`delight-press flex min-h-11 items-center gap-2 px-3 py-2 text-xs font-bold rounded transition-colors lg:min-h-0 lg:py-1 ${
+                  view === 'ANALYSIS' ? 'bg-scada-accent-soft text-scada-accent' : 'text-scada-muted hover-text-scada-secondary'
+                }`}
+              >
+                <LineChartIcon size={14} className="delight-icon-shift" /> ANALYSIS
+              </button>
+              <button
+                onClick={() => handleViewChange('CHECKLIST')}
+                className={`delight-press flex min-h-11 items-center gap-2 px-3 py-2 text-xs font-bold rounded transition-colors lg:min-h-0 lg:py-1 ${
+                  view === 'CHECKLIST' ? 'bg-scada-accent-soft text-scada-accent' : 'text-scada-muted hover-text-scada-secondary'
+                }`}
+              >
+                <ListChecks size={14} className="delight-icon-shift" /> CHECKLIST
+              </button>
+              <button
+                onClick={() => handleViewChange('CONFIGURATION')}
+                className={`delight-press flex min-h-11 items-center gap-2 px-3 py-2 text-xs font-bold rounded transition-colors lg:min-h-0 lg:py-1 ${
+                  view === 'CONFIGURATION' ? 'bg-scada-accent-soft text-scada-accent' : 'text-scada-muted hover-text-scada-secondary'
+                }`}
+              >
+                <SlidersHorizontal size={14} className="delight-icon-shift" /> CONFIGURATION
+              </button>
+            </div>
           </div>
 
-          <div className="flex items-center gap-2 px-3 py-1 bg-slate-900 border border-slate-700 rounded">
-            <span className="text-xs text-slate-500">AVG FAST ΔT</span>
-            <span className="font-mono font-bold text-lg text-slate-200">{telemetry.avgFastAdcPacketLength.toFixed(1)}</span>
-          </div>
+          <div className="ml-auto flex items-center justify-end gap-2 md:gap-6">
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleSimToggle}
+                className={`delight-press flex min-h-11 items-center gap-2 px-3 py-2 text-xs font-bold rounded transition-colors border lg:min-h-0 lg:py-1 ${
+                  isSimulating
+                    ? 'bg-scada-accent-soft border-scada-accent text-scada-accent'
+                    : 'border-scada text-scada-muted hover-text-scada-secondary'
+                }`}
+              >
+                <Beaker size={14} className="delight-icon-shift" /> {isSimulating ? 'STOP SIM' : 'SIM'}
+              </button>
+              {isSimulating && (
+                <button
+                  onClick={actions.toggleSimSafety}
+                  className={`delight-press flex min-h-11 items-center gap-2 px-3 py-2 rounded text-xs font-bold border lg:min-h-0 lg:py-1 ${
+                    telemetry.isUnsafe
+                      ? 'bg-scada-danger-strong border-scada-danger text-scada-inverse'
+                      : 'bg-scada-success-strong border-scada-success text-scada-inverse'
+                  }`}
+                >
+                  {telemetry.isUnsafe ? <AlertOctagon size={14} /> : <Lock size={14} />}
+                  <span className="inline xl:hidden">SIM: {telemetry.isUnsafe ? 'ARMED' : 'SAFE'}</span>
+                  <span className="hidden xl:inline">
+                    SIM: {telemetry.isUnsafe ? 'PHYSICAL SWITCH ARMED' : 'PHYSICAL SWITCH SAFE'}
+                  </span>
+                </button>
+              )}
+            </div>
 
-          <div className="flex items-center gap-2 px-3 py-1 bg-slate-900 border border-slate-700 rounded">
-            <span className="text-xs text-slate-500">LAST PACKET</span>
-            <span className="font-mono font-bold text-lg text-slate-200">T+{telemetry.lastPacketTimestamp}</span>
-          </div>
+            <div className="hidden items-center gap-2 px-3 py-1 bg-scada-surface border border-scada rounded lg:flex">
+              <span className="text-xs text-scada-muted">AVG FAST ΔT</span>
+              <span className="font-mono font-bold text-lg text-scada-secondary">{telemetry.avgFastAdcPacketLength.toFixed(1)}</span>
+            </div>
 
-          <button onClick={() => setShowConfig(!showConfig)} className="text-slate-400 hover:text-white transition-colors">
-            <Settings size={20} />
-          </button>
+            <div className="hidden items-center gap-2 px-3 py-1 bg-scada-surface border border-scada rounded lg:flex">
+              <span className="text-xs text-scada-muted">LAST PACKET</span>
+              <span className="font-mono font-bold text-lg text-scada-secondary">T+{telemetry.lastPacketTimestamp}</span>
+            </div>
 
-          <div
-            className={`flex items-center gap-2 text-xs font-bold px-2 py-1 rounded ${
-              connectionStatus === ConnectionState.CONNECTED
-                ? 'bg-green-900/30 text-green-400'
-                : 'bg-red-900/30 text-red-400'
-            }`}
-          >
-            {connectionStatus === ConnectionState.CONNECTED ? <Wifi size={14} /> : <WifiOff size={14} />}
-            {ConnectionState[connectionStatus]}
+            <button
+              aria-label="Toggle connection config"
+              onClick={() => setShowConfig(!showConfig)}
+              className="delight-press h-11 w-11 flex items-center justify-center rounded text-scada-secondary hover-text-scada-inverse hover-bg-scada-surface-elevated transition-colors"
+            >
+              <Settings size={20} className="delight-icon-shift" />
+            </button>
+
+            <div
+              className={`flex items-center gap-2 text-xs font-bold px-2 py-1 rounded ${
+                connectionStatus === ConnectionState.CONNECTED
+                  ? 'bg-scada-success-soft text-scada-success-soft'
+                  : 'bg-scada-danger-soft text-scada-danger-soft'
+              }`}
+            >
+              {connectionStatus === ConnectionState.CONNECTED ? <Wifi size={14} /> : <WifiOff size={14} />}
+              <span className="hidden xl:inline">{ConnectionState[connectionStatus]}</span>
+            </div>
           </div>
         </div>
       </header>
 
-      <main className="flex-1 p-2 min-h-0 overflow-hidden relative z-0">
+      <main className={`flex-1 p-2 ${mobileMainPaddingBottomClass} min-h-0 overflow-auto md:pb-0 md:overflow-hidden relative z-0`}>
         {showConfig && (
-          <div className="absolute inset-0 bg-slate-900/90 z-50 flex items-center justify-center backdrop-blur-sm">
-            <div className="bg-slate-800 border border-cyan-500/50 p-6 rounded shadow-[0_0_50px_rgba(6,182,212,0.2)] w-96">
-              <h2 className="text-cyan-400 font-bold mb-4 text-lg">CONNECTION CONFIG</h2>
+          <div className="absolute inset-0 z-50 flex items-center justify-center bg-scada-overlay backdrop-blur-sm">
+            <div className="bg-scada-surface-elevated border border-scada-accent p-6 rounded shadow-scada-accent-md w-full max-w-sm">
+              <h2 className="text-scada-accent font-bold mb-4 text-lg">CONNECTION CONFIG</h2>
               <div className="space-y-4">
                 <div>
-                  <label className="text-xs text-slate-400 block mb-1">HOST</label>
+                  <label className="text-xs text-scada-secondary block mb-1">HOST</label>
                   <input
                     type="text"
                     value={mqttConfig.host}
                     onChange={(event) => setMqttConfig({ ...mqttConfig, host: event.target.value })}
-                    className="w-full bg-slate-900 border border-slate-700 text-white px-3 py-2 font-mono
-                      outline-none focus:border-cyan-500"
+                    className="scada-input"
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-slate-400 block mb-1">PORT (WS)</label>
+                  <label className="text-xs text-scada-secondary block mb-1">PORT (WS)</label>
                   <input
                     type="number"
                     value={mqttConfig.port}
                     onChange={(event) => setMqttConfig({ ...mqttConfig, port: Number(event.target.value) })}
-                    className="w-full bg-slate-900 border border-slate-700 text-white px-3 py-2 font-mono
-                      outline-none focus:border-cyan-500"
+                    className="scada-input"
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-slate-400 block mb-1">USERNAME</label>
+                  <label className="text-xs text-scada-secondary block mb-1">USERNAME</label>
                   <input
                     type="text"
                     value={mqttConfig.username ?? ''}
                     onChange={(event) => setMqttConfig({ ...mqttConfig, username: event.target.value })}
-                    className="w-full bg-slate-900 border border-slate-700 text-white px-3 py-2 font-mono
-                      outline-none focus:border-cyan-500"
+                    className="scada-input"
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-slate-400 block mb-1">PASSWORD</label>
+                  <label className="text-xs text-scada-secondary block mb-1">PASSWORD</label>
                   <input
                     type="password"
                     value={mqttConfig.password ?? ''}
                     onChange={(event) => setMqttConfig({ ...mqttConfig, password: event.target.value })}
-                    className="w-full bg-slate-900 border border-slate-700 text-white px-3 py-2 font-mono
-                      outline-none focus:border-cyan-500"
+                    className="scada-input"
                   />
                 </div>
 
-                <button onClick={handleConnect} className="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2 mt-2">
+                <button onClick={handleConnect} className="delight-press w-full min-h-11 bg-scada-accent hover-bg-scada-accent text-scada-inverse font-bold py-2 mt-2">
                   CONNECT
                 </button>
               </div>
@@ -302,52 +389,69 @@ const App = () => {
           </div>
         )}
 
-        {view === 'CHECKLIST' && checklistEngine.isReadOnly && (
+        {checklistEngine.isReadOnly && (
           <div
-            className="pointer-events-none absolute bottom-2 left-1/2 z-40 w-max max-w-[calc(100%-1rem)]
-              -translate-x-1/2 rounded border-2 border-amber-400 bg-amber-900/90 px-4 py-2 text-center
-              text-xs font-bold tracking-widest text-amber-100 shadow-[0_0_24px_rgba(251,191,36,0.35)]
-              md:bottom-4 md:px-6 md:py-3 md:text-sm"
+            className="pointer-events-none fixed left-1/2 top-[calc(3.75rem+env(safe-area-inset-top)+0.25rem)] z-40 w-max max-w-[calc(100%-1rem)]
+              -translate-x-1/2 rounded border-2 border-scada-warning bg-scada-warning-strong px-4 py-2 text-center
+              text-xs font-bold tracking-widest text-scada-warning-soft shadow-scada-warning-md md:px-6 md:py-3 md:text-sm"
           >
             <div className="flex items-center justify-center gap-2">
               <Lock size={14} />
               <span>READ ONLY SNAPSHOT</span>
             </div>
-            <div className="mt-1 text-[10px] tracking-normal text-amber-200 md:text-xs">
+            <div className="mt-1 text-[10px] tracking-normal text-scada-warning-soft md:text-xs">
               MQTT disconnected and simulator disabled
             </div>
           </div>
         )}
 
-        {view === 'DASHBOARD' ? (
-          <DashboardView telemetry={telemetry} actions={actions} commandsEnabled={commandsEnabled} />
-        ) : view === 'ANALYSIS' ? (
-          <AnalysisView
-            telemetry={telemetry}
-            actions={actions}
-            connectionStatus={connectionStatus}
-            isSimulating={isSimulating}
-            commandsEnabled={commandsEnabled}
-          />
-        ) : view === 'CHECKLIST' ? (
-          <ChecklistView
-            mode={checklistEngine.mode}
-            summaries={checklistEngine.summaries}
-            selectedChecklistId={checklistEngine.selectedChecklistId}
-            onSelectChecklist={checklistEngine.setSelectedChecklistId}
-            stepStates={checklistEngine.stepStates}
-            activeStep={checklistEngine.activeStep}
-            getStepContext={checklistEngine.getStepContext}
-            setStepContextField={checklistEngine.setStepContextField}
-            onCompleteCurrentStep={checklistEngine.completeStep}
-            onResetChecklist={() => checklistEngine.resetChecklist(checklistEngine.selectedChecklistId)}
-            onResetAllChecklists={checklistEngine.resetAllChecklists}
-            isReadOnly={checklistEngine.isReadOnly}
-          />
-        ) : (
-          <ConfigurationView onDirtyChange={setConfigHasUnsavedChanges} />
-        )}
+        <Suspense fallback={<LoadingFallback />}>
+          <div key={view} className="h-full delight-view-enter">
+            {currentView}
+          </div>
+        </Suspense>
       </main>
+
+      <nav className="fixed bottom-0 inset-x-0 z-20 md:hidden border-t border-scada-weak bg-scada-app-soft">
+        <div className="grid grid-cols-4 gap-px bg-scada-surface-elevated">
+          <button
+            onClick={() => handleViewChange('DASHBOARD')}
+            className={`delight-press min-h-14 bg-scada-app px-2 py-1 flex flex-col items-center justify-center text-[10px] font-bold tracking-wide ${
+              view === 'DASHBOARD' ? 'text-scada-accent' : 'text-scada-muted'
+            }`}
+          >
+            <LayoutDashboard size={16} className="delight-icon-shift" />
+            <span>DASH</span>
+          </button>
+          <button
+            onClick={() => handleViewChange('ANALYSIS')}
+            className={`delight-press min-h-14 bg-scada-app px-2 py-1 flex flex-col items-center justify-center text-[10px] font-bold tracking-wide ${
+              view === 'ANALYSIS' ? 'text-scada-accent' : 'text-scada-muted'
+            }`}
+          >
+            <LineChartIcon size={16} className="delight-icon-shift" />
+            <span>ANALYSIS</span>
+          </button>
+          <button
+            onClick={() => handleViewChange('CHECKLIST')}
+            className={`delight-press min-h-14 bg-scada-app px-2 py-1 flex flex-col items-center justify-center text-[10px] font-bold tracking-wide ${
+              view === 'CHECKLIST' ? 'text-scada-accent' : 'text-scada-muted'
+            }`}
+          >
+            <ListChecks size={16} className="delight-icon-shift" />
+            <span>CHECK</span>
+          </button>
+          <button
+            onClick={() => handleViewChange('CONFIGURATION')}
+            className={`delight-press min-h-14 bg-scada-app px-2 py-1 flex flex-col items-center justify-center text-[10px] font-bold tracking-wide ${
+              view === 'CONFIGURATION' ? 'text-scada-accent' : 'text-scada-muted'
+            }`}
+          >
+            <SlidersHorizontal size={16} className="delight-icon-shift" />
+            <span>CONFIG</span>
+          </button>
+        </div>
+      </nav>
     </div>
   );
 };
