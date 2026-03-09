@@ -148,6 +148,10 @@ const App = () => {
 
   const commandsEnabled =
     connectionStatus === ConnectionState.CONNECTED || isSimulating;
+  const mobileMainPaddingBottomClass =
+    view === 'DASHBOARD'
+      ? 'pb-[calc(6.5rem+env(safe-area-inset-bottom)+0.75rem)]'
+      : 'pb-[calc(4rem+env(safe-area-inset-bottom)+0.75rem)]';
 
   useEffect(() => {
     try {
@@ -334,7 +338,7 @@ const App = () => {
         </div>
       </header>
 
-      <main className="flex-1 p-2 pb-16 min-h-0 overflow-auto md:pb-0 md:overflow-hidden relative z-0">
+      <main className={`flex-1 p-2 ${mobileMainPaddingBottomClass} min-h-0 overflow-auto md:pb-0 md:overflow-hidden relative z-0`}>
         {showConfig && (
           <div className="absolute inset-0 z-50 flex items-center justify-center bg-scada-overlay backdrop-blur-sm">
             <div className="bg-scada-surface-elevated border border-scada-accent p-6 rounded shadow-scada-accent-md w-full max-w-sm">

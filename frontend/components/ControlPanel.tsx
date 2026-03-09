@@ -80,10 +80,10 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
       )}
 
       <ScadaPanel title="MASTER CONTROL" className="h-full" danger={isFiring}>
-        <div className="flex flex-col h-full gap-2 p-1">
+        <div className="flex flex-col gap-2 p-1 md:h-full">
         
         {/* Top Row: Indicators */}
-        <div className="flex gap-2 h-1/4 min-h-[60px]">
+        <div className="flex gap-2 min-h-[60px] md:h-1/4">
             {/* System State */}
             <div className={`flex-1 border-2 rounded text-center flex flex-col justify-center items-center ${stateColor}`}>
                 <span className="text-[10px] tracking-widest opacity-70 mb-1 leading-none">STATE</span>
@@ -101,7 +101,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
         </div>
 
         {/* Middle Row: Big Button */}
-        <div className="flex-1 flex flex-col">
+        <div className="flex flex-col min-h-[140px] md:flex-1">
            {isFiring ? (
                 <button 
                 onClick={() => actions.setFireState('FIRE_END')}

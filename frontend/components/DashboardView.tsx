@@ -150,7 +150,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ telemetry, actions
     ).slice().reverse();
 
     return (
-        <div className="grid grid-cols-1 gap-2 auto-rows-[minmax(220px,auto)] min-h-full md:grid-cols-12 md:grid-rows-12 md:h-full">
+        <div
+            className="grid grid-cols-1 gap-2 auto-rows-[minmax(220px,auto)] min-h-full
+                pb-[calc(4rem+env(safe-area-inset-bottom)+1rem)] md:pb-0 md:grid-cols-12 md:grid-rows-12 md:h-full"
+        >
             {/* Mobile-only order: power, thermal, pressures, servo, tensometer, status, master */}
             <div className="order-1 md:hidden">
                 <ScadaPanel title="POWER SYSTEMS" className="h-full">
@@ -365,7 +368,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ telemetry, actions
                 </ScadaPanel>
             </div>
 
-            <div className="order-7 md:col-span-4 md:row-span-4">
+            <div className="order-7 min-h-[320px] md:min-h-0 md:col-span-4 md:row-span-4">
                 <ControlPanel
                     systemState={telemetry.state}
                     isUnsafe={telemetry.isUnsafe}
