@@ -46,6 +46,8 @@ MQTT communication
 - Frontend connects to the same broker via WebSocket (`ws://<host>:8000`) and subscribes/publishes control topics
 - MQTT TCP port: `1883` (standard MQTT)
 - MQTT WebSocket port: `8000` (used by frontend)
+- `mosquitto.conf` raises `max_packet_size` to `20000000` so the retained
+  `shared/firmware/test_stand_controller/elf` payload can carry the matching firmware ELF
 
 Publishing the retained ELF
 
