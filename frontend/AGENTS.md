@@ -16,6 +16,10 @@ This file documents the `frontend/` app for coding agents.
   - `ConfigurationView.tsx`: conversion + LUT calibration editor.
   - `Widgets.tsx`: shared SCADA panel/chart/value primitives.
 - `utils/`: parser, conversions, DB, simulator, checklist topic helpers.
+- `utils/defmt.ts`: DEFMT MQTT topic constants, wasm loader, and byte helpers.
+- `utils/statusLog.ts`: bounded status-log append helpers shared by the MQTT runtime.
+- `scripts/build-defmt-decoder.sh`: builds the browser DEFMT decoder package from the
+  `esp32-mainboard` submodule into `public/defmt-mqtt-decoder/`.
 
 ## Styling and design system
 
@@ -33,3 +37,6 @@ This file documents the `frontend/` app for coding agents.
 - Tailwind is compiled locally through Vite (`@tailwindcss/vite`) from `index.css`.
 - Views are lazy-loaded from `App.tsx` to reduce initial payload.
 - MQTT runtime is loaded on demand in `useMqttSystem.connect()` (dynamic import).
+- DEFMT decoding depends on a retained raw ELF payload on
+  `shared/firmware/test_stand_controller/elf` and the wasm package built from
+  `../esp32-mainboard/tools/defmt-mqtt-decoder`.

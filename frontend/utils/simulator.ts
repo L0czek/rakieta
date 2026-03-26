@@ -59,7 +59,7 @@ export class RocketSimulator {
                         }
                     }, 10000);
                 } else {
-                    this.onPacket({ topic: 'status/cmd', payload: 'ERR: Cannot Fire (Check Arm/Safety)' });
+                    console.warn('[SIM] FIRE rejected: Check Arm/Safety');
                 }
             }
             if (payload === 'ABORT') {
@@ -70,7 +70,7 @@ export class RocketSimulator {
                     }
                     this.systemState = SystemState.POSTFIRE;
                 } else {
-                    this.onPacket({ topic: 'status/cmd', payload: 'ERR: ABORT rejected: not in COUNTDOWN state' });
+                    console.warn('[SIM] ABORT rejected: not in COUNTDOWN state');
                 }
             }
             if (payload === 'FIRE_END') {
@@ -89,7 +89,7 @@ export class RocketSimulator {
                         }
                     }, 2000);
                 } else {
-                    this.onPacket({ topic: 'status/cmd', payload: 'ERR: LAMP_TEST rejected: not in ARMED state' });
+                    console.warn('[SIM] LAMP_TEST rejected: not in ARMED state');
                 }
             }
             if (payload === 'CAMERA_TEST') {
@@ -104,7 +104,7 @@ export class RocketSimulator {
                         }
                     }, 5000);
                 } else {
-                    this.onPacket({ topic: 'status/cmd', payload: 'ERR: CAMERA_TEST rejected: not in ARMED state' });
+                    console.warn('[SIM] CAMERA_TEST rejected: not in ARMED state');
                 }
             }
 
@@ -118,7 +118,7 @@ export class RocketSimulator {
                  if (payload === 'CLOSE') this.servoState = ServoState.CLOSED;
                  this.onPacket({ topic: 'status/servo', payload: this.servoState });
             } else {
-                this.onPacket({ topic: 'status/cmd', payload: 'ERR: Servo Locked during FIRE/COUNTDOWN' });
+                console.warn('[SIM] Servo locked during FIRE/COUNTDOWN');
             }
         }
     }

@@ -1,3 +1,7 @@
 [submodule "blackbox-firmware/lib/stm32-spi-dma-sdcard"]
 	path = blackbox-firmware/lib/stm32-spi-dma-sdcard
 	url = git@github.com:L0czek/stm32-spi-dma-sdcard.git
+[submodule "esp32-mainboard"]
+	path = esp32-mainboard
+	url = https://github.com/L0czek/esp32-mainboard.git
+	branch = teststand

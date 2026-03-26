@@ -146,8 +146,13 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ telemetry, actions
     const chartXDomain: [number, number] = [chartWindowStart, chartWindowEnd];
     const statusLogEntries = (telemetry.statusLog.length > 0
         ? telemetry.statusLog
-        : [{ message: 'System Ready.', receivedAt: 0, type: 'status' as const }]
+        : [{ message: 'System Ready.', receivedAt: 0, type: 'log' as const }]
     ).slice().reverse();
+    const getStatusLogEntryClass = (type: typeof statusLogEntries[number]['type']) => {
+        if (type === 'connection') return 'text-scada-accent-soft';
+        if (type === 'warning') return 'text-scada-danger-soft';
+        return 'text-scada-warning-soft';
+    };
 
     return (
         <div
@@ -293,7 +298,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ telemetry, actions
                             {statusLogEntries.map((entry, index) => (
                                 <div
                                     key={`${entry.receivedAt}-${index}`}
-                                    className={`break-all ${entry.type === 'connection' ? 'text-scada-accent-soft' : 'text-scada-warning-soft'}`}
+                                    className={`break-all ${getStatusLogEntryClass(entry.type)}`}
                                 >
                                     <span className="text-scada-muted">[{new Date(entry.receivedAt).toLocaleString()}]</span>{' '}
                                     &gt; {entry.message}
@@ -358,7 +363,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ telemetry, actions
                         {statusLogEntries.map((entry, index) => (
                             <div
                                 key={`${entry.receivedAt}-${index}`}
-                                className={`break-all ${entry.type === 'connection' ? 'text-scada-accent-soft' : 'text-scada-warning-soft'}`}
+                                className={`break-all ${getStatusLogEntryClass(entry.type)}`}
                             >
                                 <span className="text-scada-muted">[{new Date(entry.receivedAt).toLocaleString()}]</span>{' '}
                                 &gt; {entry.message}

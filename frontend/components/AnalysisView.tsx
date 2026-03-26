@@ -550,14 +550,20 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
                                 <div className="font-mono text-xs p-2 h-full overflow-y-auto pr-1 scrollbar-thin space-y-1">
                                         {(telemetry.statusLog.length > 0
                                             ? telemetry.statusLog
-                                            : [{ message: 'System Ready.', receivedAt: 0, type: 'status' as const }]
+                                            : [{ message: 'System Ready.', receivedAt: 0, type: 'log' as const }]
                                         )
                                             .slice()
                                             .reverse()
                                             .map((entry, index) => (
                                                 <div
                                                   key={`${entry.receivedAt}-${index}`}
-                                                  className={`break-all ${entry.type === 'connection' ? 'text-scada-accent-soft' : 'text-scada-warning-soft'}`}
+                                                  className={`break-all ${
+                                                    entry.type === 'connection'
+                                                      ? 'text-scada-accent-soft'
+                                                      : entry.type === 'warning'
+                                                        ? 'text-scada-danger-soft'
+                                                        : 'text-scada-warning-soft'
+                                                  }`}
                                                 >
                                                         <span className="text-scada-muted">[{new Date(entry.receivedAt).toLocaleString()}]</span>{' '}
                                                         &gt; {entry.message}

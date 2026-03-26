@@ -20,6 +20,8 @@ Web SCADA dashboard for rocket-engine test telemetry and command/control over MQ
   - Publish generated packets to MQTT if connected
 - Renders full telemetry series in charts while still storing raw telemetry in IndexedDB
 - Synchronizes checklist runtime state between clients through retained MQTT topics
+- Decodes `log/defmt` bytes in the browser using the Rust WASM decoder from the `esp32-mainboard`
+  submodule and a retained firmware ELF topic
 
 ## Tech stack
 
@@ -44,6 +46,7 @@ Web SCADA dashboard for rocket-engine test telemetry and command/control over MQ
 ## Local run
 
 ```bash
+git submodule update --init --recursive
 npm install
 npm run dev
 ```
@@ -64,6 +67,10 @@ npm run typecheck
 npm run test
 ```
 
+The dev/build scripts automatically generate the browser decoder package into
+`public/defmt-mqtt-decoder/` with `wasm-pack`, using
+`../esp32-mainboard/tools/defmt-mqtt-decoder`.
+
 ## MQTT interface (implemented topics)
 
 Subscribed:
@@ -73,7 +80,10 @@ Subscribed:
 - `sensor/digital/armed`
 - `sensor/temp/#`
 - `sensor/servo`
-- `status/#`
+- `status/state`
+- `status/servo`
+- `log/defmt`
+- `shared/firmware/test_stand_controller/elf` (retained raw ELF bytes)
 - `cmd/state`
 - `cmd/servo`
 - `checklist/+/points/+/state`
@@ -84,6 +94,14 @@ Published commands:
 - `cmd/servo` with payloads: `OPEN`, `CLOSE`
 - `checklist/<checklistId>/points/<pointId>/state` (retained JSON):
   `{"completed":boolean,"completedAtWall":number|null,"completedAtTelemetry":number|null,"context":{...}}`
+
+DEFMT log requirements:
+
+- `log/defmt` payloads must be the raw encoded `defmt` byte stream
+- `shared/firmware/test_stand_controller/elf` must contain the matching firmware ELF as retained
+  raw bytes
+- Publish the ELF with
+  `../scripts/publish-test-stand-elf.sh <path-to-test_stand_controller-elf>`
 
 ## Operator UX/design
 
@@ -107,4 +125,6 @@ Published commands:
   one-record-per-point, which reduces write amplification under high-rate telemetry.
 - Major views and MQTT transport runtime are lazy-loaded to reduce cold-start JS payload.
 - `Reset` in critical modal clears IndexedDB and in-memory telemetry.
+- `Status log` now renders decoded `defmt` lines plus decoder/runtime warnings instead of
+  `status/cmd`.
 - `vite.config.ts` exposes `GEMINI_API_KEY` defines, but this frontend currently does not use Gemini APIs.
