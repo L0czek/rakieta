@@ -11,6 +11,8 @@ export enum SystemState {
   COUNTDOWN = 'COUNTDOWN',
   FIRE = 'FIRE',
   POSTFIRE = 'POSTFIRE',
+  LAMPTEST = 'LAMPTEST',
+  CAMERATEST = 'CAMERATEST',
   UNKNOWN = 'UNKNOWN'
 }
 

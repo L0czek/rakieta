@@ -1,14 +1,14 @@
 import React from 'react';
 import { ScadaPanel } from '@/components/Widgets';
 import { SystemState } from '@/types';
-import { AlertOctagon, Lock, Flame, RefreshCcw, Power } from 'lucide-react';
+import { AlertOctagon, Lock, Flame, RefreshCcw, Power, Lightbulb, Camera } from 'lucide-react';
 
 interface ControlPanelProps {
   systemState: SystemState;
   isUnsafe: boolean; // physical switch state
   commandsEnabled: boolean;
   actions: {
-    setFireState: (cmd: 'FIRE' | 'ABORT' | 'FIRE_END' | 'FIRE_RESET') => void;
+    setFireState: (cmd: 'FIRE' | 'ABORT' | 'FIRE_END' | 'FIRE_RESET' | 'LAMP_TEST' | 'CAMERA_TEST') => void;
     requestShutdown: () => void;
   };
 }
@@ -40,6 +40,8 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
     [SystemState.COUNTDOWN]: 'text-scada-warning border-scada-warning bg-scada-warning-strong',
     [SystemState.FIRE]: 'text-scada-danger-soft border-scada-danger bg-scada-danger-soft',
     [SystemState.POSTFIRE]: 'text-scada-info border-scada-info bg-scada-info-soft',
+    [SystemState.LAMPTEST]: 'text-scada-info border-scada-info bg-scada-info-soft',
+    [SystemState.CAMERATEST]: 'text-scada-info border-scada-info bg-scada-info-soft',
     [SystemState.UNKNOWN]: 'text-scada-muted border-scada bg-scada-surface-elevated'
   }[systemState];
 
@@ -147,7 +149,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
            )}
         </div>
 
-          {/* Bottom Row: Reset + Shutdown */}
+          {/* Bottom Row: Reset + Shutdown + Test buttons */}
           <div className="grid grid-cols-2 gap-2">
             <button
               onClick={() => actions.setFireState('FIRE_RESET')}
@@ -162,6 +164,20 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
               className="delight-press min-h-11 bg-scada-warning-strong hover-bg-scada-warning text-scada-warning-soft font-mono text-xs border border-scada-warning rounded flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Power className="w-3 h-3 delight-icon-shift" /> SHUTDOWN
+            </button>
+            <button
+              onClick={() => actions.setFireState('LAMP_TEST')}
+              disabled={!isArmed || !commandsEnabled}
+              className="delight-press min-h-11 bg-scada-surface-strong hover-bg-scada-surface-strong text-scada-secondary font-mono text-xs border border-scada-strong rounded flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Lightbulb className="w-3 h-3 delight-icon-shift" /> LAMP TEST
+            </button>
+            <button
+              onClick={() => actions.setFireState('CAMERA_TEST')}
+              disabled={!isArmed || !commandsEnabled}
+              className="delight-press min-h-11 bg-scada-surface-strong hover-bg-scada-surface-strong text-scada-secondary font-mono text-xs border border-scada-strong rounded flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Camera className="w-3 h-3 delight-icon-shift" /> CAMERA TEST
             </button>
           </div>
 

@@ -11,6 +11,7 @@ export class RocketSimulator {
     private time: number = 0;
     private intervalId: NodeJS.Timeout | null = null;
     private countdownTimeoutId: ReturnType<typeof setTimeout> | null = null;
+    private testTimeoutId: ReturnType<typeof setTimeout> | null = null;
     private onPacket: (packet: PacketEmit) => void;
     
     // Physics State
@@ -76,6 +77,36 @@ export class RocketSimulator {
                 if (this.systemState === SystemState.FIRE) this.systemState = SystemState.POSTFIRE;
             }
             if (payload === 'FIRE_RESET') this.systemState = SystemState.ARMED;
+            if (payload === 'LAMP_TEST') {
+                if (this.systemState === SystemState.ARMED) {
+                    this.systemState = SystemState.LAMPTEST;
+                    this.onPacket({ topic: 'status/state', payload: this.systemState });
+                    this.testTimeoutId = setTimeout(() => {
+                        this.testTimeoutId = null;
+                        if (this.systemState === SystemState.LAMPTEST) {
+                            this.systemState = SystemState.ARMED;
+                            this.onPacket({ topic: 'status/state', payload: this.systemState });
+                        }
+                    }, 2000);
+                } else {
+                    this.onPacket({ topic: 'status/cmd', payload: 'ERR: LAMP_TEST rejected: not in ARMED state' });
+                }
+            }
+            if (payload === 'CAMERA_TEST') {
+                if (this.systemState === SystemState.ARMED) {
+                    this.systemState = SystemState.CAMERATEST;
+                    this.onPacket({ topic: 'status/state', payload: this.systemState });
+                    this.testTimeoutId = setTimeout(() => {
+                        this.testTimeoutId = null;
+                        if (this.systemState === SystemState.CAMERATEST) {
+                            this.systemState = SystemState.ARMED;
+                            this.onPacket({ topic: 'status/state', payload: this.systemState });
+                        }
+                    }, 5000);
+                } else {
+                    this.onPacket({ topic: 'status/cmd', payload: 'ERR: CAMERA_TEST rejected: not in ARMED state' });
+                }
+            }
 
             if (this.systemState !== prevState) {
                 this.onPacket({ topic: 'status/state', payload: this.systemState });
