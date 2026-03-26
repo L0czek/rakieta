@@ -10,6 +10,7 @@ export interface PacketEmit {
 export class RocketSimulator {
     private time: number = 0;
     private intervalId: NodeJS.Timeout | null = null;
+    private countdownTimeoutId: ReturnType<typeof setTimeout> | null = null;
     private onPacket: (packet: PacketEmit) => void;
     
     // Physics State
@@ -47,25 +48,46 @@ export class RocketSimulator {
             const prevState = this.systemState;
             if (payload === 'FIRE') {
                 if (this.systemState === SystemState.ARMED && this.isUnsafe) {
-                     this.systemState = SystemState.FIRE;
+                    this.systemState = SystemState.COUNTDOWN;
+                    this.onPacket({ topic: 'status/state', payload: this.systemState });
+                    this.countdownTimeoutId = setTimeout(() => {
+                        this.countdownTimeoutId = null;
+                        if (this.systemState === SystemState.COUNTDOWN) {
+                            this.systemState = SystemState.FIRE;
+                            this.onPacket({ topic: 'status/state', payload: this.systemState });
+                        }
+                    }, 10000);
                 } else {
                     this.onPacket({ topic: 'status/cmd', payload: 'ERR: Cannot Fire (Check Arm/Safety)' });
                 }
             }
-            if (payload === 'FIRE_END') this.systemState = SystemState.POSTFIRE;
+            if (payload === 'ABORT') {
+                if (this.systemState === SystemState.COUNTDOWN) {
+                    if (this.countdownTimeoutId !== null) {
+                        clearTimeout(this.countdownTimeoutId);
+                        this.countdownTimeoutId = null;
+                    }
+                    this.systemState = SystemState.POSTFIRE;
+                } else {
+                    this.onPacket({ topic: 'status/cmd', payload: 'ERR: ABORT rejected: not in COUNTDOWN state' });
+                }
+            }
+            if (payload === 'FIRE_END') {
+                if (this.systemState === SystemState.FIRE) this.systemState = SystemState.POSTFIRE;
+            }
             if (payload === 'FIRE_RESET') this.systemState = SystemState.ARMED;
-            
+
             if (this.systemState !== prevState) {
                 this.onPacket({ topic: 'status/state', payload: this.systemState });
             }
         }
         else if (topic === 'cmd/servo') {
-            if (this.systemState !== SystemState.FIRE) {
+            if (this.systemState !== SystemState.FIRE && this.systemState !== SystemState.COUNTDOWN) {
                  if (payload === 'OPEN') this.servoState = ServoState.OPEN;
                  if (payload === 'CLOSE') this.servoState = ServoState.CLOSED;
                  this.onPacket({ topic: 'status/servo', payload: this.servoState });
             } else {
-                this.onPacket({ topic: 'status/cmd', payload: 'ERR: Servo Locked during FIRE' });
+                this.onPacket({ topic: 'status/cmd', payload: 'ERR: Servo Locked during FIRE/COUNTDOWN' });
             }
         }
     }

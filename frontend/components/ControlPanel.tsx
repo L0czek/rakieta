@@ -8,7 +8,7 @@ interface ControlPanelProps {
   isUnsafe: boolean; // physical switch state
   commandsEnabled: boolean;
   actions: {
-    setFireState: (cmd: 'FIRE' | 'FIRE_END' | 'FIRE_RESET') => void;
+    setFireState: (cmd: 'FIRE' | 'ABORT' | 'FIRE_END' | 'FIRE_RESET') => void;
     requestShutdown: () => void;
   };
 }
@@ -22,10 +22,11 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
   const [showShutdownConfirm, setShowShutdownConfirm] = React.useState(false);
   
   const isArmed = systemState === SystemState.ARMED;
+  const isCountdown = systemState === SystemState.COUNTDOWN;
   const isFiring = systemState === SystemState.FIRE;
   const canFire = isArmed && isUnsafe && commandsEnabled;
   const canAbort = commandsEnabled;
-  const canShutdown = !isFiring && commandsEnabled;
+  const canShutdown = !isFiring && !isCountdown && commandsEnabled;
 
   const fireHint = (() => {
     if (!commandsEnabled) return 'CONNECT OR START SIM';
@@ -36,6 +37,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
   
   const stateColor = {
     [SystemState.ARMED]: 'text-scada-warning-soft border-scada-warning bg-scada-warning-soft',
+    [SystemState.COUNTDOWN]: 'text-scada-warning border-scada-warning bg-scada-warning-strong',
     [SystemState.FIRE]: 'text-scada-danger-soft border-scada-danger bg-scada-danger-soft',
     [SystemState.POSTFIRE]: 'text-scada-info border-scada-info bg-scada-info-soft',
     [SystemState.UNKNOWN]: 'text-scada-muted border-scada bg-scada-surface-elevated'
@@ -102,8 +104,19 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
 
         {/* Middle Row: Big Button */}
         <div className="flex flex-col min-h-[140px] md:flex-1">
-           {isFiring ? (
-                <button 
+           {isCountdown ? (
+                <button
+                onClick={() => actions.setFireState('ABORT')}
+                disabled={!canAbort}
+                className="delight-press flex-1 bg-scada-warning hover-bg-scada-warning text-scada-inverse font-bold text-2xl border-4 border-scada-warning rounded flex flex-col items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+               >
+                <div className="flex items-center gap-2">
+                    <AlertOctagon className="w-8 h-8 delight-icon-shift" />
+                    ABORT
+                </div>
+               </button>
+           ) : isFiring ? (
+                <button
                 onClick={() => actions.setFireState('FIRE_END')}
                 disabled={!canAbort}
                 className="delight-press flex-1 bg-scada-warning hover-bg-scada-warning text-scada-inverse font-bold text-2xl border-4 border-scada-warning rounded flex flex-col items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"

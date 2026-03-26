@@ -8,6 +8,7 @@ export enum ConnectionState {
 
 export enum SystemState {
   ARMED = 'ARMED',
+  COUNTDOWN = 'COUNTDOWN',
   FIRE = 'FIRE',
   POSTFIRE = 'POSTFIRE',
   UNKNOWN = 'UNKNOWN'

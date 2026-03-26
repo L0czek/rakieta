@@ -470,8 +470,9 @@ export const useMqttSystem = () => {
     else if (topic === 'status/state') {
         const val = message.toString();
         if (val === 'ARMED') current.state = SystemState.ARMED;
-        else if (val === 'POSTFIRE') current.state = SystemState.POSTFIRE;
+        else if (val === 'COUNTDOWN') current.state = SystemState.COUNTDOWN;
         else if (val === 'FIRE') current.state = SystemState.FIRE;
+        else if (val === 'POSTFIRE') current.state = SystemState.POSTFIRE;
         else current.state = SystemState.UNKNOWN;
     }
     else if (topic === 'status/servo') {
@@ -643,10 +644,10 @@ export const useMqttSystem = () => {
     [applyChecklistTopicUpdate],
   );
 
-  const setFireState = (cmd: 'FIRE' | 'FIRE_END' | 'FIRE_RESET') => sendCommand('cmd/state', cmd);
+  const setFireState = (cmd: 'FIRE' | 'ABORT' | 'FIRE_END' | 'FIRE_RESET') => sendCommand('cmd/state', cmd);
   const requestShutdown = () => sendCommand('cmd/shutdown', 'SHUTDOWN');
   const setServoCmd = (cmd: 'OPEN' | 'CLOSE') => {
-    if (telemetry.state === SystemState.FIRE) return;
+    if (telemetry.state === SystemState.FIRE || telemetry.state === SystemState.COUNTDOWN) return;
     sendCommand('cmd/servo', cmd);
   };
   
