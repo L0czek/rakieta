@@ -1,24 +1,35 @@
 
 import { useEffect, useState, useRef, useCallback } from 'react';
 import type { MqttClient } from 'mqtt';
-import { 
-  SystemTelemetry, 
-  SystemState, 
-  ServoState, 
+import {
   ConnectionState, 
   MqttConfig,
+  ServoState,
   SensorDataPoint
-} from '../types';
-import * as Parser from '../utils/parser';
-import * as Converters from '../utils/conversions';
-import * as DB from '../utils/db';
-import { RocketSimulator, PacketEmit } from '../utils/simulator';
+} from '@/types';
+import type { StatusLogEntry, SystemTelemetry } from '@/types';
+import { SystemState } from '@/types';
 import {
   ChecklistContextValue,
   ChecklistPointRuntimeState,
   ChecklistTopicUpdate,
 } from '@/types/checklist';
+import {
+  DEFMT_LOG_TOPIC,
+  type DefmtDecoderInstance,
+  type DefmtDecoderModule,
+  formatDefmtError,
+  loadDefmtDecoderModule,
+  MAX_PENDING_DEFMT_CHUNKS,
+  TEST_STAND_CONTROLLER_ELF_TOPIC,
+  toUint8Array,
+} from '@/utils/defmt';
 import { buildChecklistPointTopic, parseChecklistPointTopic } from '@/utils/checklistTopics';
+import * as Converters from '@/utils/conversions';
+import * as DB from '@/utils/db';
+import * as Parser from '@/utils/parser';
+import { RocketSimulator, PacketEmit } from '@/utils/simulator';
+import { appendStatusLogEntries, makeStatusLogEntry } from '@/utils/statusLog';
 
 const DEFAULT_TELEMETRY: SystemTelemetry = {
   startTime: 0,
@@ -36,7 +47,6 @@ const DEFAULT_TELEMETRY: SystemTelemetry = {
   temperatures: {},
   state: SystemState.UNKNOWN,
   servoState: ServoState.UNKNOWN,
-  lastCmdStatus: "Waiting for connection...",
   statusLog: [
     {
       message: 'Waiting for connection...',
@@ -139,6 +149,14 @@ export const useMqttSystem = () => {
   const checklistPointStatesRef = useRef<Record<string, ChecklistPointRuntimeState>>({});
   const fastPacketDurationWindowRef = useRef<number[]>([]);
   const fastPacketDurationWindowSumRef = useRef(0);
+  const defmtModuleRef = useRef<DefmtDecoderModule | null>(null);
+  const defmtModulePromiseRef = useRef<Promise<DefmtDecoderModule | null> | null>(null);
+  const defmtDecoderRef = useRef<DefmtDecoderInstance | null>(null);
+  const defmtElfBytesRef = useRef<Uint8Array | null>(null);
+  const pendingDefmtChunksRef = useRef<Uint8Array[]>([]);
+  const defmtChunkOverflowReportedRef = useRef(false);
+  const defmtDecodeBlockedRef = useRef(false);
+  const defmtModuleErrorReportedRef = useRef(false);
   
   // Ref to handleMessage to avoid stale closures in simulator callback
   const handleMessageRef = useRef<(topic: string, message: any) => void>(null);
@@ -307,9 +325,170 @@ export const useMqttSystem = () => {
     setChecklistPointStates(checklistPointStatesRef.current);
   }, []);
 
-  const appendStatusLogEntry = useCallback((message: string, type: 'status' | 'connection') => {
+  const appendStatusLogEntry = useCallback((message: string, type: StatusLogEntry['type']) => {
     const current = telemetryRef.current;
-    current.statusLog = [...current.statusLog, { message, receivedAt: Date.now(), type }];
+    current.statusLog = appendStatusLogEntries(current.statusLog, [
+      makeStatusLogEntry(message, type),
+    ]);
+  }, []);
+
+  const appendStatusLogBatch = useCallback((entries: StatusLogEntry[]) => {
+    if (entries.length === 0) {
+      return;
+    }
+
+    const current = telemetryRef.current;
+    current.statusLog = appendStatusLogEntries(current.statusLog, entries);
+  }, []);
+
+  const createDefmtDecoder = useCallback((): boolean => {
+    const module = defmtModuleRef.current;
+    const elfBytes = defmtElfBytesRef.current;
+    if (!module || !elfBytes) {
+      return false;
+    }
+
+    try {
+      defmtDecoderRef.current = new module.DefmtDecoder(elfBytes);
+      defmtDecodeBlockedRef.current = false;
+      return true;
+    } catch (error) {
+      defmtDecoderRef.current = null;
+      defmtDecodeBlockedRef.current = true;
+      appendStatusLogEntry(
+        `Failed to initialize DEFMT decoder: ${formatDefmtError(error)}`,
+        'warning',
+      );
+      return false;
+    }
+  }, [appendStatusLogEntry]);
+
+  const initializeDefmtDecoderIfReady = useCallback((): boolean => {
+    if (!defmtModuleRef.current || !defmtElfBytesRef.current || defmtDecoderRef.current) {
+      return false;
+    }
+
+    if (!createDefmtDecoder()) {
+      return true;
+    }
+
+    appendStatusLogEntry('DEFMT decoder ready for live log stream.', 'connection');
+    return true;
+  }, [appendStatusLogEntry, createDefmtDecoder]);
+
+  const decodeDefmtChunk = useCallback(
+    (payload: Uint8Array): boolean => {
+      const decoder = defmtDecoderRef.current;
+      if (!decoder || defmtDecodeBlockedRef.current) {
+        return false;
+      }
+
+      try {
+        const decoded = decoder.decodeChunk(payload);
+        const receivedAt = Date.now();
+        const entries = [
+          ...decoded.lines.map((line) => makeStatusLogEntry(line, 'log', receivedAt)),
+          ...decoded.warnings.map((warning) => makeStatusLogEntry(warning, 'warning', receivedAt)),
+        ];
+        appendStatusLogBatch(entries);
+        return entries.length > 0;
+      } catch (error) {
+        defmtDecodeBlockedRef.current = true;
+        appendStatusLogEntry(`DEFMT stream decode failed: ${formatDefmtError(error)}`, 'warning');
+        return true;
+      }
+    },
+    [appendStatusLogBatch, appendStatusLogEntry],
+  );
+
+  const flushPendingDefmtChunks = useCallback((): boolean => {
+    if (!defmtDecoderRef.current || defmtDecodeBlockedRef.current) {
+      return false;
+    }
+
+    let didMutate = false;
+    while (pendingDefmtChunksRef.current.length > 0) {
+      const chunk = pendingDefmtChunksRef.current.shift();
+      if (!chunk) {
+        break;
+      }
+      if (decodeDefmtChunk(chunk)) {
+        didMutate = true;
+      }
+      if (defmtDecodeBlockedRef.current) {
+        break;
+      }
+    }
+
+    return didMutate;
+  }, [decodeDefmtChunk]);
+
+  const ensureDefmtModule = useCallback(async (): Promise<void> => {
+    if (defmtModuleRef.current) {
+      if (initializeDefmtDecoderIfReady()) {
+        flushPendingDefmtChunks();
+        telemetryVersionRef.current += 1;
+      }
+      return;
+    }
+
+    if (!defmtModulePromiseRef.current) {
+      defmtModulePromiseRef.current = loadDefmtDecoderModule()
+        .then((module) => {
+          defmtModuleRef.current = module;
+          defmtModuleErrorReportedRef.current = false;
+          return module;
+        })
+        .catch((error) => {
+          defmtModulePromiseRef.current = null;
+          if (!defmtModuleErrorReportedRef.current) {
+            appendStatusLogEntry(
+              `DEFMT decoder WebAssembly package is unavailable. Run npm run build:defmt-decoder. Details: ${formatDefmtError(error)}`,
+              'warning',
+            );
+            telemetryVersionRef.current += 1;
+            defmtModuleErrorReportedRef.current = true;
+          }
+          return null;
+        });
+    }
+
+    const module = await defmtModulePromiseRef.current;
+    if (!module || !initializeDefmtDecoderIfReady()) {
+      return;
+    }
+
+    flushPendingDefmtChunks();
+    telemetryVersionRef.current += 1;
+  }, [flushPendingDefmtChunks, initializeDefmtDecoderIfReady]);
+
+  const queuePendingDefmtChunk = useCallback(
+    (payload: Uint8Array): boolean => {
+      const queue = pendingDefmtChunksRef.current;
+      if (queue.length >= MAX_PENDING_DEFMT_CHUNKS) {
+        queue.shift();
+        if (!defmtChunkOverflowReportedRef.current) {
+          defmtChunkOverflowReportedRef.current = true;
+          appendStatusLogEntry(
+            'DEFMT predecode buffer overflowed before the decoder became ready. Dropping oldest chunks.',
+            'warning',
+          );
+          return true;
+        }
+      }
+
+      queue.push(payload);
+      return false;
+    },
+    [appendStatusLogEntry],
+  );
+
+  const resetDefmtState = useCallback(() => {
+    defmtDecoderRef.current = null;
+    defmtElfBytesRef.current = null;
+    pendingDefmtChunksRef.current = [];
+    defmtChunkOverflowReportedRef.current = false;
+    defmtDecodeBlockedRef.current = false;
   }, []);
 
   const handleMessage = (topic: string, message: any, isRetained = false) => {
@@ -332,14 +511,7 @@ export const useMqttSystem = () => {
     }
 
     // Convert message to Uint8Array if it's a string/buffer
-    let buffer: Uint8Array;
-    if (typeof message === 'string') {
-        buffer = new TextEncoder().encode(message);
-    } else if (message instanceof Uint8Array) {
-        buffer = message;
-    } else {
-        buffer = new Uint8Array(message);
-    }
+    const buffer = toUint8Array(message);
 
     const current = telemetryRef.current;
 
@@ -485,10 +657,23 @@ export const useMqttSystem = () => {
         else if (val === 'CLOSING') current.servoState = ServoState.CLOSING;
         else current.servoState = ServoState.UNKNOWN;
     }
-    else if (topic === 'status/cmd') {
-        const statusMessage = message.toString();
-        current.lastCmdStatus = statusMessage;
-        appendStatusLogEntry(statusMessage, 'status');
+    else if (topic === TEST_STAND_CONTROLLER_ELF_TOPIC) {
+        defmtDecoderRef.current = null;
+        defmtDecodeBlockedRef.current = false;
+        defmtChunkOverflowReportedRef.current = false;
+        defmtElfBytesRef.current = buffer.slice();
+        appendStatusLogEntry(
+          `Loaded ${isRetained ? 'retained ' : ''}firmware ELF from ${TEST_STAND_CONTROLLER_ELF_TOPIC} (${buffer.length} bytes).`,
+          'connection',
+        );
+        void ensureDefmtModule();
+    }
+    else if (topic === DEFMT_LOG_TOPIC) {
+        if (defmtDecoderRef.current && !defmtDecodeBlockedRef.current) {
+          decodeDefmtChunk(buffer);
+        } else {
+          queuePendingDefmtChunk(buffer.slice());
+        }
     }
 
     telemetryVersionRef.current += 1;
@@ -500,6 +685,7 @@ export const useMqttSystem = () => {
   const connect = useCallback(async (config: MqttConfig) => {
     setCriticalError(null);
     if (clientRef.current) { clientRef.current.end(); clientRef.current = null; }
+    resetDefmtState();
     
     // NOTE: We do NOT touch simulatorRef here. It is independent.
 
@@ -530,6 +716,10 @@ export const useMqttSystem = () => {
     client.on('connect', () => {
         setConnectionStatus(ConnectionState.CONNECTED);
       appendStatusLogEntry(`Connected to ${connectionUrl}`, 'connection');
+      appendStatusLogEntry(
+        `Waiting for retained firmware ELF on ${TEST_STAND_CONTROLLER_ELF_TOPIC}.`,
+        'connection',
+      );
       telemetryVersionRef.current += 1;
         const topics = [
             'sensor/adc/fast/#',
@@ -537,10 +727,13 @@ export const useMqttSystem = () => {
             'sensor/digital/armed',
             'sensor/temp/#',
             'sensor/servo',
-            'cmd/state', 'cmd/servo', 'status/#',
+            'cmd/state', 'cmd/servo', 'status/state', 'status/servo',
+            DEFMT_LOG_TOPIC,
+            TEST_STAND_CONTROLLER_ELF_TOPIC,
             'checklist/+/points/+/state'
         ];
         client.subscribe(topics);
+        void ensureDefmtModule();
     });
 
     client.on('error', (err) => {
@@ -563,7 +756,7 @@ export const useMqttSystem = () => {
     });
 
     clientRef.current = client;
-  }, [appendStatusLogEntry]);
+  }, [appendStatusLogEntry, ensureDefmtModule, resetDefmtState]);
 
   const toggleSimulation = useCallback((enabled: boolean) => {
       if (enabled) {

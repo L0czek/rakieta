@@ -32,7 +32,7 @@ export interface SensorDataPoint {
 export interface StatusLogEntry {
   message: string;
   receivedAt: number;
-  type: 'status' | 'connection';
+  type: 'log' | 'warning' | 'connection';
 }
 
 export interface SystemTelemetry {
@@ -61,7 +61,6 @@ export interface SystemTelemetry {
   // Statuses
   state: SystemState;
   servoState: ServoState;
-  lastCmdStatus: string;
   statusLog: StatusLogEntry[];
 }
 
