@@ -6150,6 +6150,12 @@
 		(uuid "84117f6e-112d-42a5-99d0-4b7d4f2eba81")
 	)
 	(junction
+		(at 146.05 152.4)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "863e53ee-0d3a-4e89-b8fd-7334ee9159b0")
+	)
+	(junction
 		(at 144.78 204.47)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -6208,6 +6214,12 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "f732b6ff-27de-4bae-9c9c-69cd775018f3")
+	)
+	(junction
+		(at 308.61 40.64)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "f9da7204-9e4a-48b7-8613-90389480f320")
 	)
 	(junction
 		(at 124.46 154.94)
@@ -6332,6 +6344,16 @@
 			(type default)
 		)
 		(uuid "1afeb8cd-1606-4c62-9ce7-4aa80be9db82")
+	)
+	(wire
+		(pts
+			(xy 303.53 40.64) (xy 308.61 40.64)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1c3c6ecd-973d-4dc8-bf1e-e98c8fe6ee03")
 	)
 	(wire
 		(pts
@@ -6815,6 +6837,16 @@
 	)
 	(wire
 		(pts
+			(xy 146.05 140.97) (xy 146.05 143.51)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "593bef54-6559-49dc-b2ff-f8348e5fe5e0")
+	)
+	(wire
+		(pts
 			(xy 363.22 154.94) (xy 372.11 154.94)
 		)
 		(stroke
@@ -6975,6 +7007,16 @@
 	)
 	(wire
 		(pts
+			(xy 303.53 43.18) (xy 303.53 40.64)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "74aabe2f-6475-4174-8ac0-23ffa2af314f")
+	)
+	(wire
+		(pts
 			(xy 363.22 157.48) (xy 363.22 154.94)
 		)
 		(stroke
@@ -6982,6 +7024,16 @@
 			(type default)
 		)
 		(uuid "7724c0e9-73f5-4e1d-9d8f-2554b5b48f52")
+	)
+	(wire
+		(pts
+			(xy 308.61 40.64) (xy 318.77 40.64)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "77dd1f83-9175-4336-afbd-47ee3ed43a07")
 	)
 	(wire
 		(pts
@@ -7305,13 +7357,23 @@
 	)
 	(wire
 		(pts
-			(xy 142.24 152.4) (xy 152.4 152.4)
+			(xy 142.24 152.4) (xy 146.05 152.4)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
 		(uuid "a7320fb8-750d-48a8-8203-15658abba2df")
+	)
+	(wire
+		(pts
+			(xy 146.05 151.13) (xy 146.05 152.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a7c4f80c-c7d6-47e3-b8d1-7103217d96fd")
 	)
 	(wire
 		(pts
@@ -7615,6 +7677,16 @@
 	)
 	(wire
 		(pts
+			(xy 308.61 43.18) (xy 308.61 40.64)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d8909943-de8c-4451-93bd-4072e8ca32db")
+	)
+	(wire
+		(pts
 			(xy 241.3 165.1) (xy 241.3 157.48)
 		)
 		(stroke
@@ -7682,6 +7754,16 @@
 			(type default)
 		)
 		(uuid "e3f6b356-4106-4c14-9a78-e74555eb85a5")
+	)
+	(wire
+		(pts
+			(xy 146.05 152.4) (xy 152.4 152.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e6c085c9-b250-4dfd-aa06-b2bdbb0f9fa8")
 	)
 	(wire
 		(pts
@@ -8603,7 +8685,7 @@
 			(uuid "3c9d3631-7231-447a-95d8-09f010823316")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "R6")
 					(unit 1)
@@ -8675,6 +8757,146 @@
 			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "C13")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:C")
+		(at 308.61 46.99 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "06f86a80-c5e9-43e4-9812-b3ad735c1648")
+		(property "Reference" "C19"
+			(at 312.42 45.7199 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "47uF"
+			(at 312.42 48.2599 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Capacitor_SMD:C_1206_3216Metric"
+			(at 309.5752 50.8 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 308.61 46.99 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Unpolarized capacitor"
+			(at 308.61 46.99 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "2"
+			(uuid "125f798b-ce39-40c1-a6da-1fa5c904cc58")
+		)
+		(pin "1"
+			(uuid "f6b9f167-361d-4b68-97f7-e8ecb9361062")
+		)
+		(instances
+			(project "blackbox"
+				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
+					(reference "C19")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:C")
+		(at 303.53 46.99 0)
+		(mirror y)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "0761857c-eac2-4f45-9eff-0d656cd54108")
+		(property "Reference" "C20"
+			(at 299.72 45.7199 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "47uF"
+			(at 299.72 48.2599 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Capacitor_SMD:C_1206_3216Metric"
+			(at 302.5648 50.8 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 303.53 46.99 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Unpolarized capacitor"
+			(at 303.53 46.99 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "2"
+			(uuid "3858cf77-e35d-473c-9506-97a98e6902e9")
+		)
+		(pin "1"
+			(uuid "53df52f5-a171-450b-adc0-e1d1ffc6d3e2")
+		)
+		(instances
+			(project "blackbox"
+				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
+					(reference "C20")
 					(unit 1)
 				)
 			)
@@ -8804,7 +9026,7 @@
 			(uuid "b1837b26-7b7d-452b-8212-18c38268eb49")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "#PWR023")
 					(unit 1)
@@ -8875,7 +9097,7 @@
 			(uuid "f01199fe-7cbc-4e35-b60f-41b8f2c02370")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "J4")
 					(unit 1)
@@ -9011,7 +9233,7 @@
 			(uuid "8fc8d93f-68a6-4ed9-8f30-f1756489b08c")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "#PWR050")
 					(unit 1)
@@ -9143,7 +9365,7 @@
 			(uuid "49070452-543c-4cf5-beb1-17a981f6e671")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "#PWR016")
 					(unit 1)
@@ -9209,7 +9431,7 @@
 			(uuid "ad6b2104-5883-4d45-ba0a-140f20baa6b2")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "#PWR029")
 					(unit 1)
@@ -9301,9 +9523,75 @@
 			(uuid "0141461c-9b2f-4c4a-b012-3785f707cd47")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "J3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 308.61 50.8 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "205be990-7a4e-44b9-90bf-17251ad08232")
+		(property "Reference" "#PWR057"
+			(at 308.61 57.15 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 308.61 55.88 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 308.61 50.8 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 308.61 50.8 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
+			(at 308.61 50.8 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "3f50dcc9-94e0-418a-94ee-3e472629a023")
+		)
+		(instances
+			(project "blackbox"
+				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
+					(reference "#PWR057")
 					(unit 1)
 				)
 			)
@@ -9367,7 +9655,7 @@
 			(uuid "28edfc98-173b-4349-9cf3-6738b62af3aa")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "#PWR045")
 					(unit 1)
@@ -9435,7 +9723,7 @@
 			(uuid "f68c4796-1829-4cb5-b0b6-5f3d979932e8")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "R4")
 					(unit 1)
@@ -9505,7 +9793,7 @@
 			(uuid "0d668759-0527-4ca8-9d8e-eef2bf4dfe6b")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "R11")
 					(unit 1)
@@ -9706,7 +9994,7 @@
 			(uuid "cc3ff3fb-9a02-4b0e-911d-9f523adda09e")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "#PWR04")
 					(unit 1)
@@ -9908,9 +10196,75 @@
 			(uuid "c73b11f2-5b49-4383-893d-ad5647c01b98")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "R13")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 303.53 50.8 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "319a11e6-34fe-4656-a8e3-b431273fe616")
+		(property "Reference" "#PWR058"
+			(at 303.53 57.15 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 303.53 55.88 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 303.53 50.8 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 303.53 50.8 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
+			(at 303.53 50.8 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "546866ff-0ee2-43cb-b155-21c99a2166c8")
+		)
+		(instances
+			(project "blackbox"
+				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
+					(reference "#PWR058")
 					(unit 1)
 				)
 			)
@@ -9986,7 +10340,7 @@
 			(uuid "40aefb7f-9e00-411d-8df9-8d252a56de70")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "D3")
 					(unit 1)
@@ -10055,7 +10409,7 @@
 			(uuid "3107d81b-5dea-4f50-b23d-30a9dd0f9e13")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "R8")
 					(unit 1)
@@ -10195,7 +10549,7 @@
 			(uuid "2b49e02b-fe12-4b8d-8263-d6d3b9635bab")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "C2")
 					(unit 1)
@@ -10261,7 +10615,7 @@
 			(uuid "1c329469-aee8-4f17-8d2d-927e03fa6fc6")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "#PWR03")
 					(unit 1)
@@ -10333,7 +10687,7 @@
 			(uuid "bbd08a21-9dbb-4c94-a16d-50febf653627")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "J5")
 					(unit 1)
@@ -10428,7 +10782,7 @@
 			(uuid "caf4457c-7602-4642-835f-6e0f1887fb56")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "J1")
 					(unit 1)
@@ -10501,7 +10855,7 @@
 			(uuid "61f88524-97fe-47c1-90d4-f0bf27e481a4")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "Y1")
 					(unit 1)
@@ -10567,7 +10921,7 @@
 			(uuid "638044f7-d9ef-4ebb-9d83-232d70da21c2")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "#PWR010")
 					(unit 1)
@@ -10637,7 +10991,7 @@
 			(uuid "8daabfc8-7dbc-44e8-834f-2319666f8053")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "C16")
 					(unit 1)
@@ -10703,7 +11057,7 @@
 			(uuid "1754654c-7819-4aad-8117-d6fa8fe2feb7")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "#PWR054")
 					(unit 1)
@@ -10828,7 +11182,7 @@
 			(uuid "08d73d38-d564-4976-80ce-02c69b216e48")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "U1")
 					(unit 1)
@@ -10894,7 +11248,7 @@
 			(uuid "e1ad5dc8-0cea-4a58-89c2-8edcf8427f5d")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "#PWR01")
 					(unit 1)
@@ -10960,7 +11314,7 @@
 			(uuid "5e200a75-a91e-4f9f-85ee-a7d8bc3840d4")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "#PWR024")
 					(unit 1)
@@ -11026,7 +11380,7 @@
 			(uuid "521ce88f-8260-448f-9bcf-f23252206324")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "#PWR055")
 					(unit 1)
@@ -11092,7 +11446,7 @@
 			(uuid "9d165b39-fb2a-4901-bb39-d1a11a663c1b")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "#PWR043")
 					(unit 1)
@@ -11158,7 +11512,7 @@
 			(uuid "75714f71-6142-44a0-940a-1a5c9a44ac19")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "#PWR031")
 					(unit 1)
@@ -11434,7 +11788,7 @@
 			(uuid "9ac868bf-f3e2-4430-bfa7-d5dd7358c13f")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "R1")
 					(unit 1)
@@ -11845,7 +12199,7 @@
 			(uuid "59082554-2b53-4cf7-bcdf-2aa520ff5f97")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "#PWR08")
 					(unit 1)
@@ -11911,7 +12265,7 @@
 			(uuid "7d9b74a7-3c82-46d7-bc45-d74527a9b66d")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "#PWR022")
 					(unit 1)
@@ -11976,7 +12330,7 @@
 			(uuid "038b71b2-5715-487d-a699-212930c302f5")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "#PWR012")
 					(unit 1)
@@ -12112,7 +12466,7 @@
 			(uuid "55b053e2-b1a1-488f-838c-b9eb945b0b34")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "R12")
 					(unit 1)
@@ -12252,7 +12606,7 @@
 			(uuid "e2858f8c-d7be-4bf9-b55e-f3539e2374cd")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "#PWR05")
 					(unit 1)
@@ -12318,7 +12672,7 @@
 			(uuid "9af1d752-bfb6-4556-9740-786c334cd7e7")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "#PWR027")
 					(unit 1)
@@ -12390,7 +12744,7 @@
 			(uuid "acfc2c6f-8854-44ba-ac51-1aae1450d88d")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "RV1")
 					(unit 1)
@@ -12672,7 +13026,7 @@
 			(uuid "6bb65853-ccdf-4042-82c7-15b00b3ba9b1")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "R10")
 					(unit 1)
@@ -12738,7 +13092,7 @@
 			(uuid "bc430d97-3606-4de5-b04e-3cf80ed2da71")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "#PWR07")
 					(unit 1)
@@ -12804,7 +13158,7 @@
 			(uuid "d12975e8-056a-40b7-b91f-f547d93a2d3b")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "#PWR019")
 					(unit 1)
@@ -12881,7 +13235,7 @@
 			(uuid "72cb801e-7a67-4372-93f1-8a47010c1385")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "U6")
 					(unit 1)
@@ -12960,7 +13314,7 @@
 			(uuid "c20311a6-314b-4a07-8cd5-a7c22b740f65")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "D1")
 					(unit 1)
@@ -13096,7 +13450,7 @@
 			(uuid "ad4d8e96-efde-4d4e-a05c-a7b1e9d994d6")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "#PWR011")
 					(unit 1)
@@ -13235,7 +13589,7 @@
 			(uuid "cf768877-3a2d-4032-9412-764c7c65ae3f")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "R5")
 					(unit 1)
@@ -13301,7 +13655,7 @@
 			(uuid "25e2df44-e6af-4881-b92f-a32cde520722")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "#PWR06")
 					(unit 1)
@@ -13367,7 +13721,7 @@
 			(uuid "d5ea6b3a-c7d1-420d-b86f-0dbd23d688a0")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "#PWR053")
 					(unit 1)
@@ -13445,7 +13799,7 @@
 			(uuid "5ef94dc4-5185-4e17-abc2-8095930f6d31")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "J2")
 					(unit 1)
@@ -13585,7 +13939,7 @@
 			(uuid "e9b9aef3-7765-40e1-8ad2-32d2b48bf5fb")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "#PWR035")
 					(unit 1)
@@ -13730,7 +14084,7 @@
 			(uuid "1a437ee8-4b5a-414a-8468-5787cc3b9fcd")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "#PWR037")
 					(unit 1)
@@ -13863,7 +14217,7 @@
 			(uuid "1c8988da-34fb-43c4-84b2-572b3fca3ad4")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "#PWR030")
 					(unit 1)
@@ -13999,7 +14353,7 @@
 			(uuid "26698942-2c25-46b3-8a7f-e383843bf977")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "C4")
 					(unit 1)
@@ -14065,7 +14419,7 @@
 			(uuid "9310629a-0090-4c77-abb4-e5e07fcb2d79")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "#PWR02")
 					(unit 1)
@@ -14134,7 +14488,7 @@
 			(uuid "3edcf7c9-02f6-4731-8d8b-2962d54d0a50")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "C3")
 					(unit 1)
@@ -14200,7 +14554,7 @@
 			(uuid "f1565a65-7919-478e-9c11-37d91d2dbbf1")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "#PWR039")
 					(unit 1)
@@ -14268,7 +14622,7 @@
 			(uuid "517bf717-8c3a-4ae2-a42f-411ee6603471")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "SW1")
 					(unit 1)
@@ -14336,9 +14690,75 @@
 			(uuid "739348e9-1e49-448f-b9f1-df2dc4f9e548")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "F2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+3.3V")
+		(at 146.05 140.97 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "b10bf943-aa5c-4fec-a196-c3b9cfb171ae")
+		(property "Reference" "#PWR056"
+			(at 146.05 144.78 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "+3.3V"
+			(at 146.05 135.89 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 146.05 140.97 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 146.05 140.97 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+3.3V\""
+			(at 146.05 140.97 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "e8078f26-32c0-4896-a430-1eb4bd8c10dd")
+		)
+		(instances
+			(project "blackbox"
+				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
+					(reference "#PWR056")
 					(unit 1)
 				)
 			)
@@ -14402,7 +14822,7 @@
 			(uuid "bcab8a24-2bff-499a-8c51-e9aa5abad223")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "#PWR032")
 					(unit 1)
@@ -14497,7 +14917,7 @@
 			(uuid "0f7e2f0d-53ac-4f60-b616-677d1974e3e9")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "U4")
 					(unit 1)
@@ -14563,7 +14983,7 @@
 			(uuid "60af75f1-6316-4b0a-a26e-fa6d24a452bf")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "#PWR041")
 					(unit 1)
@@ -14629,7 +15049,7 @@
 			(uuid "47d68278-f330-4c84-9ae7-b13a2f9d2d5b")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "#PWR044")
 					(unit 1)
@@ -14695,7 +15115,7 @@
 			(uuid "eca42f78-4d37-4089-8004-9c2abae6c1c3")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "#PWR038")
 					(unit 1)
@@ -14761,7 +15181,7 @@
 			(uuid "a1a9fadf-c1c0-4f48-9eaf-07d314043726")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "#PWR028")
 					(unit 1)
@@ -14827,7 +15247,7 @@
 			(uuid "2fab9038-ec88-48ac-aeee-9d25ec5bc657")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "#PWR014")
 					(unit 1)
@@ -14905,7 +15325,7 @@
 			(uuid "e37e90ca-0a30-4ffe-8c39-e73021c6100d")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "U5")
 					(unit 1)
@@ -14993,9 +15413,79 @@
 			(uuid "5b3e8b23-4454-48b0-8265-4e9712d665b0")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "U2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 146.05 147.32 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "c1238918-37a8-4fa0-ab11-905b922924eb")
+		(property "Reference" "R15"
+			(at 148.59 146.0499 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "10K"
+			(at 148.59 148.5899 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
+			(at 144.272 147.32 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 146.05 147.32 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Resistor"
+			(at 146.05 147.32 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "14e38cbc-2740-42a7-87bf-0e483bf4a665")
+		)
+		(pin "2"
+			(uuid "dc595840-b0e3-4373-9f9f-9b211ef91859")
+		)
+		(instances
+			(project "blackbox"
+				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
+					(reference "R15")
 					(unit 1)
 				)
 			)
@@ -15059,7 +15549,7 @@
 			(uuid "8e952fd1-80f2-4a05-8e08-5e22afea2810")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "#PWR049")
 					(unit 1)
@@ -15129,7 +15619,7 @@
 			(uuid "7c49e8ca-4f3a-465c-9435-b74f9c660b69")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "R14")
 					(unit 1)
@@ -15195,7 +15685,7 @@
 			(uuid "5e412ae8-a871-4378-84c3-24f4be407cdf")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "#PWR036")
 					(unit 1)
@@ -15263,7 +15753,7 @@
 			(uuid "8083dc10-39ee-421b-bbba-204f13190391")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "F1")
 					(unit 1)
@@ -15329,7 +15819,7 @@
 			(uuid "7847e5f5-9c29-43a6-a7ec-d499dadfc895")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "#PWR020")
 					(unit 1)
@@ -15395,7 +15885,7 @@
 			(uuid "a6ffaa51-bec9-436e-be38-e421bc9a9875")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "#PWR025")
 					(unit 1)
@@ -15531,7 +16021,7 @@
 			(uuid "40248e6a-c1a6-4ba7-8078-c47d5cf85a92")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "#PWR09")
 					(unit 1)
@@ -15755,7 +16245,7 @@
 			(uuid "ea1082e7-e28a-4fd0-9724-477cb21f8048")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "C8")
 					(unit 1)
@@ -15823,7 +16313,7 @@
 			(uuid "d3a6fc6f-92d3-4197-b368-f555a04c6dde")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "R3")
 					(unit 1)
@@ -15955,7 +16445,7 @@
 			(uuid "e629dfce-88a4-497f-8bb2-2c9586e15cca")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "#PWR034")
 					(unit 1)
@@ -16021,7 +16511,7 @@
 			(uuid "934289dd-db12-4c15-9c1b-b2e43206c93c")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "#PWR046")
 					(unit 1)
@@ -16091,7 +16581,7 @@
 			(uuid "af568144-09c8-4416-95a9-ce0b7a9804fd")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "C9")
 					(unit 1)
@@ -16157,7 +16647,7 @@
 			(uuid "dbbf5f0e-335e-4958-8ba3-bdbd0bde9434")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "#PWR040")
 					(unit 1)
@@ -16223,7 +16713,7 @@
 			(uuid "805bab0e-0124-4ebc-98bf-1a3f62eb453b")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "#PWR033")
 					(unit 1)
@@ -16289,7 +16779,7 @@
 			(uuid "f75b4fc8-deb6-4be8-8bbf-18654af9063a")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "#PWR021")
 					(unit 1)
@@ -16355,7 +16845,7 @@
 			(uuid "3771db34-9f9e-42d2-acf0-35403ef7b98c")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "#PWR042")
 					(unit 1)
@@ -16425,7 +16915,7 @@
 			(uuid "3453a7d6-da96-473d-b5a4-d107667b6129")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "TH1")
 					(unit 1)
@@ -16495,7 +16985,7 @@
 			(uuid "1a19b68b-2210-4e30-a0b4-6cca45d016c5")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "C1")
 					(unit 1)
@@ -16697,7 +17187,7 @@
 			(uuid "7e01508e-5af9-4c83-9666-9ad5961c6172")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "#PWR015")
 					(unit 1)
@@ -16767,7 +17257,7 @@
 			(uuid "29bd5b4a-8e55-495f-8fbf-5ba25be100dd")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "C7")
 					(unit 1)
@@ -16907,7 +17397,7 @@
 			(uuid "c7f5b238-cce9-403e-8437-f8553097fbd1")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "R7")
 					(unit 1)
@@ -17109,7 +17599,7 @@
 			(uuid "08f6a975-24f4-494b-9134-ffcd989995c1")
 		)
 		(instances
-			(project ""
+			(project "blackbox"
 				(path "/2e56890d-f60c-4e7a-9c20-d68c88d207cf"
 					(reference "#PWR013")
 					(unit 1)
