@@ -111,6 +111,7 @@ const App = () => {
     connect,
     toggleSimulation,
     publishChecklistPointState,
+    publishConversionSettings,
     resetData,
     actions,
   } = useMqttSystem();
@@ -192,7 +193,13 @@ const App = () => {
         />
       );
     }
-    return <ConfigurationView onDirtyChange={setConfigHasUnsavedChanges} />;
+    return (
+      <ConfigurationView
+        onDirtyChange={setConfigHasUnsavedChanges}
+        telemetry={telemetry}
+        publishConversionSettings={publishConversionSettings}
+      />
+    );
   })();
 
   return (

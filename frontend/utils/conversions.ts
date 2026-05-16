@@ -16,18 +16,16 @@ export interface LutPoint {
     y: number;
 }
 
+export type PressureChannel = 'pressureTank' | 'pressureCombustion';
+
 export interface ConversionSettings {
     lutByChannel: Record<AnalogChannel, LutPoint[]>;
     tensometerDividerRatio: number;
     tensometerKgPerV: number;
-    pressureDividerRatio: {
-        pressureTank: number;
-        pressureCombustion: number;
-    };
-    pressureScaleBarPerV: {
-        pressureTank: number;
-        pressureCombustion: number;
-    };
+    pressureDividerRatio: Record<PressureChannel, number>;
+    pressureShuntOhms: Record<PressureChannel, number>;
+    pressureAmplifierGain: Record<PressureChannel, number>;
+    pressureBarPerMa: Record<PressureChannel, number>;
     voltageDividerRatio: {
         batteryStand: number;
         batteryComputer: number;
@@ -35,6 +33,8 @@ export interface ConversionSettings {
         starterSense: number;
     };
 }
+
+export const PRESSURE_LOOP_ZERO_MA = 4;
 
 // --- ADC CORRECTION (ESP32 LUT) ---
 
@@ -67,12 +67,20 @@ export const getDefaultConversionSettings = (): ConversionSettings => ({
     tensometerDividerRatio: 4.774,
     tensometerKgPerV: 200.0,
     pressureDividerRatio: {
-        pressureTank: 3.1,
-        pressureCombustion: 3.129,
+        pressureTank: 3.15,
+        pressureCombustion: 3.1,
     },
-    pressureScaleBarPerV: {
-        pressureTank: 40.0,
-        pressureCombustion: 40.0,
+    pressureShuntOhms: {
+        pressureTank: 4.7,
+        pressureCombustion: 4.7,
+    },
+    pressureAmplifierGain: {
+        pressureTank: 50.0,
+        pressureCombustion: 50.0,
+    },
+    pressureBarPerMa: {
+        pressureTank: 10.0,
+        pressureCombustion: 10.0,
     },
     voltageDividerRatio: {
         batteryStand: 14.316,
@@ -95,7 +103,9 @@ const deepCloneSettings = (settings: ConversionSettings): ConversionSettings => 
     tensometerDividerRatio: settings.tensometerDividerRatio,
     tensometerKgPerV: settings.tensometerKgPerV,
     pressureDividerRatio: { ...settings.pressureDividerRatio },
-    pressureScaleBarPerV: { ...settings.pressureScaleBarPerV },
+    pressureShuntOhms: { ...settings.pressureShuntOhms },
+    pressureAmplifierGain: { ...settings.pressureAmplifierGain },
+    pressureBarPerMa: { ...settings.pressureBarPerMa },
     voltageDividerRatio: { ...settings.voltageDividerRatio },
 });
 
@@ -161,16 +171,40 @@ const sanitizeSettings = (candidate: unknown): ConversionSettings => {
             : defaults.pressureDividerRatio.pressureCombustion,
     };
 
-    const pressureScaleSource = source.pressureScaleBarPerV && typeof source.pressureScaleBarPerV === 'object'
-        ? source.pressureScaleBarPerV
+    const shuntSource = source.pressureShuntOhms && typeof source.pressureShuntOhms === 'object'
+        ? source.pressureShuntOhms
         : {};
-    const pressureScaleBarPerV = {
-        pressureTank: Number.isFinite(Number(pressureScaleSource.pressureTank))
-            ? Math.max(0, Number(pressureScaleSource.pressureTank))
-            : defaults.pressureScaleBarPerV.pressureTank,
-        pressureCombustion: Number.isFinite(Number(pressureScaleSource.pressureCombustion))
-            ? Math.max(0, Number(pressureScaleSource.pressureCombustion))
-            : defaults.pressureScaleBarPerV.pressureCombustion,
+    const pressureShuntOhms = {
+        pressureTank: Number.isFinite(Number(shuntSource.pressureTank)) && Number(shuntSource.pressureTank) > 0
+            ? Number(shuntSource.pressureTank)
+            : defaults.pressureShuntOhms.pressureTank,
+        pressureCombustion: Number.isFinite(Number(shuntSource.pressureCombustion)) && Number(shuntSource.pressureCombustion) > 0
+            ? Number(shuntSource.pressureCombustion)
+            : defaults.pressureShuntOhms.pressureCombustion,
+    };
+
+    const gainSource = source.pressureAmplifierGain && typeof source.pressureAmplifierGain === 'object'
+        ? source.pressureAmplifierGain
+        : {};
+    const pressureAmplifierGain = {
+        pressureTank: Number.isFinite(Number(gainSource.pressureTank)) && Number(gainSource.pressureTank) > 0
+            ? Number(gainSource.pressureTank)
+            : defaults.pressureAmplifierGain.pressureTank,
+        pressureCombustion: Number.isFinite(Number(gainSource.pressureCombustion)) && Number(gainSource.pressureCombustion) > 0
+            ? Number(gainSource.pressureCombustion)
+            : defaults.pressureAmplifierGain.pressureCombustion,
+    };
+
+    const barPerMaSource = source.pressureBarPerMa && typeof source.pressureBarPerMa === 'object'
+        ? source.pressureBarPerMa
+        : {};
+    const pressureBarPerMa = {
+        pressureTank: Number.isFinite(Number(barPerMaSource.pressureTank))
+            ? Math.max(0, Number(barPerMaSource.pressureTank))
+            : defaults.pressureBarPerMa.pressureTank,
+        pressureCombustion: Number.isFinite(Number(barPerMaSource.pressureCombustion))
+            ? Math.max(0, Number(barPerMaSource.pressureCombustion))
+            : defaults.pressureBarPerMa.pressureCombustion,
     };
 
     const dividerSource = source.voltageDividerRatio && typeof source.voltageDividerRatio === 'object'
@@ -196,7 +230,9 @@ const sanitizeSettings = (candidate: unknown): ConversionSettings => {
         tensometerDividerRatio,
         tensometerKgPerV,
         pressureDividerRatio,
-        pressureScaleBarPerV,
+        pressureShuntOhms,
+        pressureAmplifierGain,
+        pressureBarPerMa,
         voltageDividerRatio,
     };
 };
@@ -220,18 +256,73 @@ const loadSettings = (): ConversionSettings => {
 
 let conversionSettings: ConversionSettings = loadSettings();
 
+const settingsListeners = new Set<(settings: ConversionSettings) => void>();
+
+const notifySettingsListeners = () => {
+    const snapshot = getConversionSettings();
+    settingsListeners.forEach((cb) => {
+        try {
+            cb(snapshot);
+        } catch (err) {
+            console.error('Conversion settings listener threw:', err);
+        }
+    });
+};
+
+export const subscribeToConversionSettings = (
+    cb: (settings: ConversionSettings) => void,
+): (() => void) => {
+    settingsListeners.add(cb);
+    return () => {
+        settingsListeners.delete(cb);
+    };
+};
+
 export const getConversionSettings = (): ConversionSettings => deepCloneSettings(conversionSettings);
 
 export const setConversionSettings = (nextSettings: ConversionSettings): ConversionSettings => {
     conversionSettings = sanitizeSettings(nextSettings);
     persistSettings(conversionSettings);
+    notifySettingsListeners();
     return getConversionSettings();
 };
 
 export const resetConversionSettings = (): ConversionSettings => {
     conversionSettings = getDefaultConversionSettings();
     persistSettings(conversionSettings);
+    notifySettingsListeners();
     return getConversionSettings();
+};
+
+export const CONVERSION_SETTINGS_MQTT_TOPIC = 'config/conversions/state';
+const CONVERSION_SETTINGS_PAYLOAD_VERSION = 1;
+
+export interface ConversionSettingsEnvelope {
+    version: number;
+    savedAtWall: number;
+    settings: ConversionSettings;
+}
+
+export const encodeConversionSettingsPayload = (settings: ConversionSettings): string => {
+    const envelope: ConversionSettingsEnvelope = {
+        version: CONVERSION_SETTINGS_PAYLOAD_VERSION,
+        savedAtWall: Date.now(),
+        settings: deepCloneSettings(settings),
+    };
+    return JSON.stringify(envelope);
+};
+
+export const decodeConversionSettingsPayload = (payload: string): ConversionSettings | null => {
+    let parsed: unknown;
+    try {
+        parsed = JSON.parse(payload);
+    } catch {
+        return null;
+    }
+    if (!parsed || typeof parsed !== 'object') return null;
+    const source = parsed as Record<string, unknown>;
+    if (!source.settings || typeof source.settings !== 'object') return null;
+    return sanitizeSettings(source.settings);
 };
 
 export const importConversionSettingsFromJson = (jsonContent: string): ConversionSettings => {
@@ -274,9 +365,56 @@ export const rawToThrustKg = (raw: number): number => {
     return v * conversionSettings.tensometerDividerRatio * conversionSettings.tensometerKgPerV;
 };
 
-export const rawToPressureBar = (raw: number, channel: 'pressureTank' | 'pressureCombustion'): number => {
-    const v = correctAdcToVoltage(raw, channel);
-    return v * conversionSettings.pressureDividerRatio[channel] * conversionSettings.pressureScaleBarPerV[channel];
+export interface PressureConversionSteps {
+    raw: number;
+    voltageAtAdc: number;        // V, after LUT
+    voltageAtAmpOutput: number;  // V at INA213 output (after un-dividing)
+    voltageAcrossShunt: number;  // V across the shunt resistor (after un-gain)
+    currentMa: number;           // mA flowing through loop / shunt
+    currentAboveZeroMa: number;  // mA - 4 (live-zero subtracted)
+    pressureBar: number;         // final
+}
+
+const interpolateLut = (raw: number, lut: LutPoint[]): number => {
+    if (raw <= 0) return 0;
+    if (raw >= 4095) return lut[lut.length - 1].y / 1000.0;
+    for (let i = 0; i < lut.length - 1; i++) {
+        const p1 = lut[i];
+        const p2 = lut[i + 1];
+        if (raw >= p1.x && raw <= p2.x) {
+            const mV = p1.y + (raw - p1.x) * (p2.y - p1.y) / (p2.x - p1.x);
+            return mV / 1000.0;
+        }
+    }
+    return 0;
+};
+
+export const computePressureConversionSteps = (
+    raw: number,
+    channel: PressureChannel,
+    settings: ConversionSettings = conversionSettings,
+): PressureConversionSteps => {
+    const voltageAtAdc = interpolateLut(raw, settings.lutByChannel[channel]);
+    const voltageAtAmpOutput = voltageAtAdc * settings.pressureDividerRatio[channel];
+    const gain = settings.pressureAmplifierGain[channel];
+    const voltageAcrossShunt = gain > 0 ? voltageAtAmpOutput / gain : 0;
+    const shunt = settings.pressureShuntOhms[channel];
+    const currentMa = shunt > 0 ? (voltageAcrossShunt / shunt) * 1000 : 0;
+    const currentAboveZeroMa = currentMa - PRESSURE_LOOP_ZERO_MA;
+    const pressureBar = currentAboveZeroMa * settings.pressureBarPerMa[channel];
+    return {
+        raw,
+        voltageAtAdc,
+        voltageAtAmpOutput,
+        voltageAcrossShunt,
+        currentMa,
+        currentAboveZeroMa,
+        pressureBar,
+    };
+};
+
+export const rawToPressureBar = (raw: number, channel: PressureChannel): number => {
+    return computePressureConversionSteps(raw, channel).pressureBar;
 };
 
 export const rawToVoltage = (raw: number, channel: 'batteryStand' | 'batteryComputer' | 'boostVoltage' | 'starterSense'): number => {

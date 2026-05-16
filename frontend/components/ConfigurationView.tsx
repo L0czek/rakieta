@@ -5,18 +5,59 @@ import {
     AnalogChannel,
     ConversionSettings,
     LutPoint,
+    PressureChannel,
+    computePressureConversionSteps,
     exportConversionSettingsToJson,
     getConversionSettings,
     importConversionSettingsFromJson,
     resetConversionSettings,
     setConversionSettings,
+    subscribeToConversionSettings,
 } from '@/utils/conversions';
 import { ScadaPanel, useChartSize } from '@/components/Widgets';
 import { CHART_COLORS } from '@/theme/tokens';
+import type { SystemTelemetry } from '@/types';
 
 interface ConfigurationViewProps {
     onDirtyChange?: (isDirty: boolean) => void;
+    telemetry?: SystemTelemetry;
+    publishConversionSettings?: (settings: ConversionSettings) => Promise<void> | void;
 }
+
+const PRESSURE_DEBUG_CHANNELS: { channel: PressureChannel; label: string }[] = [
+    { channel: 'pressureTank', label: 'PRESSURE TANK' },
+    { channel: 'pressureCombustion', label: 'PRESSURE COMBUSTION' },
+];
+
+const PressureDebugRow: React.FC<{
+    label: string;
+    raw: number | null;
+    channel: PressureChannel;
+    settings: ConversionSettings;
+}> = ({ label, raw, channel, settings }) => {
+    const steps = raw === null ? null : computePressureConversionSteps(raw, channel, settings);
+    const cell = (text: string) => (
+        <td className="px-2 py-1 font-mono text-scada-secondary tabular-nums">{text}</td>
+    );
+    return (
+        <tr className="border-t border-scada-weak">
+            <td className="px-2 py-1 text-xs text-scada-secondary uppercase tracking-wider">{label}</td>
+            {steps === null ? (
+                <td colSpan={7} className="px-2 py-1 font-mono text-scada-secondary opacity-50">— no data —</td>
+            ) : (
+                <>
+                    {cell(`${steps.raw}`)}
+                    {cell(`${steps.voltageAtAdc.toFixed(4)} V`)}
+                    {cell(`${steps.voltageAtAmpOutput.toFixed(4)} V`)}
+                    {cell(`${(steps.voltageAcrossShunt * 1000).toFixed(3)} mV`)}
+                    {cell(`${steps.currentMa.toFixed(3)} mA`)}
+                    {cell(`${steps.currentAboveZeroMa.toFixed(3)} mA`)}
+                    {cell(`${steps.pressureBar.toFixed(2)} bar`)}
+                </>
+            )}
+        </tr>
+    );
+};
 
 const ANALOG_CHANNELS: AnalogChannel[] = [
     'tensometer',
@@ -146,7 +187,11 @@ const LutChart: React.FC<{ points: LutPoint[]; onHoverIndexChange?: (index: numb
     );
 };
 
-export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyChange }) => {
+export const ConfigurationView: React.FC<ConfigurationViewProps> = ({
+    onDirtyChange,
+    telemetry,
+    publishConversionSettings,
+}) => {
     const [settings, setSettingsState] = useState<ConversionSettings>(() => getConversionSettings());
     const [lastSavedSettings, setLastSavedSettings] = useState<ConversionSettings>(() => getConversionSettings());
     const [selectedChannel, setSelectedChannel] = useState<AnalogChannel>('tensometer');
@@ -212,6 +257,28 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
         setHoveredPointIndex(null);
     }, [selectedChannel]);
 
+    const hasUnsavedChangesRef = useRef(false);
+    useEffect(() => {
+        hasUnsavedChangesRef.current = hasUnsavedChanges;
+    }, [hasUnsavedChanges]);
+
+    useEffect(() => {
+        const unsubscribe = subscribeToConversionSettings((incoming) => {
+            setLastSavedSettings((prev) => {
+                if (JSON.stringify(prev) === JSON.stringify(incoming)) return prev;
+                if (hasUnsavedChangesRef.current) {
+                    setStatus('REMOTE UPDATE RECEIVED — DRAFT KEPT');
+                } else {
+                    setSettingsState(incoming);
+                    refreshLutDrafts(incoming);
+                    setStatus('REMOTE UPDATE APPLIED');
+                }
+                return incoming;
+            });
+        });
+        return unsubscribe;
+    }, []);
+
     const refreshLutDrafts = (next: ConversionSettings) => {
         setLutDrafts({
             tensometer: normalizeLutForUi(next.lutByChannel.tensometer),
@@ -263,6 +330,11 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
             setLastSavedSettings(saved);
             refreshLutDrafts(saved);
             setStatus('SAVED');
+            if (publishConversionSettings) {
+                Promise.resolve(publishConversionSettings(saved))
+                    .then(() => setStatus('SAVED & PUBLISHED'))
+                    .catch((err) => setStatus(`PUBLISH ERROR: ${err?.message || 'unknown'}`));
+            }
         } catch (err: any) {
             setStatus(`ERROR: ${err.message || 'Failed to save settings.'}`);
         }
@@ -349,14 +421,40 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-xs text-scada-secondary block mb-1">PRESSURE TANK BAR/V</label>
+                                    <label className="text-xs text-scada-secondary block mb-1">PRESSURE TANK SHUNT (Ω)</label>
                                     <input
                                         type="number"
                                         step="any"
-                                        value={settings.pressureScaleBarPerV.pressureTank}
+                                        value={settings.pressureShuntOhms.pressureTank}
                                         onChange={e => setSettingsState(prev => ({
                                             ...prev,
-                                            pressureScaleBarPerV: { ...prev.pressureScaleBarPerV, pressureTank: Number(e.target.value) }
+                                            pressureShuntOhms: { ...prev.pressureShuntOhms, pressureTank: Number(e.target.value) }
+                                        }))}
+                                        className="scada-input"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-xs text-scada-secondary block mb-1">PRESSURE TANK AMP GAIN (V/V)</label>
+                                    <input
+                                        type="number"
+                                        step="any"
+                                        value={settings.pressureAmplifierGain.pressureTank}
+                                        onChange={e => setSettingsState(prev => ({
+                                            ...prev,
+                                            pressureAmplifierGain: { ...prev.pressureAmplifierGain, pressureTank: Number(e.target.value) }
+                                        }))}
+                                        className="scada-input"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-xs text-scada-secondary block mb-1">PRESSURE TANK BAR/mA</label>
+                                    <input
+                                        type="number"
+                                        step="any"
+                                        value={settings.pressureBarPerMa.pressureTank}
+                                        onChange={e => setSettingsState(prev => ({
+                                            ...prev,
+                                            pressureBarPerMa: { ...prev.pressureBarPerMa, pressureTank: Number(e.target.value) }
                                         }))}
                                         className="scada-input"
                                     />
@@ -376,14 +474,40 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-xs text-scada-secondary block mb-1">PRESSURE COMBUSTION BAR/V</label>
+                                    <label className="text-xs text-scada-secondary block mb-1">PRESSURE COMBUSTION SHUNT (Ω)</label>
                                     <input
                                         type="number"
                                         step="any"
-                                        value={settings.pressureScaleBarPerV.pressureCombustion}
+                                        value={settings.pressureShuntOhms.pressureCombustion}
                                         onChange={e => setSettingsState(prev => ({
                                             ...prev,
-                                            pressureScaleBarPerV: { ...prev.pressureScaleBarPerV, pressureCombustion: Number(e.target.value) }
+                                            pressureShuntOhms: { ...prev.pressureShuntOhms, pressureCombustion: Number(e.target.value) }
+                                        }))}
+                                        className="scada-input"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-xs text-scada-secondary block mb-1">PRESSURE COMBUSTION AMP GAIN (V/V)</label>
+                                    <input
+                                        type="number"
+                                        step="any"
+                                        value={settings.pressureAmplifierGain.pressureCombustion}
+                                        onChange={e => setSettingsState(prev => ({
+                                            ...prev,
+                                            pressureAmplifierGain: { ...prev.pressureAmplifierGain, pressureCombustion: Number(e.target.value) }
+                                        }))}
+                                        className="scada-input"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-xs text-scada-secondary block mb-1">PRESSURE COMBUSTION BAR/mA</label>
+                                    <input
+                                        type="number"
+                                        step="any"
+                                        value={settings.pressureBarPerMa.pressureCombustion}
+                                        onChange={e => setSettingsState(prev => ({
+                                            ...prev,
+                                            pressureBarPerMa: { ...prev.pressureBarPerMa, pressureCombustion: Number(e.target.value) }
                                         }))}
                                         className="scada-input"
                                     />
@@ -569,6 +693,47 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({ onDirtyCha
                                         </button>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                    </ScadaPanel>
+                </div>
+
+                <div className="col-span-12">
+                    <ScadaPanel title="PRESSURE DEBUG (LIVE, USES UNSAVED EDITS)">
+                        <div className="p-3">
+                            <div className="overflow-auto border border-scada rounded">
+                                <table className="w-full text-xs">
+                                    <thead className="bg-scada-app text-scada-secondary uppercase tracking-wider">
+                                        <tr>
+                                            <th className="text-left px-2 py-1">Channel</th>
+                                            <th className="text-left px-2 py-1">Raw ADC</th>
+                                            <th className="text-left px-2 py-1">V at ADC</th>
+                                            <th className="text-left px-2 py-1">V at amp out</th>
+                                            <th className="text-left px-2 py-1">V across shunt</th>
+                                            <th className="text-left px-2 py-1">Current</th>
+                                            <th className="text-left px-2 py-1">Current − 4 mA</th>
+                                            <th className="text-left px-2 py-1">Pressure</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {PRESSURE_DEBUG_CHANNELS.map(({ channel, label }) => (
+                                            <PressureDebugRow
+                                                key={channel}
+                                                label={label}
+                                                raw={
+                                                    channel === 'pressureTank'
+                                                        ? telemetry?.pressureTankRaw ?? null
+                                                        : telemetry?.pressureCombustionRaw ?? null
+                                                }
+                                                channel={channel}
+                                                settings={draftSettings}
+                                            />
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div className="mt-2 text-xs text-scada-secondary opacity-70">
+                                Steps shown use the current (unsaved) form values. Raw ADC is the latest sample from the most recent batch.
                             </div>
                         </div>
                     </ScadaPanel>

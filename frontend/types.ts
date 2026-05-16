@@ -44,6 +44,10 @@ export interface SystemTelemetry {
   tensometer: SensorDataPoint[];
   pressureTank: SensorDataPoint[];
   pressureCombustion: SensorDataPoint[];
+
+  // Latest raw ADC samples for pressure channels (for calibration debug view)
+  pressureTankRaw: number | null;
+  pressureCombustionRaw: number | null;
   
   // Slow ADCs
   batteryStand: SensorDataPoint[];

@@ -26,6 +26,13 @@ import {
 } from '@/utils/defmt';
 import { buildChecklistPointTopic, parseChecklistPointTopic } from '@/utils/checklistTopics';
 import * as Converters from '@/utils/conversions';
+import {
+  CONVERSION_SETTINGS_MQTT_TOPIC,
+  decodeConversionSettingsPayload,
+  encodeConversionSettingsPayload,
+  setConversionSettings,
+  type ConversionSettings,
+} from '@/utils/conversions';
 import * as DB from '@/utils/db';
 import * as Parser from '@/utils/parser';
 import { RocketSimulator, PacketEmit } from '@/utils/simulator';
@@ -38,6 +45,8 @@ const DEFAULT_TELEMETRY: SystemTelemetry = {
   tensometer: [],
   pressureTank: [],
   pressureCombustion: [],
+  pressureTankRaw: null,
+  pressureCombustionRaw: null,
   batteryStand: [],
   batteryComputer: [],
   boostVoltage: [],
@@ -494,6 +503,16 @@ export const useMqttSystem = () => {
   const handleMessage = (topic: string, message: any, isRetained = false) => {
     if (connectionStatus === ConnectionState.ERROR) return;
 
+    if (topic === CONVERSION_SETTINGS_MQTT_TOPIC) {
+      const decoded = decodeConversionSettingsPayload(toMessageText(message));
+      if (decoded === null) {
+        console.warn(`Invalid conversion settings payload on topic: ${topic}`);
+        return;
+      }
+      setConversionSettings(decoded);
+      return;
+    }
+
     const checklistTopicParts = parseChecklistPointTopic(topic);
     if (checklistTopicParts) {
       const parsedState = parseChecklistPointStatePayload(toMessageText(message));
@@ -580,11 +599,13 @@ export const useMqttSystem = () => {
     } 
     else if (topic === 'sensor/adc/fast/pressure/tank') {
       const { timestampStart, timestampEnd, values } = Parser.parseFastAdc(buffer);
-            updateFastSensor('pressureTank', 'pressureTank', timestampStart, timestampEnd, values.map(v => Converters.rawToPressureBar(v, 'pressureTank')));
+      if (values.length > 0) current.pressureTankRaw = values[values.length - 1];
+      updateFastSensor('pressureTank', 'pressureTank', timestampStart, timestampEnd, values.map(v => Converters.rawToPressureBar(v, 'pressureTank')));
     }
     else if (topic === 'sensor/adc/fast/pressure/combustion') {
       const { timestampStart, timestampEnd, values } = Parser.parseFastAdc(buffer);
-            updateFastSensor('pressureCombustion', 'pressureCombustion', timestampStart, timestampEnd, values.map(v => Converters.rawToPressureBar(v, 'pressureCombustion')));
+      if (values.length > 0) current.pressureCombustionRaw = values[values.length - 1];
+      updateFastSensor('pressureCombustion', 'pressureCombustion', timestampStart, timestampEnd, values.map(v => Converters.rawToPressureBar(v, 'pressureCombustion')));
     }
     else if (topic.startsWith('sensor/adc/slow/')) {
         const { timestamp, value: raw } = Parser.parseSlowAdc(buffer);
@@ -730,7 +751,8 @@ export const useMqttSystem = () => {
             'cmd/state', 'cmd/servo', 'status/state', 'status/servo',
             DEFMT_LOG_TOPIC,
             TEST_STAND_CONTROLLER_ELF_TOPIC,
-            'checklist/+/points/+/state'
+            'checklist/+/points/+/state',
+            CONVERSION_SETTINGS_MQTT_TOPIC,
         ];
         client.subscribe(topics);
         void ensureDefmtModule();
@@ -815,6 +837,31 @@ export const useMqttSystem = () => {
     }
   };
 
+  const publishConversionSettings = useCallback(
+    async (settings: ConversionSettings): Promise<void> => {
+      const client = clientRef.current;
+      if (!client || !client.connected) {
+        return;
+      }
+      const payload = encodeConversionSettingsPayload(settings);
+      await new Promise<void>((resolve, reject) => {
+        client.publish(
+          CONVERSION_SETTINGS_MQTT_TOPIC,
+          payload,
+          { qos: 1, retain: true },
+          (error) => {
+            if (error) {
+              reject(error);
+              return;
+            }
+            resolve();
+          },
+        );
+      });
+    },
+    [],
+  );
+
   const publishChecklistPointState = useCallback(
     async (checklistId: string, pointId: string, state: ChecklistPointRuntimeState): Promise<void> => {
       applyChecklistTopicUpdate({ checklistId, pointId, state });
@@ -862,6 +909,7 @@ export const useMqttSystem = () => {
     disconnect,
     toggleSimulation,
     publishChecklistPointState,
+    publishConversionSettings,
     resetData,
     actions: { setFireState, setServoCmd, toggleSimSafety, requestShutdown }
   };
