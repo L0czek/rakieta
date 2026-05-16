@@ -322,19 +322,21 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({
         });
     };
 
+    const publishWithStatus = (settings: ConversionSettings, localStatus: string) => {
+        setStatus(localStatus);
+        if (!publishConversionSettings) return;
+        Promise.resolve(publishConversionSettings(settings))
+            .then(() => setStatus(`${localStatus} & PUBLISHED`))
+            .catch((err) => setStatus(`PUBLISH ERROR: ${err?.message || 'unknown'}`));
+    };
+
     const handleSaveAll = () => {
         try {
-            const nextSettings: ConversionSettings = draftSettings;
-            const saved = setConversionSettings(nextSettings);
+            const saved = setConversionSettings(draftSettings);
             setSettingsState(saved);
             setLastSavedSettings(saved);
             refreshLutDrafts(saved);
-            setStatus('SAVED');
-            if (publishConversionSettings) {
-                Promise.resolve(publishConversionSettings(saved))
-                    .then(() => setStatus('SAVED & PUBLISHED'))
-                    .catch((err) => setStatus(`PUBLISH ERROR: ${err?.message || 'unknown'}`));
-            }
+            publishWithStatus(saved, 'SAVED');
         } catch (err: any) {
             setStatus(`ERROR: ${err.message || 'Failed to save settings.'}`);
         }
@@ -345,7 +347,7 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({
         setSettingsState(reset);
         setLastSavedSettings(reset);
         refreshLutDrafts(reset);
-        setStatus('RESET TO DEFAULTS');
+        publishWithStatus(reset, 'RESET TO DEFAULTS');
     };
 
     const handleRevert = () => {
@@ -373,7 +375,7 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({
             setSettingsState(imported);
             setLastSavedSettings(imported);
             refreshLutDrafts(imported);
-            setStatus('IMPORTED');
+            publishWithStatus(imported, 'IMPORTED');
         } catch (err: any) {
             setStatus(`ERROR: ${err.message || 'Import failed.'}`);
         }
