@@ -1,0 +1,10 @@
+*
+
+!esp32-mainboard/
+!esp32-mainboard/**
+!frontend/
+!frontend/**
+
+frontend/dist
+frontend/node_modules
+frontend/public/defmt-mqtt-decoder

@@ -6,7 +6,8 @@
   "scripts": {
     "build:defmt-decoder": "./scripts/build-defmt-decoder.sh",
     "dev": "npm run build:defmt-decoder && vite",
-    "build": "npm run build:defmt-decoder && vite build",
+    "build": "npm run build:defmt-decoder && npm run build:vite",
+    "build:vite": "vite build",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",

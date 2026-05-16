@@ -39,6 +39,7 @@ FRONTEND[[FRONTEND WEB UI]] --- MQTT
 MQTT communication
 
 - Broker: Mosquitto (`docker-compose.yml` service `mqtt`)
+- Frontend: Docker Compose also launches the web dashboard on `http://localhost:3000`
 - Controller (`esp32-mainboard`) publishes telemetry and receives command topics via MQTT
 - Controller also publishes raw `defmt` log bytes on `log/defmt`
 - The matching firmware ELF is shared as retained raw bytes on
@@ -60,6 +61,16 @@ scripts/publish-test-stand-elf.sh \
 
 Set `MQTT_HOST`, `MQTT_PORT`, `MQTT_USERNAME`, `MQTT_PASSWORD`, or `MQTT_TOPIC` if you need
 non-default broker settings.
+
+Running with Docker Compose
+
+```bash
+git submodule update --init --recursive
+docker compose up --build
+```
+
+The frontend is available at `http://localhost:3000`. The MQTT broker exposes TCP MQTT on
+`1883` and WebSocket MQTT on `8000`.
 
 Notes
 

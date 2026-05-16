@@ -60,6 +60,15 @@ npm run build
 npm run preview
 ```
 
+Docker Compose:
+
+```bash
+git submodule update --init --recursive
+docker compose up --build frontend
+```
+
+Compose launches the frontend at `http://localhost:3000`.
+
 Quality checks:
 
 ```bash

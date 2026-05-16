@@ -20,6 +20,9 @@ This file documents the `frontend/` app for coding agents.
 - `utils/statusLog.ts`: bounded status-log append helpers shared by the MQTT runtime.
 - `scripts/build-defmt-decoder.sh`: builds the browser DEFMT decoder package from the
   `esp32-mainboard` submodule into `public/defmt-mqtt-decoder/`.
+- `Dockerfile`: multi-stage frontend image. The Rust stage builds the DEFMT decoder with
+  `wasm-pack`; the Node stage runs `npm ci` and `npm run build:vite`; the runtime stage
+  serves the built `dist/` directory with `vite preview` on port `3000`.
 
 ## Styling and design system
 
@@ -40,3 +43,5 @@ This file documents the `frontend/` app for coding agents.
 - DEFMT decoding depends on a retained raw ELF payload on
   `shared/firmware/test_stand_controller/elf` and the wasm package built from
   `../esp32-mainboard/tools/defmt-mqtt-decoder`.
+- Docker builds require the `esp32-mainboard` submodule to be initialized before running
+  `docker compose build frontend`.
