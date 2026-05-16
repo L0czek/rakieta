@@ -260,9 +260,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ telemetry, actions
                     <FastChart data={telemetry.pressureTank} color={SENSOR_COLORS.pressureTank} domain={CHART_RANGES.pressure} xDomain={chartXDomain} />
                 </ScadaPanel>
             </div>
-            <div className="hidden flex-col gap-2 md:flex md:col-span-4 md:row-span-4">
-                    <ScadaPanel title="POWER SYSTEMS" className="flex-1">
-                        <div className="p-2 space-y-2">
+            {/* Desktop right column - all secondary panels stacked, Status Log takes leftover space */}
+            <div className="hidden md:flex md:flex-col md:gap-2 md:col-span-4 md:col-start-9 md:row-start-1 md:row-span-12 min-h-0">
+                <ScadaPanel title="POWER SYSTEMS" className="shrink-0">
+                    <div className="p-2 space-y-2">
                         <div className="flex items-center justify-between border-b border-scada pb-1 mb-1 gap-2 min-w-0">
                             <div className="text-scada-secondary text-xs uppercase truncate min-w-0">{getSeriesLabel('batteryStand')}</div>
                             <div className="flex items-center gap-2 shrink-0">
@@ -291,21 +292,56 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ telemetry, actions
                                 <div className="text-xl font-mono font-bold text-scada-series-violet text-right leading-none">{vals.starter}<span className="text-xs text-scada-muted ml-1"> V</span></div>
                             </div>
                         </div>
-                        </div>
-                    </ScadaPanel>
-                    <ScadaPanel title="STATUS LOG" className="h-40 md:h-24">
-                        <div className="font-mono text-xs p-2 h-full overflow-y-auto pr-1 scrollbar-thin space-y-1">
-                            {statusLogEntries.map((entry, index) => (
-                                <div
-                                    key={`${entry.receivedAt}-${index}`}
-                                    className={`break-all ${getStatusLogEntryClass(entry.type)}`}
-                                >
-                                    <span className="text-scada-muted">[{new Date(entry.receivedAt).toLocaleString()}]</span>{' '}
-                                    &gt; {entry.message}
+                    </div>
+                </ScadaPanel>
+                <ScadaPanel title="STATUS LOG" className="flex-1 min-h-[6rem]">
+                    <div className="font-mono text-xs p-2 h-full overflow-y-auto pr-1 scrollbar-thin space-y-1">
+                        {statusLogEntries.map((entry, index) => (
+                            <div
+                                key={`${entry.receivedAt}-${index}`}
+                                className={`break-all ${getStatusLogEntryClass(entry.type)}`}
+                            >
+                                <span className="text-scada-muted">[{new Date(entry.receivedAt).toLocaleString()}]</span>{' '}
+                                &gt; {entry.message}
+                            </div>
+                        ))}
+                    </div>
+                </ScadaPanel>
+                <ScadaPanel title="THERMAL SENSORS (°C)" className="shrink-0 max-h-[14.5rem]">
+                    <div className="p-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {latestTemperatures.map(({ id, value: temp }, index) => (
+                            <div key={id} className="bg-scada-surface-soft p-2 border border-scada rounded flex items-center justify-between gap-2 min-w-0">
+                                <div className="text-[10px] text-scada-muted truncate min-w-0">{getSeriesLabel(id)}</div>
+                                <div className="flex items-center gap-2 shrink-0">
+                                    <MiniTrendChart
+                                        data={telemetry.temperatures[id] || []}
+                                        color={TEMP_COLORS[index % TEMP_COLORS.length]}
+                                        xDomain={chartXDomain}
+                                    />
+                                    <div className="text-xl font-mono font-bold text-scada-series-temp text-right leading-none">{temp.toFixed(1)}<span className="text-xs text-scada-muted ml-1"> °C</span></div>
                                 </div>
-                            ))}
-                        </div>
-                    </ScadaPanel>
+                            </div>
+                        ))}
+                        {latestTemperatures.length === 0 && <div className="col-span-2 text-xs text-scada-muted text-center py-4">NO THERMAL DATA</div>}
+                    </div>
+                </ScadaPanel>
+                <div className="shrink-0">
+                    <ServoPanel
+                        servoPositionDegrees={servoPositionDegrees}
+                        servoState={telemetry.servoState}
+                        systemState={telemetry.state}
+                        actions={actions}
+                        commandsEnabled={commandsEnabled}
+                    />
+                </div>
+                <div className="shrink-0">
+                    <ControlPanel
+                        systemState={telemetry.state}
+                        isUnsafe={telemetry.isUnsafe}
+                        actions={actions}
+                        commandsEnabled={commandsEnabled}
+                    />
+                </div>
             </div>
             <div className="hidden min-h-[220px] md:block md:col-span-8 md:row-span-4 md:min-h-0">
                     <ScadaPanel 
@@ -315,37 +351,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ telemetry, actions
                     >
                     <FastChart data={telemetry.pressureCombustion} color={SENSOR_COLORS.pressureCombustion} domain={CHART_RANGES.pressure} xDomain={chartXDomain} />
                 </ScadaPanel>
-            </div>
-            <div className="hidden flex-col gap-2 md:flex md:col-span-4 md:row-span-4">
-                <div className="flex-1">
-                    <ScadaPanel title="THERMAL SENSORS (°C)" className="h-full">
-                            <div className="p-2 grid grid-cols-1 sm:grid-cols-2 gap-2 overflow-y-auto">
-                                {latestTemperatures.map(({ id, value: temp }, index) => (
-                                    <div key={id} className="bg-scada-surface-soft p-2 border border-scada rounded flex items-center justify-between gap-2 min-w-0">
-                                        <div className="text-[10px] text-scada-muted truncate min-w-0">{getSeriesLabel(id)}</div>
-                                        <div className="flex items-center gap-2 shrink-0">
-                                            <MiniTrendChart
-                                                data={telemetry.temperatures[id] || []}
-                                                color={TEMP_COLORS[index % TEMP_COLORS.length]}
-                                                xDomain={chartXDomain}
-                                            />
-                                            <div className="text-xl font-mono font-bold text-scada-series-temp text-right leading-none">{temp.toFixed(1)}<span className="text-xs text-scada-muted ml-1"> °C</span></div>
-                                        </div>
-                                    </div>
-                                ))}
-                                {latestTemperatures.length === 0 && <div className="col-span-2 text-xs text-scada-muted text-center py-4">NO THERMAL DATA</div>}
-                            </div>
-                        </ScadaPanel>
-                </div>
-                <div className="flex-1">
-                    <ServoPanel
-                        servoPositionDegrees={servoPositionDegrees}
-                        servoState={telemetry.servoState}
-                        systemState={telemetry.state}
-                        actions={actions}
-                        commandsEnabled={commandsEnabled}
-                    />
-                </div>
             </div>
             <div className="order-5 min-h-[220px] md:col-span-8 md:row-span-4 md:min-h-0">
                     <ScadaPanel 
@@ -373,7 +378,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ telemetry, actions
                 </ScadaPanel>
             </div>
 
-            <div className="order-7 min-h-[320px] md:min-h-0 md:col-span-4 md:row-span-4">
+            <div className="order-7 md:hidden">
                 <ControlPanel
                     systemState={telemetry.state}
                     isUnsafe={telemetry.isUnsafe}

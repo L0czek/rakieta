@@ -25,8 +25,8 @@ export const ServoPanel: React.FC<ServoPanelProps> = ({
     const percent = (Math.max(0, Math.min(180, degrees)) / 180) * 100;
 
     return (
-        <ScadaPanel title="SERVO DIAGNOSTICS & CONTROL" className="h-full">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 h-full p-1">
+        <ScadaPanel title="SERVO DIAGNOSTICS & CONTROL">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-1">
                 {/* Left: Visualization */}
                 <div className="flex flex-col justify-between">
                     <div>
