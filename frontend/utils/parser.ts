@@ -18,6 +18,11 @@ const readU16 = (buffer: Uint8Array, offset: number): number => {
   return (buffer[offset] | (buffer[offset + 1] << 8));
 };
 
+const readI32 = (buffer: Uint8Array, offset: number): number => {
+  const view = new DataView(buffer.buffer, buffer.byteOffset, buffer.byteLength);
+  return view.getInt32(offset, true);
+};
+
 export const parseFastAdc = (buffer: Uint8Array): { timestampStart: number, timestampEnd: number, values: number[] } => {
   if (buffer.length < 8) return { timestampStart: 0, timestampEnd: 0, values: [] };
 
@@ -112,4 +117,14 @@ export const parseServo = (buffer: Uint8Array): { timestamp: number, value: numb
     const timestamp = readU32(buffer, 0);
     const value = readU16(buffer, 4);
     return { timestamp, value };
-}
+};
+
+export const parseCpuIdleMetric = (buffer: Uint8Array): number | null => {
+  if (buffer.length < 2) return null;
+  return Math.min(1000, readU16(buffer, 0));
+};
+
+export const parseWifiRssiMetric = (buffer: Uint8Array): number | null => {
+  if (buffer.length < 4) return null;
+  return readI32(buffer, 0);
+};

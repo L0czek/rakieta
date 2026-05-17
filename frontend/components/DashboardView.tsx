@@ -4,6 +4,7 @@ import { SensorDataPoint, SystemTelemetry } from '@/types';
 import { ScadaPanel, FastChart, SENSOR_COLORS, CHART_RANGES, TEMP_COLORS, useChartSize } from '@/components/Widgets';
 import { ControlPanel } from '@/components/ControlPanel';
 import { ServoPanel } from '@/components/ServoPanel';
+import { Cpu, Wifi } from 'lucide-react';
 
 interface DashboardViewProps {
     telemetry: SystemTelemetry;
@@ -113,6 +114,70 @@ const CombinedPressureChart: React.FC<{
     );
 };
 
+const metricValue = (value: number | null, format: (value: number) => string): string =>
+    value === null ? '--' : format(value);
+
+const ControllerHealthPanel: React.FC<{ telemetry: SystemTelemetry }> = ({ telemetry }) => {
+    const idlePercent = telemetry.cpuIdlePermille === null ? null : telemetry.cpuIdlePermille / 10;
+    const busyPercent = idlePercent === null ? null : Math.max(0, 100 - idlePercent);
+    const signalTone = (() => {
+        const rssi = telemetry.wifiRssiDbm;
+        if (rssi === null) return 'bg-scada-surface-strong';
+        if (rssi >= -60) return 'bg-scada-success';
+        if (rssi >= -75) return 'bg-scada-warning';
+        return 'bg-scada-danger';
+    })();
+
+    return (
+        <ScadaPanel title="CONTROLLER HEALTH">
+            <div className="grid grid-cols-2 gap-2 p-1">
+                <div className="rounded border border-scada bg-scada-surface-soft p-2">
+                    <div className="flex items-center justify-between gap-2 text-[10px] text-scada-muted">
+                        <span>CPU BUSY</span>
+                        <Cpu className="h-3.5 w-3.5 text-scada-accent" />
+                    </div>
+                    <div className="mt-2 font-mono text-2xl font-bold text-scada-accent leading-none">
+                        {metricValue(busyPercent, (value) => value.toFixed(1))}
+                        <span className="ml-1 text-xs text-scada-muted">%</span>
+                    </div>
+                    <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-scada-surface-strong">
+                        <div
+                            className="h-full bg-scada-accent transition-[width] duration-300"
+                            style={{ width: `${busyPercent ?? 0}%` }}
+                        />
+                    </div>
+                </div>
+
+                <div className="rounded border border-scada bg-scada-surface-soft p-2">
+                    <div className="flex items-center justify-between gap-2 text-[10px] text-scada-muted">
+                        <span>WIFI RSSI</span>
+                        <Wifi className="h-3.5 w-3.5 text-scada-success" />
+                    </div>
+                    <div className="mt-2 flex items-end justify-between gap-2">
+                        <div className="font-mono text-2xl font-bold text-scada-success leading-none">
+                            {metricValue(telemetry.wifiRssiDbm, (value) => value.toFixed(0))}
+                            <span className="ml-1 text-xs text-scada-muted">dBm</span>
+                        </div>
+                        <div className="flex h-7 items-end gap-1 pb-0.5">
+                            {[1, 2, 3, 4].map((bar) => {
+                                const threshold = -88 + (bar * 10);
+                                const active = telemetry.wifiRssiDbm !== null && telemetry.wifiRssiDbm >= threshold;
+                                return (
+                                    <span
+                                        key={bar}
+                                        className={`w-2 rounded-sm ${active ? signalTone : 'bg-scada-surface-strong'}`}
+                                        style={{ height: `${bar * 25}%` }}
+                                    />
+                                );
+                            })}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ScadaPanel>
+    );
+};
+
 export const DashboardView: React.FC<DashboardViewProps> = ({ telemetry, actions, commandsEnabled }) => {
     const sensorLabels: Record<string, string> = {
         tensometer: 'tensometer',
@@ -216,7 +281,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ telemetry, actions
                 </ScadaPanel>
             </div>
 
-            <div className="order-3 min-h-[220px] md:hidden">
+            <div className="order-3 md:hidden">
+                <ControllerHealthPanel telemetry={telemetry} />
+            </div>
+
+            <div className="order-4 min-h-[220px] md:hidden">
                 <ScadaPanel title="PRESSURES" className="h-full">
                     <div className="h-full flex flex-col gap-2">
                         <div className="flex flex-wrap items-center gap-3 text-xs">
@@ -240,7 +309,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ telemetry, actions
                 </ScadaPanel>
             </div>
 
-            <div className="order-4 md:hidden">
+            <div className="order-5 md:hidden">
                 <ServoPanel
                     servoPositionDegrees={servoPositionDegrees}
                     servoState={telemetry.servoState}
@@ -294,6 +363,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ telemetry, actions
                         </div>
                     </div>
                 </ScadaPanel>
+                <div className="shrink-0">
+                    <ControllerHealthPanel telemetry={telemetry} />
+                </div>
                 <ScadaPanel title="STATUS LOG" className="flex-1 min-h-[6rem]">
                     <div className="font-mono text-xs p-2 h-full overflow-y-auto pr-1 scrollbar-thin space-y-1">
                         {statusLogEntries.map((entry, index) => (
@@ -338,6 +410,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ telemetry, actions
                     <ControlPanel
                         systemState={telemetry.state}
                         isUnsafe={telemetry.isUnsafe}
+                        countdownEndsAtWall={telemetry.countdownEndsAtWall}
                         actions={actions}
                         commandsEnabled={commandsEnabled}
                     />
@@ -352,7 +425,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ telemetry, actions
                     <FastChart data={telemetry.pressureCombustion} color={SENSOR_COLORS.pressureCombustion} domain={CHART_RANGES.pressure} xDomain={chartXDomain} />
                 </ScadaPanel>
             </div>
-            <div className="order-5 min-h-[220px] md:col-span-8 md:row-span-4 md:min-h-0">
+            <div className="order-6 min-h-[220px] md:col-span-8 md:row-span-4 md:min-h-0">
                     <ScadaPanel 
                     title={getSeriesLabel('tensometer')} 
                     className="h-full"
@@ -362,7 +435,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ telemetry, actions
                     </ScadaPanel>
             </div>
 
-            <div className="order-6 md:hidden">
+            <div className="order-7 md:hidden">
                 <ScadaPanel title="STATUS LOG" className="h-full">
                     <div className="font-mono text-xs p-2 h-full overflow-y-auto pr-1 scrollbar-thin space-y-1">
                         {statusLogEntries.map((entry, index) => (
@@ -378,10 +451,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ telemetry, actions
                 </ScadaPanel>
             </div>
 
-            <div className="order-7 md:hidden">
+            <div className="order-8 md:hidden">
                 <ControlPanel
                     systemState={telemetry.state}
                     isUnsafe={telemetry.isUnsafe}
+                    countdownEndsAtWall={telemetry.countdownEndsAtWall}
                     actions={actions}
                     commandsEnabled={commandsEnabled}
                 />

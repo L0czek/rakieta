@@ -688,6 +688,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
                 <ControlPanel 
                     systemState={telemetry.state} 
                     isUnsafe={telemetry.isUnsafe} 
+                    countdownEndsAtWall={telemetry.countdownEndsAtWall}
                     actions={actions}
                     commandsEnabled={commandsEnabled}
                 />

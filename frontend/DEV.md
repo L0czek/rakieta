@@ -109,6 +109,7 @@ This is a single-page React+TypeScript application built on Vite. The architectu
 - Simulator enforces command logic:
   - FIRE requires `ARMED` + unsafe/armed safety state
   - Servo commands denied during FIRE
+  - Safety returning safe during COUNTDOWN aborts to POSTFIRE
 
 ### [6] Checklist runtime
 
@@ -131,6 +132,8 @@ This is a single-page React+TypeScript application built on Vite. The architectu
 - Digital: `u32 timestamp` + `u8 value`
 - Temp: `u32 timestamp` + repeated signed 14-bit values in 16-bit containers
 - Servo: `u32 timestamp` + `u16 value`
+- CPU idle metric: retained little-endian `u16` permille on `metric/cpu/idle`
+- WiFi RSSI metric: retained little-endian signed `i32` dBm on `metric/wifi/rssi`
 
 ## UI design and features
 
@@ -147,6 +150,8 @@ This is a single-page React+TypeScript application built on Vite. The architectu
   - Advanced analysis chart with axis-per-metric toggles
   - Timeline scroll + zoom + live/pause mode
   - Fire control panel and servo diagnostics/control
+  - Client-side countdown seconds display based on the observed COUNTDOWN state transition
+  - Controller health panel for CPU busy/idle and WiFi RSSI
   - Simulation safety override toggle
   - Checklist tab with strict sequential aviation-style execution
 

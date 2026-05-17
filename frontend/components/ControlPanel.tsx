@@ -6,6 +6,7 @@ import { AlertOctagon, Lock, Flame, RefreshCcw, Power, Lightbulb, Camera } from 
 interface ControlPanelProps {
   systemState: SystemState;
   isUnsafe: boolean; // physical switch state
+  countdownEndsAtWall: number | null;
   commandsEnabled: boolean;
   actions: {
     setFireState: (cmd: 'FIRE' | 'ABORT' | 'FIRE_END' | 'FIRE_RESET' | 'LAMP_TEST' | 'CAMERA_TEST') => void;
@@ -16,17 +17,32 @@ interface ControlPanelProps {
 export const ControlPanel: React.FC<ControlPanelProps> = ({
   systemState,
   isUnsafe,
+  countdownEndsAtWall,
   commandsEnabled,
   actions,
 }) => {
   const [showShutdownConfirm, setShowShutdownConfirm] = React.useState(false);
+  const [countdownNow, setCountdownNow] = React.useState(Date.now());
   
   const isArmed = systemState === SystemState.ARMED;
   const isCountdown = systemState === SystemState.COUNTDOWN;
   const isFiring = systemState === SystemState.FIRE;
   const canFire = isArmed && isUnsafe && commandsEnabled;
-  const canAbort = commandsEnabled;
+  const canAbortCountdown = isCountdown && commandsEnabled;
+  const canEndFire = isFiring && commandsEnabled;
+  const canReset = systemState === SystemState.POSTFIRE && commandsEnabled;
   const canShutdown = !isFiring && !isCountdown && commandsEnabled;
+  const countdownRemainingMs = isCountdown && countdownEndsAtWall !== null
+    ? Math.max(0, countdownEndsAtWall - countdownNow)
+    : 0;
+  const countdownRemainingSeconds = countdownRemainingMs / 1000;
+
+  React.useEffect(() => {
+    if (!isCountdown) return undefined;
+    setCountdownNow(Date.now());
+    const intervalId = window.setInterval(() => setCountdownNow(Date.now()), 40);
+    return () => window.clearInterval(intervalId);
+  }, [isCountdown, countdownEndsAtWall]);
 
   const fireHint = (() => {
     if (!commandsEnabled) return 'CONNECT OR START SIM';
@@ -73,8 +89,8 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                   actions.requestShutdown();
                   setShowShutdownConfirm(false);
                 }}
-                disabled={!commandsEnabled}
-                className="delight-press flex-1 py-3 bg-scada-warning hover-bg-scada-warning text-scada-inverse font-bold rounded border border-scada-warning transition-colors flex items-center justify-center gap-2"
+                disabled={!canShutdown}
+                className="delight-press flex-1 py-3 bg-scada-warning hover-bg-scada-warning text-scada-inverse font-bold rounded border border-scada-warning transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Power className="w-4 h-4 delight-icon-shift" /> SHUTDOWN
               </button>
@@ -109,10 +125,15 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
            {isCountdown ? (
                 <button
                 onClick={() => actions.setFireState('ABORT')}
-                disabled={!canAbort}
-                className="delight-press flex-1 bg-scada-warning hover-bg-scada-warning text-scada-inverse font-bold text-2xl border-4 border-scada-warning rounded flex flex-col items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={!canAbortCountdown}
+                className="delight-press flex-1 overflow-hidden bg-scada-warning hover-bg-scada-warning text-scada-inverse font-bold border-4 border-scada-warning rounded flex flex-col items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                >
-                <div className="flex items-center gap-2">
+                <div className="flex items-baseline gap-2 font-mono leading-none">
+                    <span className="text-sm tracking-widest">T-</span>
+                    <span className="text-4xl tabular-nums">{countdownRemainingSeconds.toFixed(2)}</span>
+                    <span className="text-sm">s</span>
+                </div>
+                <div className="mt-3 flex items-center gap-2 text-xl">
                     <AlertOctagon className="w-8 h-8 delight-icon-shift" />
                     ABORT
                 </div>
@@ -120,12 +141,12 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
            ) : isFiring ? (
                 <button
                 onClick={() => actions.setFireState('FIRE_END')}
-                disabled={!canAbort}
+                disabled={!canEndFire}
                 className="delight-press flex-1 bg-scada-warning hover-bg-scada-warning text-scada-inverse font-bold text-2xl border-4 border-scada-warning rounded flex flex-col items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                >
                 <div className="flex items-center gap-2">
                     <AlertOctagon className="w-8 h-8 delight-icon-shift" />
-                    ABORT
+                    END FIRE
                 </div>
                </button>
            ) : (
@@ -153,8 +174,8 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
           <div className="grid grid-cols-2 gap-2">
             <button
               onClick={() => actions.setFireState('FIRE_RESET')}
-              disabled={!commandsEnabled}
-              className="delight-press min-h-11 bg-scada-surface-strong hover-bg-scada-surface-strong text-scada-secondary font-mono text-xs border border-scada-strong rounded flex items-center justify-center gap-2"
+              disabled={!canReset}
+              className="delight-press min-h-11 bg-scada-surface-strong hover-bg-scada-surface-strong text-scada-secondary font-mono text-xs border border-scada-strong rounded flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <RefreshCcw className="w-3 h-3 delight-icon-shift" /> RESET STATE
             </button>

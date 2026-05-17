@@ -1,6 +1,6 @@
 
-import { SystemState, ServoState } from '../types';
-import * as PacketBuilder from './packetBuilder';
+import { FIRE_COUNTDOWN_DURATION_MS, SystemState, ServoState } from '@/types';
+import * as PacketBuilder from '@/utils/packetBuilder';
 
 export interface PacketEmit {
     topic: string;
@@ -36,6 +36,8 @@ export class RocketSimulator {
             clearInterval(this.intervalId);
             this.intervalId = null;
         }
+        this.clearCountdownTimer();
+        this.clearTestTimer();
     }
 
     public setTime(t: number) {
@@ -57,17 +59,14 @@ export class RocketSimulator {
                             this.systemState = SystemState.FIRE;
                             this.onPacket({ topic: 'status/state', payload: this.systemState });
                         }
-                    }, 10000);
+                    }, FIRE_COUNTDOWN_DURATION_MS);
                 } else {
                     console.warn('[SIM] FIRE rejected: Check Arm/Safety');
                 }
             }
             if (payload === 'ABORT') {
                 if (this.systemState === SystemState.COUNTDOWN) {
-                    if (this.countdownTimeoutId !== null) {
-                        clearTimeout(this.countdownTimeoutId);
-                        this.countdownTimeoutId = null;
-                    }
+                    this.clearCountdownTimer();
                     this.systemState = SystemState.POSTFIRE;
                 } else {
                     console.warn('[SIM] ABORT rejected: not in COUNTDOWN state');
@@ -76,7 +75,13 @@ export class RocketSimulator {
             if (payload === 'FIRE_END') {
                 if (this.systemState === SystemState.FIRE) this.systemState = SystemState.POSTFIRE;
             }
-            if (payload === 'FIRE_RESET') this.systemState = SystemState.ARMED;
+            if (payload === 'FIRE_RESET') {
+                if (this.systemState === SystemState.POSTFIRE) {
+                    this.systemState = SystemState.ARMED;
+                } else {
+                    console.warn('[SIM] FIRE_RESET rejected: not in POSTFIRE state');
+                }
+            }
             if (payload === 'LAMP_TEST') {
                 if (this.systemState === SystemState.ARMED) {
                     this.systemState = SystemState.LAMPTEST;
@@ -113,12 +118,12 @@ export class RocketSimulator {
             }
         }
         else if (topic === 'cmd/servo') {
-            if (this.systemState !== SystemState.FIRE && this.systemState !== SystemState.COUNTDOWN) {
+            if (this.systemState !== SystemState.FIRE) {
                  if (payload === 'OPEN') this.servoState = ServoState.OPEN;
                  if (payload === 'CLOSE') this.servoState = ServoState.CLOSED;
                  this.onPacket({ topic: 'status/servo', payload: this.servoState });
             } else {
-                console.warn('[SIM] Servo locked during FIRE/COUNTDOWN');
+                console.warn('[SIM] Servo locked during FIRE');
             }
         }
     }
@@ -129,9 +134,28 @@ export class RocketSimulator {
             topic: 'sensor/digital/armed',
             payload: PacketBuilder.buildDigitalPacket(this.time, this.isUnsafe)
         });
+        if (!this.isUnsafe && this.systemState === SystemState.COUNTDOWN) {
+            this.clearCountdownTimer();
+            this.systemState = SystemState.POSTFIRE;
+            this.onPacket({ topic: 'status/state', payload: this.systemState });
+        }
     }
 
     public getIsUnsafe() { return this.isUnsafe; }
+
+    private clearCountdownTimer() {
+        if (this.countdownTimeoutId !== null) {
+            clearTimeout(this.countdownTimeoutId);
+            this.countdownTimeoutId = null;
+        }
+    }
+
+    private clearTestTimer() {
+        if (this.testTimeoutId !== null) {
+            clearTimeout(this.testTimeoutId);
+            this.testTimeoutId = null;
+        }
+    }
 
     private tick() {
         const dt = 100; // 100ms tick duration
@@ -224,5 +248,13 @@ export class RocketSimulator {
         // Statuses
         this.onPacket({ topic: 'status/state', payload: this.systemState });
         this.onPacket({ topic: 'status/servo', payload: this.servoState });
+        this.onPacket({
+            topic: 'metric/cpu/idle',
+            payload: PacketBuilder.buildCpuIdleMetricPacket(isFiring ? 420 : 760),
+        });
+        this.onPacket({
+            topic: 'metric/wifi/rssi',
+            payload: PacketBuilder.buildWifiRssiMetricPacket(-58 + Math.sin(phaseSlow * 0.03) * 5),
+        });
     }
 }

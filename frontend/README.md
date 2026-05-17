@@ -91,6 +91,8 @@ Subscribed:
 - `sensor/servo`
 - `status/state`
 - `status/servo`
+- `metric/cpu/idle`
+- `metric/wifi/rssi`
 - `log/defmt`
 - `shared/firmware/test_stand_controller/elf` (retained raw ELF bytes)
 - `cmd/state`
@@ -99,8 +101,10 @@ Subscribed:
 
 Published commands:
 
-- `cmd/state` with payloads: `FIRE`, `FIRE_END`, `FIRE_RESET`
+- `cmd/state` with payloads: `FIRE`, `ABORT`, `FIRE_END`, `FIRE_RESET`,
+  `LAMP_TEST`, `CAMERA_TEST`
 - `cmd/servo` with payloads: `OPEN`, `CLOSE`
+- `cmd/shutdown` with payload: `SHUTDOWN`
 - `checklist/<checklistId>/points/<pointId>/state` (retained JSON):
   `{"completed":boolean,"completedAtWall":number|null,"completedAtTelemetry":number|null,"context":{...}}`
 
@@ -119,6 +123,7 @@ DEFMT log requirements:
 - Safety-first interactions:
   - Fire allowed only when system is ARMED and physical safety is unsafe/armed
   - Servo commands blocked during FIRE
+  - Countdown displays client-side seconds from the observed `COUNTDOWN` state transition
   - Critical time-travel check can force disconnect and display lockout modal
 - Live packet clock shown as `T+timestamp`
 - Config modal for broker host/port

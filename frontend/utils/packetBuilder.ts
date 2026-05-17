@@ -110,3 +110,17 @@ export const buildServoPacket = (timestamp: number, value: number): Uint8Array =
     writeU16(view, 4, Math.max(0, Math.min(65535, Math.floor(value))));
     return buffer;
 };
+
+export const buildCpuIdleMetricPacket = (idlePermille: number): Uint8Array => {
+    const buffer = new Uint8Array(2);
+    const view = new DataView(buffer.buffer);
+    writeU16(view, 0, Math.max(0, Math.min(1000, Math.floor(idlePermille))));
+    return buffer;
+};
+
+export const buildWifiRssiMetricPacket = (rssiDbm: number): Uint8Array => {
+    const buffer = new Uint8Array(4);
+    const view = new DataView(buffer.buffer);
+    view.setInt32(0, Math.floor(rssiDbm), true);
+    return buffer;
+};

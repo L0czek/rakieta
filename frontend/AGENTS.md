@@ -40,6 +40,10 @@ This file documents the `frontend/` app for coding agents.
 - Tailwind is compiled locally through Vite (`@tailwindcss/vite`) from `index.css`.
 - Views are lazy-loaded from `App.tsx` to reduce initial payload.
 - MQTT runtime is loaded on demand in `useMqttSystem.connect()` (dynamic import).
+- `metric/cpu/idle` and `metric/wifi/rssi` are retained binary MQTT health metrics
+  parsed into `SystemTelemetry` and surfaced on the dashboard.
+- Countdown timing is frontend-derived from the observed `status/state = COUNTDOWN`
+  transition; firmware does not publish an absolute countdown deadline.
 - DEFMT decoding depends on a retained raw ELF payload on
   `shared/firmware/test_stand_controller/elf` and the wasm package built from
   `../esp32-mainboard/tools/defmt-mqtt-decoder`.

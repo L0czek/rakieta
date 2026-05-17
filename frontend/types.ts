@@ -6,6 +6,8 @@ export enum ConnectionState {
   ERROR
 }
 
+export const FIRE_COUNTDOWN_DURATION_MS = 10_000;
+
 export enum SystemState {
   ARMED = 'ARMED',
   COUNTDOWN = 'COUNTDOWN',
@@ -39,6 +41,8 @@ export interface SystemTelemetry {
   startTime: number;
   lastPacketTimestamp: number;
   avgFastAdcPacketLength: number;
+  countdownStartedAtWall: number | null;
+  countdownEndsAtWall: number | null;
 
   // Fast ADCs
   tensometer: SensorDataPoint[];
@@ -65,6 +69,8 @@ export interface SystemTelemetry {
   // Statuses
   state: SystemState;
   servoState: ServoState;
+  cpuIdlePermille: number | null;
+  wifiRssiDbm: number | null;
   statusLog: StatusLogEntry[];
 }
 

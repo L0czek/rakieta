@@ -3,6 +3,7 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import type { MqttClient } from 'mqtt';
 import {
   ConnectionState, 
+  FIRE_COUNTDOWN_DURATION_MS,
   MqttConfig,
   ServoState,
   SensorDataPoint
@@ -42,6 +43,8 @@ const DEFAULT_TELEMETRY: SystemTelemetry = {
   startTime: 0,
   lastPacketTimestamp: 0,
   avgFastAdcPacketLength: 0,
+  countdownStartedAtWall: null,
+  countdownEndsAtWall: null,
   tensometer: [],
   pressureTank: [],
   pressureCombustion: [],
@@ -56,6 +59,8 @@ const DEFAULT_TELEMETRY: SystemTelemetry = {
   temperatures: {},
   state: SystemState.UNKNOWN,
   servoState: ServoState.UNKNOWN,
+  cpuIdlePermille: null,
+  wifiRssiDbm: null,
   statusLog: [
     {
       message: 'Waiting for connection...',
@@ -662,6 +667,7 @@ export const useMqttSystem = () => {
     }
     else if (topic === 'status/state') {
         const val = message.toString();
+        const previousState = current.state;
         if (val === 'ARMED') current.state = SystemState.ARMED;
         else if (val === 'COUNTDOWN') current.state = SystemState.COUNTDOWN;
         else if (val === 'FIRE') current.state = SystemState.FIRE;
@@ -669,6 +675,17 @@ export const useMqttSystem = () => {
         else if (val === 'LAMPTEST') current.state = SystemState.LAMPTEST;
         else if (val === 'CAMERATEST') current.state = SystemState.CAMERATEST;
         else current.state = SystemState.UNKNOWN;
+
+        if (current.state === SystemState.COUNTDOWN) {
+          if (previousState !== SystemState.COUNTDOWN || current.countdownEndsAtWall === null) {
+            const countdownStartedAtWall = Date.now();
+            current.countdownStartedAtWall = countdownStartedAtWall;
+            current.countdownEndsAtWall = countdownStartedAtWall + FIRE_COUNTDOWN_DURATION_MS;
+          }
+        } else {
+          current.countdownStartedAtWall = null;
+          current.countdownEndsAtWall = null;
+        }
     }
     else if (topic === 'status/servo') {
         const val = message.toString();
@@ -695,6 +712,12 @@ export const useMqttSystem = () => {
         } else {
           queuePendingDefmtChunk(buffer.slice());
         }
+    }
+    else if (topic === 'metric/cpu/idle') {
+        current.cpuIdlePermille = Parser.parseCpuIdleMetric(buffer);
+    }
+    else if (topic === 'metric/wifi/rssi') {
+        current.wifiRssiDbm = Parser.parseWifiRssiMetric(buffer);
     }
 
     telemetryVersionRef.current += 1;
@@ -749,6 +772,8 @@ export const useMqttSystem = () => {
             'sensor/temp/#',
             'sensor/servo',
             'cmd/state', 'cmd/servo', 'status/state', 'status/servo',
+            'metric/cpu/idle',
+            'metric/wifi/rssi',
             DEFMT_LOG_TOPIC,
             TEST_STAND_CONTROLLER_ELF_TOPIC,
             'checklist/+/points/+/state',
@@ -889,7 +914,7 @@ export const useMqttSystem = () => {
   const setFireState = (cmd: 'FIRE' | 'ABORT' | 'FIRE_END' | 'FIRE_RESET' | 'LAMP_TEST' | 'CAMERA_TEST') => sendCommand('cmd/state', cmd);
   const requestShutdown = () => sendCommand('cmd/shutdown', 'SHUTDOWN');
   const setServoCmd = (cmd: 'OPEN' | 'CLOSE') => {
-    if (telemetry.state === SystemState.FIRE || telemetry.state === SystemState.COUNTDOWN) return;
+    if (telemetry.state === SystemState.FIRE) return;
     sendCommand('cmd/servo', cmd);
   };
   
