@@ -64,8 +64,8 @@ const getDefaultLuts = (): Record<AnalogChannel, LutPoint[]> => ({
 
 export const getDefaultConversionSettings = (): ConversionSettings => ({
     lutByChannel: getDefaultLuts(),
-    tensometerDividerRatio: 4.774,
-    tensometerKgPerV: 200.0,
+    tensometerDividerRatio: 5.047,
+    tensometerKgPerV: 43.478,
     pressureDividerRatio: {
         pressureTank: 3.15,
         pressureCombustion: 3.1,
