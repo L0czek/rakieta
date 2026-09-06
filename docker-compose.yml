@@ -7,6 +7,21 @@ services:
       - "8000:8000"
     volumes:
       - ./mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+  mqtt-recorder:
+    image: eclipse-mosquitto:2
+    restart: unless-stopped
+    depends_on:
+      - mqtt
+    user: "1000:1000"
+    volumes:
+      - ./recordings:/recordings
+    command:
+      - sh
+      - -c
+      - >-
+        exec mosquitto_sub -h mqtt -p 1883 -V 5 -q 2 --retain-as-published
+        -t '#' -F '%U\t%t\t%q\t%r\t%x'
+        > "/recordings/$$(date -u +%Y%m%dT%H%M%SZ).tsv"
   frontend:
     build:
       context: .

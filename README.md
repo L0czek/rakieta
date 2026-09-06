@@ -39,6 +39,7 @@ FRONTEND[[FRONTEND WEB UI]] --- MQTT
 MQTT communication
 
 - Broker: Mosquitto (`docker-compose.yml` service `mqtt`)
+- Recorder: `mqtt-recorder` service dumps all traffic to `recordings/` (see below)
 - Frontend: Docker Compose also launches the web dashboard on `http://localhost:3000`
 - Controller (`esp32-mainboard`) publishes telemetry and receives command topics via MQTT
 - Controller also publishes raw `defmt` log bytes on `log/defmt`
@@ -61,6 +62,42 @@ scripts/publish-test-stand-elf.sh \
 
 Set `MQTT_HOST`, `MQTT_PORT`, `MQTT_USERNAME`, `MQTT_PASSWORD`, or `MQTT_TOPIC` if you need
 non-default broker settings.
+
+Recording and replaying MQTT traffic
+
+The `mqtt-recorder` compose service subscribes to `#` and appends every message to
+`recordings/<UTC timestamp>.tsv`. Each container start opens a new file, so restarting the
+service (or the broker, which makes the recorder exit and restart) starts a new recording.
+The directory is gitignored.
+
+Each line holds one message, five tab-separated fields:
+
+```
+<unix time with ns>\t<topic>\t<qos>\t<retain>\t<payload as hex>
+```
+
+Payloads are hex because most topics carry raw binary. The retain flag is the publisher's
+(MQTT v5 retain-as-published), so retained state can be reproduced. Every retained message,
+including the ~12 MB firmware ELF, lands in the file at every recorder start.
+
+Replay a recording into a broker with:
+
+```bash
+scripts/replay-mqtt.sh recordings/20260906T155835Z.tsv
+```
+
+It publishes every line to its original topic with the original QoS and retain flag, as
+fast as the broker accepts (roughly 500 messages per second). Timestamps are ignored; the
+frontend orders data by the timestamps inside the payloads. Set `MQTT_HOST` and `MQTT_PORT`
+for a non-default broker.
+
+- Messages on `cmd/#` are never replayed: a connected controller would execute them.
+- Clear the browser database before replaying. The frontend rejects packets older than
+  its last stored timestamp as time travel, and recordings from another controller boot
+  are older.
+- Retained frontend state (`checklist/*`, `config/conversions/state`) is replayed too and
+  overwrites the current broker state with the recorded one.
+- The recorder is running during replay, so the replay itself becomes a new recording.
 
 Running with Docker Compose
 
