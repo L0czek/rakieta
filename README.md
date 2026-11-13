@@ -1,20 +1,73 @@
-Rakieta hardware
-================
+Rakieta
+=======
 
-This repository contains the hardware and firmware for the rocket engine test project. It groups several PCBs and related firmware used for sensing, control distribution, ignition, and a crash-survivable blackbox recorder.
+Hardware, firmware and ground software for a rocket engine test stand: sensing, valve and
+ignition control, live telemetry, and a crash-survivable blackbox recorder.
 
-Subprojects
+## Documentation
 
-- `blackbox/`: Blackbox PCB (stores UART data to SD card)
-- `blackbox-firmware/`: Firmware for the blackbox recorder
-- `connector-main-computer/`: Connector board near controller that aggregates GPIO to a 10m DVI-I cable
-- `connector-test-stand/`: Connector board at the test-stand end; decomposes signals, provides power, analog preprocessing, and actuators
-- `esp32-mainboard/`: ESP32-C6 controller firmware as a git submodule on the `teststand` branch
-- `frontend/`: Web UI for telemetry visualization and command/control; connects to MQTT over WebSocket
-- `sensor-tmp107/`: TMP107 temperature sensor PCB (chainable via SMAART wire bus)
-- `starter/`: Ignition starter board with I2C IO expander and safety comparator
+Operator guides, in the order you need them:
 
-Connection graph (Mermaid)
+| Guide | Covers |
+| --- | --- |
+| [docs/setup.md](docs/setup.md) | network layout, starting the broker and frontend, configuring and flashing the controller, publishing the firmware ELF |
+| [docs/calibration.md](docs/calibration.md) | what the conversion settings mean, how to calibrate, where the calibration is stored, how not to lose it |
+| [docs/blackbox.md](docs/blackbox.md) | preparing the SD card, verifying that the blackbox records, reading the data back |
+| [docs/data-and-history.md](docs/data-and-history.md) | MQTT recording and replay, the frontend's history, CSV export, controller reboots |
+| [docs/experiment.md](docs/experiment.md) | preparing for and running a test firing, and securing the data afterwards |
+
+Developer notes live next to the code: `frontend/DEV.md`, `esp32-mainboard/DEV.md`,
+`blackbox-firmware/DEV.md`.
+
+## Quick start
+
+```bash
+git submodule update --init --recursive
+docker compose up --build -d          # broker :1883 / :8000, recorder, frontend :3000
+
+cd esp32-mainboard
+cp .env.example .env                  # set WIFI_SSID, WIFI_PASSWORD, MQTT_HOST
+cargo run --release --bin test-stand-controller
+cd ..
+
+scripts/publish-test-stand-elf.sh \
+  esp32-mainboard/target/riscv32imac-unknown-none-elf/release/test-stand-controller
+```
+
+Then open `http://localhost:3000`, click the gear icon and **CONNECT**. Details and
+verification steps are in [docs/setup.md](docs/setup.md).
+
+## Five things that lose data
+
+1. The broker keeps nothing across a restart. The firmware ELF and the calibration must be
+   published again after every restart of the `mqtt` container.
+2. The calibration lives in the browser and on the broker. Export it to a file after every
+   change.
+3. The blackbox starts writing at the beginning of the card every time it powers up. Take the
+   card out before powering it again.
+4. The frontend's history does not survive a controller reboot. Export the CSV first.
+5. The firmware ELF must match the flashed build exactly. Publish it again after every flash.
+
+## Subprojects
+
+| Directory | Contents |
+| --- | --- |
+| `esp32-mainboard/` | controller firmware (ESP32-C6, Rust), git submodule on branch `teststand`; also the host tools `tools/blackbox-decoder` and `tools/defmt-mqtt-decoder` |
+| `frontend/` | web UI for telemetry, control, checklists and calibration; talks MQTT over WebSocket |
+| `blackbox-firmware/` | firmware for the blackbox recorder (STM32C011) |
+| `blackbox/` | blackbox PCB: UART to SD card logger |
+| `connector-main-computer/` | connector board at the controller; aggregates its I/O onto a 10 m DVI-I cable |
+| `connector-test-stand/` | connector board at the stand; splits the cable out, provides power, analog front ends and actuator drivers |
+| `starter/` | ignition board with I2C IO expander and safety comparator |
+| `sensor-tmp107/` | TMP107 temperature sensor PCB, chainable on one bus |
+| `scripts/` | `publish-test-stand-elf.sh`, `replay-mqtt.sh` |
+| `recordings/` | MQTT recordings written by the `mqtt-recorder` service (not in git) |
+| `shared/` | logo files and footprints |
+
+The PCB directories are KiCad projects; each has a README with a picture and the schematic
+PDF.
+
+## Hardware connections
 
 ```mermaid
 flowchart TB;
@@ -34,82 +87,46 @@ id2(TEST STAND CONNECTOR) --- id8(VALVE SERVO)
 id2(TEST STAND CONNECTOR) --- id11(TENSOMETR)
 id5(STARTER) --- id9(ENGINE IGNITION)
 FRONTEND[[FRONTEND WEB UI]] --- MQTT
+RECORDER[[MQTT RECORDER]] --- MQTT
 ```
 
-MQTT communication
+## MQTT topics
 
-- Broker: Mosquitto (`docker-compose.yml` service `mqtt`)
-- Recorder: `mqtt-recorder` service dumps all traffic to `recordings/` (see below)
-- Frontend: Docker Compose also launches the web dashboard on `http://localhost:3000`
-- Controller (`esp32-mainboard`) publishes telemetry and receives command topics via MQTT
-- Controller also publishes raw `defmt` log bytes on `log/defmt`
-- The matching firmware ELF is shared as retained raw bytes on
-  `shared/firmware/test_stand_controller/elf`
-- Frontend connects to the same broker via WebSocket (`ws://<host>:8000`) and subscribes/publishes control topics
-- MQTT TCP port: `1883` (standard MQTT)
-- MQTT WebSocket port: `8000` (used by frontend)
-- `mosquitto.conf` raises `max_packet_size` to `20000000` so the retained
-  `shared/firmware/test_stand_controller/elf` payload can carry the matching firmware ELF
+Broker: Mosquitto, anonymous, MQTT on TCP `1883` and MQTT over WebSocket on `8000`.
+`mosquitto.conf` raises `max_packet_size` to 20 MB so that the firmware ELF fits in one
+message. All integers are little-endian; timestamps are milliseconds since the controller
+booted.
 
-Publishing the retained ELF
+Published by the controller:
 
-Use the helper script after building the matching controller firmware ELF:
+| Topic | Retained | Payload |
+| --- | --- | --- |
+| `sensor/adc/fast/tensometer`, `sensor/adc/fast/pressure/tank`, `sensor/adc/fast/pressure/combustion` | no | `u32` first timestamp, `u32` last timestamp, packed 12-bit raw ADC samples (100 per message, 1 ms apart) |
+| `sensor/adc/slow/battery/stand`, `…/battery/computer`, `sensor/adc/slow/boost_voltage`, `…/starter_sense` | no | `u32` timestamp, `u16` raw ADC |
+| `sensor/temp/<n>` | no | `u32` first timestamp, `u32` last timestamp, `u16` raw readings |
+| `sensor/digital/armed` | yes | `u32` timestamp, `u8`: 1 = safety switch armed, 0 = safe |
+| `sensor/servo` | yes | `u32` timestamp, `u16` pulse ticks (500 = 0°, 2500 = 180°) |
+| `status/state` | yes | `ARMED`, `COUNTDOWN`, `FIRE`, `POSTFIRE`, `LAMPTEST`, `CAMERATEST` |
+| `status/servo` | yes | `CLOSED`, `OPENING`, `OPEN`, `CLOSING` |
+| `metric/cpu/idle` | yes | `u16` idle time in permille |
+| `metric/wifi/rssi` | yes | `i32` dBm |
+| `log/defmt` | no | raw `defmt` log bytes; decoding needs the firmware ELF |
 
-```bash
-scripts/publish-test-stand-elf.sh \
-  esp32-mainboard/target/riscv32imac-unknown-none-elf/debug/test_stand_controller
-```
+Commands to the controller (never retained):
 
-Set `MQTT_HOST`, `MQTT_PORT`, `MQTT_USERNAME`, `MQTT_PASSWORD`, or `MQTT_TOPIC` if you need
-non-default broker settings.
+| Topic | Payload |
+| --- | --- |
+| `cmd/state` | `FIRE`, `ABORT`, `FIRE_END`, `FIRE_RESET`, `LAMP_TEST`, `CAMERA_TEST` |
+| `cmd/servo` | `OPEN`, `CLOSE` |
+| `cmd/shutdown` | `SHUTDOWN` |
 
-Recording and replaying MQTT traffic
+Shared state kept on the broker (retained, lost when the broker restarts):
 
-The `mqtt-recorder` compose service subscribes to `#` and appends every message to
-`recordings/<UTC timestamp>.tsv`. Each container start opens a new file, so restarting the
-service (or the broker, which makes the recorder exit and restart) starts a new recording.
-The directory is gitignored.
+| Topic | Written by | Payload |
+| --- | --- | --- |
+| `shared/firmware/test_stand_controller/elf` | `scripts/publish-test-stand-elf.sh` | the firmware ELF, raw bytes |
+| `config/conversions/state` | frontend | calibration, JSON |
+| `checklist/<checklist>/points/<point>/state` | frontend | checklist step state, JSON |
 
-Each line holds one message, five tab-separated fields:
-
-```
-<unix time with ns>\t<topic>\t<qos>\t<retain>\t<payload as hex>
-```
-
-Payloads are hex because most topics carry raw binary. The retain flag is the publisher's
-(MQTT v5 retain-as-published), so retained state can be reproduced. Every retained message,
-including the ~12 MB firmware ELF, lands in the file at every recorder start.
-
-Replay a recording into a broker with:
-
-```bash
-scripts/replay-mqtt.sh recordings/20260906T155835Z.tsv
-```
-
-It publishes every line to its original topic with the original QoS and retain flag, as
-fast as the broker accepts (roughly 500 messages per second). Timestamps are ignored; the
-frontend orders data by the timestamps inside the payloads. Set `MQTT_HOST` and `MQTT_PORT`
-for a non-default broker.
-
-- Messages on `cmd/#` are never replayed: a connected controller would execute them.
-- Clear the browser database before replaying. The frontend rejects packets older than
-  its last stored timestamp as time travel, and recordings from another controller boot
-  are older.
-- Retained frontend state (`checklist/*`, `config/conversions/state`) is replayed too and
-  overwrites the current broker state with the recorded one.
-- The recorder is running during replay, so the replay itself becomes a new recording.
-
-Running with Docker Compose
-
-```bash
-git submodule update --init --recursive
-docker compose up --build
-```
-
-The frontend is available at `http://localhost:3000`. The MQTT broker exposes TCP MQTT on
-`1883` and WebSocket MQTT on `8000`.
-
-Notes
-
-- This repo is intended for hardware files (KiCad projects), gerbers and firmware sources related to the test-stand and engine instrumentation.
-- See subdirectory READMEs for purpose and quick pointers to major files.
+The controller sends raw readings on purpose: conversion happens in the frontend, so a wrong
+calibration can be corrected afterwards by replaying the recording.
