@@ -62,7 +62,7 @@ verification steps are in [docs/setup.md](docs/setup.md).
 | `connector-test-stand/` | connector board at the stand; splits the cable out, provides power, analog front ends and actuator drivers |
 | `starter/` | ignition board with I2C IO expander and safety comparator |
 | `sensor-tmp107/` | TMP107 temperature sensor PCB, chainable on one bus |
-| `scripts/` | `publish-test-stand-elf.sh`, `replay-mqtt.sh` |
+| `scripts/` | `publish-test-stand-elf.sh`, and two ways to replay a recording: `replay-mqtt.py` (fast) and `replay-mqtt.sh` (no Python needed) |
 | `recordings/` | MQTT recordings written by the `mqtt-recorder` service (not in git) |
 | `shared/` | logo files and footprints |
 

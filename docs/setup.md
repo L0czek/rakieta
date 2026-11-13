@@ -42,8 +42,9 @@ router.
 | Docker with the Compose plugin | broker, recorder, frontend |
 | `rustup` | building the controller firmware and the host tools (the pinned nightly toolchain installs itself) |
 | `probe-rs` | flashing the controller (`cargo run` calls it) and the blackbox |
-| `mosquitto_pub` (package `mosquitto-clients`) | publishing the firmware ELF, replaying recordings |
-| `xxd` | replaying recordings |
+| `mosquitto_pub` (package `mosquitto-clients`) | publishing the firmware ELF, replaying recordings with `replay-mqtt.sh` |
+| `xxd` | replaying recordings with `replay-mqtt.sh` |
+| Python 3 with `paho-mqtt` | replaying recordings with the faster `replay-mqtt.py` ([data-and-history.md](data-and-history.md), section 2) |
 
 Clone with submodules:
 
@@ -73,13 +74,17 @@ Check that it works:
 2. A new file appears in `recordings/`.
 3. `http://<laptop>:3000` loads.
 
-Two things to know about the broker:
+Three things to know about the broker:
 
 - Retained messages (the firmware ELF, the calibration, the checklist state, the controller's
   last state) are stored in the Docker volume `mosquitto-data` and survive restarts of the
   container and of the laptop. The broker writes them to disk when it shuts down and once a
   minute while running, so a hard power cut can lose the last minute of changes.
   `docker compose down -v` deletes the volume and with it everything retained.
+- It never drops messages for a subscriber that falls behind (`max_queued_messages 0`); it
+  holds them in memory until the subscriber catches up. This keeps a briefly stalled frontend
+  from losing live telemetry and makes fast replays safe
+  ([data-and-history.md](data-and-history.md), section 2).
 - The recorder writes as user `1000:1000`. If `recordings/` is not writable by that user, the
   recorder restarts in a loop and nothing is recorded.
 

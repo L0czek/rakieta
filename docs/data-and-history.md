@@ -74,7 +74,11 @@ data, so it rebuilds its charts and history from the recording.
    boot when its timestamps start below the newest stored one, or appended to the current
    boot when they happen to continue past it.
 4. Open the frontend and **CONNECT**.
-5. Replay:
+5. Replay, with either of the two scripts (see "The two replay scripts" below):
+
+   ```bash
+   scripts/.venv/bin/python scripts/replay-mqtt.py recordings/20260906T155835Z.tsv
+   ```
 
    ```bash
    scripts/replay-mqtt.sh recordings/20260906T155835Z.tsv
@@ -82,15 +86,55 @@ data, so it rebuilds its charts and history from the recording.
 
    Optional second and third arguments are the broker host and port (default
    `127.0.0.1:1883`).
-6. Wait for `Replayed N messages, skipped M on cmd/#.`
+6. Wait for `Replayed N messages …, skipped M on cmd/#.` The Python script then takes another
+   11 seconds to ask the broker whether any messages were dropped.
 7. In **ANALYSIS**, switch **LIVE** to **PAUSED** and browse or export (section 3). A
    recording that contains controller reboots shows up as several boots in the boot selector.
 
+### The two replay scripts
+
+Both publish every recorded line to its original topic with the original QoS and retain
+flag, in file order, and both skip `cmd/#`. They differ in speed and in what they need.
+
+| | `replay-mqtt.py` | `replay-mqtt.sh` |
+| --- | --- | --- |
+| Needs | Python 3 with the `paho-mqtt` package | `mosquitto_pub` and `xxd` |
+| How | one broker connection for the whole file | a new `mosquitto_pub` process and connection per message |
+| Speed | tens of thousands of messages per second: an hour of recording in well under a minute | a few hundred messages per second: an hour of recording in ten minutes or more |
+| Rate limit | none by default; `--rate N` caps it at N messages per second | none; it cannot go faster |
+| Lost-message check | yes | no |
+
+Set up the Python script once (this needs internet access):
+
+```bash
+python3 -m venv scripts/.venv
+scripts/.venv/bin/pip install -r scripts/requirements.txt
+```
+
+The script finishes when the broker has taken every message. The frontend may still be
+working through them for a while after that; wait until `LAST PACKET T+…` in its header stops
+advancing before you export.
+
+**Why a fast replay is safe.** A subscriber that reads more slowly than the replay sends, such
+as a browser, leaves a backlog on the broker. Mosquitto by default keeps only 1,000 waiting
+messages per subscriber and silently drops the rest, which leaves holes in the frontend
+history with no sign that anything is missing. `mosquitto.conf` in this repository removes
+that limit (`max_queued_messages 0`), so the broker keeps the backlog in memory until the
+frontend has caught up. In a test, the frontend stored 60 % of an unthrottled replay with the
+default limit and all of it with the limit removed.
+
+**The lost-message check.** After the replay, the Python script reads the broker's counter of
+dropped messages and compares it with the value from before. If it went up, the script says
+how many messages were dropped and exits with an error. This matters when you replay into a
+broker that does not use this repository's configuration: fix the broker's limit, or clear
+the frontend history and replay again with `--rate`. The counter covers all subscribers, so a
+slow client other than your frontend also trips it. `--no-drop-check` skips the check and the
+11-second wait.
+
 ### What replay does and does not do
 
-- It runs as fast as the broker accepts, about 500 messages per second, several times faster
-  than real time. Recorded wall-clock times are ignored; the charts are placed by the
-  controller timestamps inside the payloads, so the result is the same.
+- Recorded wall-clock times are ignored. The charts are placed by the controller timestamps
+  inside the payloads, so the result is the same at any replay speed.
 - The countdown clock in the frontend is meaningless during a replay.
 - Each controller reboot in the recording raises the **CONTROLLER REBOOTED** banner, as it
   would live. Dismiss it.
@@ -114,7 +158,7 @@ grep -vP '\tconfig/conversions/state\t' recordings/<file>.tsv > /tmp/replay.tsv
 
 1. Empty the frontend history.
 2. Connect, and set the calibration you want (**IMPORT JSON** or edit and **SAVE SETTINGS**).
-3. `scripts/replay-mqtt.sh /tmp/replay.tsv`
+3. `scripts/.venv/bin/python scripts/replay-mqtt.py /tmp/replay.tsv`
 4. Export the CSV.
 
 ## 3. Frontend history
