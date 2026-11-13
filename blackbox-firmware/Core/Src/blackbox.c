@@ -56,6 +56,11 @@ void blackbox_tick(Blackbox *bb)
     }
 }
 
+/* Returns the first all-zero sector, found by binary search. This relies on the
+ * card layout the logger produces: sessions written back to back from sector 0,
+ * each starting with a separator sector, followed by zeros up to the end of the
+ * card. Logged sectors are never all zero, because every packet starts with a
+ * non-zero ID. On failure sets BLACKBOX_ERR_SD and returns 0. */
 uint32_t blackbox_find_free_sector(Blackbox *bb) {
     DWORD total = 0;
     if (SD_disk_ioctl(bb->sd, GET_SECTOR_COUNT, &total)
@@ -78,9 +83,9 @@ uint32_t blackbox_find_free_sector(Blackbox *bb) {
             return 0;
         }
 
-        /* Check if sector is all zeros (memcpy avoids aliasing UB) */
+        /* Check if the sector just read is all zeros (memcpy avoids aliasing UB) */
         uint32_t nonzero = 0;
-        for (uint32_t i = 0; i < BLACKBOX_HALF_SIZE; i += 4) {
+        for (uint32_t i = 0; i < 512U; i += 4) {
             uint32_t word;
             memcpy(&word, &buf[i], sizeof(word));
             nonzero |= word;

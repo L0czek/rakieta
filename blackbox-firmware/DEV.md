@@ -148,11 +148,13 @@ numeric bitmask value.
 
 These are the most relevant non-obvious behaviors in the checked-in firmware:
 
-- `sd_start_logging()` calls `blackbox_find_free_sector(...)` and then
-  immediately overrides the result with `free = 0;`. In practice, every new
-  logging session starts again at sector `0`.
-- Sector `0` is seeded with one `0xAA` marker byte and zeros. Payload logging
-  starts at sector `1`.
+- `sd_start_logging()` starts each session at the sector returned by
+  `blackbox_find_free_sector(...)`, a binary search for the first all-zero
+  sector. The search assumes sessions written back to back from sector `0` on a
+  zero-filled card. If it fails, logging does not start: falling back to sector
+  `0` would overwrite the earlier sessions.
+- The first sector of a session is seeded with one `0xAA` marker byte and
+  zeros. Payload logging starts in the following sector.
 - `BLACKBOX_DMA_BUF_SIZE` is `4096` bytes and each SD write is `2048` bytes.
 - The idle timeout is `1000` ms, but `flush_pending` is not implemented, so a
   partially filled tail buffer is not written when the UART stream stops.

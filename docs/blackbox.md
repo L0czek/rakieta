@@ -26,27 +26,34 @@ The stream is about 7–8 kB/s, roughly 30 MB per hour.
 
 These are properties of the current firmware. Each one can cost you the data.
 
-1. **Every start begins writing at the start of the card.** Powering the blackbox up, or
-   pulling the card out and pushing it back in, starts a new session at sector 0 and
-   overwrites the previous one. After an experiment, power the blackbox off and take the card
-   out **before** anything else. Do not power it up again with that card until the data is
-   copied.
+1. **Every start appends a new session.** Powering the blackbox up, or pulling the card out
+   and pushing it back in, starts a new session after the data already on the card. Earlier
+   sessions stay intact. To find the end of the data, the blackbox looks for the first empty
+   (all-zero) sector, so this only works on a card that was zeroed before its first use
+   (section 3).
+
+   **Firmware older than this change starts every session at sector 0 and overwrites the
+   previous one.** A blackbox that has not been reflashed since (section 6) still does this:
+   with it, take the card out after an experiment before powering the blackbox again. Check
+   which behaviour your board has with the two-session test in section 4.
 2. **The card is used raw, without a filesystem.** A computer shows it as unformatted. Do not
    let the operating system "fix" or format it. Read it with the decoder (section 5).
-3. **Old data is not erased by a new session.** A short session written over a long one
-   leaves the tail of the long one behind it. Zero the card before each experiment
-   (section 3) so that one card holds exactly one session.
+3. **The card must start out zeroed.** On a card that holds anything else (a filesystem, an
+   old recording that was not written back to back), the search for the first empty sector
+   lands in an arbitrary place. Zero a new card once, and zero it again whenever you want to
+   start with an empty card.
 4. **The last 2 KiB may be missing.** Data is written in 2 KiB blocks, and a partly filled
    block is not flushed when the stream stops. At 8 kB/s that is at most the last quarter
    second before the controller stopped sending.
 5. **An overrun stops recording until reset.** If the card is too slow, the blackbox raises
    the overrun error (8 blinks, section 4) and writes nothing more until it is power-cycled.
-   A power cycle starts over at sector 0 (point 1).
+   A power cycle starts a new session (point 1).
 6. **The button does nothing.**
 
 ## 3. Preparing the card
 
-Zero the card before each experiment, on the laptop:
+Zero a card before its first use, and again whenever it should start empty. Starting each
+experiment with an empty card keeps the decoded output to that experiment only. On the laptop:
 
 ```bash
 lsblk                       # find the card, for example /dev/sdX; check the size
@@ -109,7 +116,12 @@ matters, do a dry run:
 4. Check that the output has `timing_sync` lines with increasing `timestamp_ms`, `fast_adc`
    lines 1 ms apart, a `digital` line for the switch and `servo` lines, and that the warning
    count is small.
-5. Zero the card again before the real run.
+5. Put the card back, power the blackbox and the controller for another minute, and decode
+   again. With current firmware the output now holds both sessions: the first one unchanged,
+   then a second `experiment_separator` (or a backwards jump in `timestamp_ms`) and the new
+   data. If only the second session is there, the board runs the old firmware that overwrites
+   from sector 0.
+6. Zero the card again before the real run.
 
 ### If nothing is received
 
@@ -167,12 +179,14 @@ Output is one JSON object per line. Warnings and the final `decoded N packets` g
 
 What to expect in a healthy decode:
 
-- The first line is `experiment_separator`.
+- The first line is `experiment_separator`. Each later session on the same card starts with
+  another one. Where the previous session ended in the middle of a packet, the decoder can
+  miss that separator; the backwards jump in `timestamp_ms` still marks the new session.
 - A few warnings right after it (`unknown packet id`, `dropping … before first timing sync`):
   the recording starts in the middle of a packet, and the decoder locks on at the first
   timing sync.
 - One `truncated packet … resynchronizing` near the end, where the stream stops.
-- Timestamps that jump backwards mean the controller rebooted during the session.
+- Timestamps that jump backwards mean a new session, or a controller reboot during a session.
 
 Only the fast ADC lines have exact times. Every other packet carries the time of the most
 recent fast sample before it.

@@ -138,16 +138,15 @@ static void sd_start_logging(void)
   }
   sh_puts("main: SD initialized\n");
 
-  DWORD sector_count = 0;
-  if (SD_disk_ioctl(&sd_ctx, GET_SECTOR_COUNT, &sector_count) != RES_OK
-      || sector_count == 0) {
-    blackbox.error |= BLACKBOX_ERR_SD;
+  /* Append after the data already on the card. A failed lookup must not fall
+   * through: it returns 0, and writing there would destroy the old sessions. */
+  uint32_t free_sector = blackbox_find_free_sector(&blackbox);
+  if (blackbox.error & BLACKBOX_ERR_SD) {
     log_blackbox_error("m:sc=");
     return;
   }
-  blackbox.total_sectors = sector_count;
-  blackbox.next_sector = 0;
-  sh_puts("main: sector count ready\n");
+  blackbox.next_sector = free_sector;
+  sh_puts("main: free sector found\n");
 
   if (blackbox.next_sector >= blackbox.total_sectors) {
     blackbox.error |= BLACKBOX_ERR_FULL;

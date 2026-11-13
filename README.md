@@ -43,8 +43,9 @@ verification steps are in [docs/setup.md](docs/setup.md).
    volume. `docker compose down -v` deletes it; keep exported copies.
 2. The calibration lives in the browser and on the broker. Export it to a file after every
    change.
-3. The blackbox starts writing at the beginning of the card every time it powers up. Take the
-   card out before powering it again.
+3. A blackbox that still runs firmware from before the append fix starts writing at the
+   beginning of the card every time it powers up. Reflash it, or take the card out before
+   powering it again.
 4. The frontend's history does not survive a controller reboot. Export the CSV first.
 5. The firmware ELF must match the flashed build exactly. Publish it again after every flash.
 

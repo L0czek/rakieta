@@ -8,7 +8,7 @@ writes it directly to an SD card over SPI.
 This firmware is meant for a board that sits between a UART data source and a
 removable SD card:
 
-1. Insert an SD card.
+1. Insert an SD card that was zero-filled before its first use.
 2. Power the logger.
 3. Feed the source stream into the logger UART input.
 4. Remove the card later and inspect the raw binary capture offline.
@@ -113,8 +113,10 @@ before logging restarts.
 
 The SD card contents are raw sectors, not files:
 
-- Sector `0` is written with a marker byte `0xAA` followed by zeros.
-- Logged payload data starts at sector `1`.
+- Each session starts at the first all-zero sector of the card: sector `0` on a
+  zero-filled card, otherwise directly after the previous session.
+- The first sector of a session holds a marker byte `0xAA` followed by zeros.
+- Logged payload data starts in the next sector.
 - Each completed 2 KiB UART DMA half-buffer is written as 4 consecutive
   512-byte sectors.
 
@@ -122,8 +124,10 @@ The SD card contents are raw sectors, not files:
 
 These are current behaviors of the checked-in firmware, not future plans:
 
-- Every successful SD initialization restarts logging at sector `0`, so a new
-  session overwrites the start of any previous capture on the card.
+- The start of a session is found by binary search for the first all-zero
+  sector. This is only correct on a card that was zero-filled before its first
+  use and then written by this firmware alone; on any other card the session
+  lands in an arbitrary place.
 - Only completed 2 KiB half-buffers are written. The trailing partial buffer is
   not flushed when the UART stream stops.
 - The push-button input is debounced in software, but the separator-write path

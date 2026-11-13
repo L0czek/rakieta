@@ -100,7 +100,7 @@ nothing else:
 5. Write down the controller time (`LAST PACKET T+…`) next to the wall-clock time. It lets
    you match the charts to video and notes later.
 
-From here on **do not reboot the controller** and do not power-cycle the blackbox until the
+From here on **do not reboot the controller** and leave the blackbox running until the
 data is secured (section 6).
 
 ## 5. Firing
@@ -171,9 +171,9 @@ throughout. The physical safety switch works without the link.
 Do this before powering anything down, in this order. The first step protects the copy that
 is easiest to destroy.
 
-1. **Blackbox:** power it off, take the card out, label it. Powering it up again with the
-   card inside overwrites the recording from the start ([blackbox.md](blackbox.md),
-   section 2).
+1. **Blackbox:** power it off, take the card out, label it. A blackbox with old firmware
+   overwrites the recording when it is powered up again with the card inside
+   ([blackbox.md](blackbox.md), section 2); taking the card out first is safe with either.
 2. **Frontend:** in **ANALYSIS**, export the CSV for the whole run
    ([data-and-history.md](data-and-history.md), section 3). This copy is lost with the next
    controller reboot.
