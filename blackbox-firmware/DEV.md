@@ -170,6 +170,9 @@ These are the most relevant non-obvious behaviors in the checked-in firmware:
   filled, so that half (2 KiB) is lost, and the half still waiting for its SD
   write can be partly overwritten before it reaches the card. The flag stays
   set until the next SD reinitialization.
+- The overrun flag is not set while card detect reports an empty socket. A
+  card pulled out mid-write stalls the write long enough to overrun, and that
+  case is reported by `BLACKBOX_ERR_SD` alone.
 - The main loop re-checks the battery every `BATTERY_CHECK_MS` and sets or
   clears `BLACKBOX_ERR_BATTERY` accordingly.
 - Semihosting logging (`Core/Src/logging.c`) is disabled by default; see Flash

@@ -48,7 +48,8 @@ These are properties of the current firmware. Each one can cost you the data.
 5. **An overrun loses data but recording continues.** If the card is too slow, the blackbox
    raises the overrun error (8 blinks, section 4), drops about 2 KiB of the stream, and keeps
    recording. The error keeps blinking so that the loss is visible afterwards. Pulling the
-   card out while data is arriving usually causes an overrun as well.
+   card out while data is arriving is not counted as an overrun: it shows the card error (1
+   blink) alone, or 9 blinks if an overrun had already happened before.
 6. **The button does nothing.**
 
 ## 3. Preparing the card

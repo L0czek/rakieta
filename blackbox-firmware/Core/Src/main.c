@@ -182,6 +182,12 @@ static void log_dma_overrun(uint8_t is_half)
     return;
   }
 
+  /* A card pulled out mid-write stalls that write until the data overruns.
+   * That is the missing card, reported as the SD error, not a slow card. */
+  if (HAL_GPIO_ReadPin(CD_PORT, CD_PIN) != GPIO_PIN_RESET) {
+    return;
+  }
+
   blackbox.error |= BLACKBOX_ERR_OVERRUN;
   sh_puts(is_half ? "ovr:h\n" : "ovr:f\n");
   sh_puts("ovr:w\n");
