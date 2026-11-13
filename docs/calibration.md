@@ -32,16 +32,16 @@ How they interact:
 
 Do this after every calibration change:
 
-1. In **CONFIGURATION**, click **SAVE SETTINGS** while the header shows the connection as
-   green. The status line under the buttons shows `SAVED & PUBLISHED`.
+1. In **CONFIGURATION**, click **SAVE SETTINGS**. The status line under the buttons shows
+   `SAVED & PUBLISHED`.
 2. Click **EXPORT JSON** and keep the downloaded `conversion-settings.json`. Commit it to the
    repository if it is the calibration to use from now on.
 3. If the values should become the defaults for a fresh browser, also copy them into
    `getDefaultConversionSettings()` and rebuild the frontend.
 
-The status line says `SAVED & PUBLISHED` even when the frontend is disconnected. In that case
-the settings were only saved in this browser. Check the connection indicator, not the status
-line.
+If the frontend is disconnected, the status line shows
+`SAVED IN THIS BROWSER ONLY — MQTT DISCONNECTED, NOT PUBLISHED`. The settings are then stored
+in this browser but not on the broker; connect and **IMPORT JSON** an export to publish them.
 
 **EXPORT JSON** exports the last *saved* settings. Unsaved edits in the form are not included.
 

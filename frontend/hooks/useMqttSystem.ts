@@ -863,10 +863,10 @@ export const useMqttSystem = () => {
   };
 
   const publishConversionSettings = useCallback(
-    async (settings: ConversionSettings): Promise<void> => {
+    async (settings: ConversionSettings): Promise<boolean> => {
       const client = clientRef.current;
       if (!client || !client.connected) {
-        return;
+        return false;
       }
       const payload = encodeConversionSettingsPayload(settings);
       await new Promise<void>((resolve, reject) => {
@@ -883,6 +883,7 @@ export const useMqttSystem = () => {
           },
         );
       });
+      return true;
     },
     [],
   );

@@ -21,7 +21,8 @@ import type { SystemTelemetry } from '@/types';
 interface ConfigurationViewProps {
     onDirtyChange?: (isDirty: boolean) => void;
     telemetry?: SystemTelemetry;
-    publishConversionSettings?: (settings: ConversionSettings) => Promise<void> | void;
+    /** Resolves to false when the settings could not be published because MQTT is disconnected. */
+    publishConversionSettings?: (settings: ConversionSettings) => Promise<boolean | void> | boolean | void;
 }
 
 const PRESSURE_DEBUG_CHANNELS: { channel: PressureChannel; label: string }[] = [
@@ -213,6 +214,7 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({
 
     const statusClass = useMemo(() => {
         if (status.startsWith('ERROR')) return 'text-scada-danger';
+        if (status.includes('NOT PUBLISHED')) return 'text-scada-warning';
         if (status.startsWith('IMPORTED')) return 'text-scada-success';
         return 'text-scada-accent';
     }, [status]);
@@ -326,7 +328,11 @@ export const ConfigurationView: React.FC<ConfigurationViewProps> = ({
         setStatus(localStatus);
         if (!publishConversionSettings) return;
         Promise.resolve(publishConversionSettings(settings))
-            .then(() => setStatus(`${localStatus} & PUBLISHED`))
+            .then((published) => setStatus(
+                published === false
+                    ? `${localStatus} IN THIS BROWSER ONLY — MQTT DISCONNECTED, NOT PUBLISHED`
+                    : `${localStatus} & PUBLISHED`,
+            ))
             .catch((err) => setStatus(`PUBLISH ERROR: ${err?.message || 'unknown'}`));
     };
 
