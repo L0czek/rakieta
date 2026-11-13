@@ -98,10 +98,10 @@ cp .env.example .env
 | --- | --- |
 | `WIFI_SSID`, `WIFI_PASSWORD` | the network served by the directional dish |
 | `MQTT_HOST` | the laptop, as an IP address or a name the network's DNS resolves |
+| `MQTT_PORT` | broker TCP port; 1883 if unset. Keep 1883 unless you change the port in `docker-compose.yml` |
 | `MQTT_USER`, `MQTT_PASSWORD` | leave empty; the broker is anonymous |
 
-The broker port is fixed at 1883 in the test-stand firmware; `MQTT_PORT` in `.env` has no
-effect on it. Give the laptop a fixed address (DHCP reservation or static IP), because a
+Give the laptop a fixed address (DHCP reservation or static IP), because a
 changed address means rebuilding and reflashing.
 
 `WIFI_SSID`, `WIFI_PASSWORD` and `MQTT_HOST` are mandatory. The firmware builds without them,
