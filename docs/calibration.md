@@ -13,7 +13,7 @@ There are four places. Knowing which one wins is the key to not losing settings.
 | --- | --- | --- | --- |
 | 1 | Defaults in the code: `getDefaultConversionSettings()` in `frontend/utils/conversions.ts` | permanent, in git | you edit the file and rebuild the frontend |
 | 2 | The browser's `localStorage`, key `rocket.conversions.settings` | until the browser's site data is cleared; separate for each browser and each address the frontend is opened under | on save, import, reset, and whenever a calibration arrives over MQTT |
-| 3 | Retained MQTT topic `config/conversions/state` | **until the `mqtt` container restarts** (the broker has no persistence) | on save, import and reset, if the frontend is connected |
+| 3 | Retained MQTT topic `config/conversions/state` | kept in the broker's Docker volume `mosquitto-data`; survives restarts, deleted by `docker compose down -v` | on save, import and reset, if the frontend is connected |
 | 4 | A JSON file from **EXPORT JSON** | as long as you keep the file | when you click the button |
 
 How they interact:
@@ -45,10 +45,11 @@ line.
 
 **EXPORT JSON** exports the last *saved* settings. Unsaved edits in the form are not included.
 
-### Restoring after a broker restart
+### Restoring a lost calibration
 
-After `docker compose restart mqtt`, `docker compose down`, or a laptop reboot, the retained
-calibration is gone. To put it back:
+The broker keeps the calibration across restarts. It is gone after `docker compose down -v`,
+on a freshly set up laptop, or when a replay has overwritten it with a recorded one. To put it
+back:
 
 1. Open the frontend and connect.
 2. In **CONFIGURATION**, click **IMPORT JSON** and choose the exported file.

@@ -75,9 +75,11 @@ Check that it works:
 
 Two things to know about the broker:
 
-- **It has no persistence.** Every retained message (the firmware ELF, the calibration, the
-  checklist state) is lost when the `mqtt` container restarts. See section 6 and
-  [calibration.md](calibration.md).
+- Retained messages (the firmware ELF, the calibration, the checklist state, the controller's
+  last state) are stored in the Docker volume `mosquitto-data` and survive restarts of the
+  container and of the laptop. The broker writes them to disk when it shuts down and once a
+  minute while running, so a hard power cut can lose the last minute of changes.
+  `docker compose down -v` deletes the volume and with it everything retained.
 - The recorder writes as user `1000:1000`. If `recordings/` is not writable by that user, the
   recorder restarts in a loop and nothing is recorded.
 
@@ -188,7 +190,10 @@ five seconds.
 Publish the ELF again:
 
 - after **every flash**, because the ELF must match the build byte for byte;
-- after **every restart of the `mqtt` container**, because the retained copy is gone.
+- after `docker compose down -v` or on a new laptop, because the broker's stored copy is gone.
+
+The broker keeps the ELF across restarts, so an ELF from an older build stays there until you
+replace it.
 
 Without a matching ELF everything else still works: telemetry, commands and charts do not
 depend on it. You only lose the controller's log lines, which include the reasons for rejected

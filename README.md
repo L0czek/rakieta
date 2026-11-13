@@ -39,8 +39,8 @@ verification steps are in [docs/setup.md](docs/setup.md).
 
 ## Five things that lose data
 
-1. The broker keeps nothing across a restart. The firmware ELF and the calibration must be
-   published again after every restart of the `mqtt` container.
+1. The broker's retained state (firmware ELF, calibration, checklist) lives in a Docker
+   volume. `docker compose down -v` deletes it; keep exported copies.
 2. The calibration lives in the browser and on the broker. Export it to a file after every
    change.
 3. The blackbox starts writing at the beginning of the card every time it powers up. Take the
@@ -120,7 +120,7 @@ Commands to the controller (never retained):
 | `cmd/servo` | `OPEN`, `CLOSE` |
 | `cmd/shutdown` | `SHUTDOWN` |
 
-Shared state kept on the broker (retained, lost when the broker restarts):
+Shared state kept on the broker (retained, persisted in the `mosquitto-data` volume):
 
 | Topic | Written by | Payload |
 | --- | --- | --- |

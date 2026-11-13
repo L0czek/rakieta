@@ -94,8 +94,7 @@ data, so it rebuilds its charts and history from the recording.
 - Retained messages are replayed as retained. After a replay the broker holds the **recorded**
   ELF, calibration and checklist state, not the ones it had before. Every connected frontend
   takes over the recorded calibration. To get the current one back, **IMPORT JSON** your
-  exported calibration ([calibration.md](calibration.md)) or restart the `mqtt` container and
-  republish.
+  exported calibration ([calibration.md](calibration.md)) and publish the current ELF again.
 - The recorder is running during a replay, so the replay itself is written to a new recording
   file. Delete that file afterwards.
 
@@ -214,7 +213,7 @@ Do not use "Clear site data" for this. It also deletes the calibration stored in
 
 The **CHECKLIST** view is synchronized between all connected frontends through retained
 topics `checklist/<checklist>/points/<point>/state`. It is recorded and replayed like
-everything else, and it is lost when the broker restarts. Text entered in a checklist step
+everything else, and the broker keeps it across restarts. Text entered in a checklist step
 (for example the experiment name) is stored only there.
 
 ## 5. Which copy to use

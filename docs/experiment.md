@@ -12,8 +12,8 @@ Do these where there is time and a desk. Each item links to its how-to.
 
 - [ ] Controller flashed with the firmware you intend to use, with the site's WiFi name and
       the laptop's address in `.env` ([setup.md](setup.md), section 4).
-- [ ] The matching ELF file is on the laptop, and you know its path. It has to be republished
-      on site ([setup.md](setup.md), section 6).
+- [ ] The matching ELF is published to the broker, and the file is on the laptop in case it
+      has to be published again ([setup.md](setup.md), section 6).
 - [ ] Calibration checked, saved, and exported to `conversion-settings.json` on the laptop
       ([calibration.md](calibration.md), section 2).
 - [ ] Docker images built: `docker compose up --build -d` has run once on this laptop. The
@@ -35,9 +35,10 @@ Bring the system up in this order. Each step depends on the ones before it.
    running.
 3. **Frontend.** On the laptop open the frontend, gear icon, **CONNECT**. Use the same address
    as always, so that the stored calibration is the one you expect.
-4. **ELF.** Publish it. The status log shows `Loaded retained firmware ELF …`.
-5. **Calibration.** In **CONFIGURATION**, **IMPORT JSON** with your exported file. The broker
-   was just started, so it holds no calibration until you do this.
+4. **ELF.** The status log shows `Loaded retained firmware ELF …` if the broker still holds
+   one. Publish it again if you flashed since, or if you are not sure which build it is from.
+5. **Calibration.** In **CONFIGURATION**, compare the form with your exported file. If they
+   differ, or the broker's volume was deleted, **IMPORT JSON**.
 6. **Blackbox.** Insert the zeroed card and power the blackbox.
 7. **Controller.** Power it. Within seconds the dashboard shows live values, and the status
    log shows `DEFMT decoder ready for live log stream.` followed by controller log lines.
