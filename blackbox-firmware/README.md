@@ -69,7 +69,7 @@ The activity LED shows whether UART data is arriving:
 - It is off after reset until the first byte arrives.
 - It turns off after roughly 1 second without new bytes.
 - It is not a per-packet or per-sector write pulse, and it does not show that
-  data is being written: with an SD or overrun error it can blink while nothing
+  data is being written: with an SD error it can blink while nothing
   is recorded. Read it together with the status LED.
 
 Practical interpretation:
@@ -93,7 +93,7 @@ Error flag weights:
 | `1` | SD error or SD card missing/removal |
 | `2` | Battery below threshold at startup |
 | `4` | Card full |
-| `8` | UART overrun while an SD write is still in progress |
+| `8` | UART overrun while an SD write is still in progress; about 2 KiB was lost, logging continues |
 
 How to interpret combined errors:
 

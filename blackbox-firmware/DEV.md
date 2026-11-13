@@ -165,9 +165,11 @@ These are the most relevant non-obvious behaviors in the checked-in firmware:
 - The button debounce path sets `push_separator = 1`, but the separator write
   logic in `blackbox_process(...)` is commented out. There is no active user
   separator feature.
-- The main loop busy-waits forever when `BLACKBOX_ERR_OVERRUN` is set. Timer and
-  interrupt-driven LED updates can continue, but the foreground write loop is
-  effectively halted until reset.
+- An overrun does not stop logging. The DMA callback that detects it sets
+  `BLACKBOX_ERR_OVERRUN` and does not queue the half-buffer that was just
+  filled, so that half (2 KiB) is lost, and the half still waiting for its SD
+  write can be partly overwritten before it reaches the card. The flag stays
+  set until the next SD reinitialization.
 - The periodic battery re-check block exists only as commented code in
   `main.c`; the active implementation checks battery once at startup.
 - Semihosting logging (`Core/Src/logging.c`) is disabled by default; see Flash

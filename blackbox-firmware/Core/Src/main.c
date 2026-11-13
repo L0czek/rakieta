@@ -310,9 +310,6 @@ int main(void)
     /* USER CODE BEGIN 3 */
     log_uart_rate_if_pending();
     {
-      while (blackbox.error & BLACKBOX_ERR_OVERRUN)
-          ;
-
       uint8_t inserted = (HAL_GPIO_ReadPin(CD_PORT, CD_PIN)
                           == GPIO_PIN_RESET);
       if (!inserted && card_present) {

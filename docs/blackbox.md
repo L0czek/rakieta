@@ -45,9 +45,10 @@ These are properties of the current firmware. Each one can cost you the data.
 4. **The last 2 KiB may be missing.** Data is written in 2 KiB blocks, and a partly filled
    block is not flushed when the stream stops. At 8 kB/s that is at most the last quarter
    second before the controller stopped sending.
-5. **An overrun stops recording until reset.** If the card is too slow, the blackbox raises
-   the overrun error (8 blinks, section 4) and writes nothing more until it is power-cycled.
-   A power cycle starts a new session (point 1).
+5. **An overrun loses data but recording continues.** If the card is too slow, the blackbox
+   raises the overrun error (8 blinks, section 4), drops about 2 KiB of the stream, and keeps
+   recording. The error keeps blinking so that the loss is visible afterwards. Pulling the
+   card out while data is arriving usually causes an overrun as well.
 6. **The button does nothing.**
 
 ## 3. Preparing the card
@@ -123,7 +124,7 @@ seconds, and repeats. The count is the sum of the active errors:
 | 1 | SD card missing, removed, or failing |
 | 2 | blackbox battery below 3.3 V |
 | 4 | card full |
-| 8 | UART overrun; recording has stopped |
+| 8 | UART overrun; some data was lost, recording continues |
 
 For example 3 blinks = card problem + low battery.
 
@@ -136,7 +137,7 @@ one second after the data stops. It is dark after power-up until the first byte 
    within about a second.
 
 The activity LED shows that bytes arrive, not that they are written. With an error on the
-status LED (missing card, overrun) it can blink while nothing is recorded, so always read
+status LED (missing card, failing card) it can blink while nothing is recorded, so always read
 both LEDs: **activity blinking and status dark** is the healthy state.
 
 Interrupting the stream does not restart the session; only power-cycling the blackbox or
