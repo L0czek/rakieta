@@ -4,7 +4,7 @@ import { SystemTelemetry, SensorDataPoint } from '@/types';
 import { ScadaPanel, ValueDisplay, SENSOR_COLORS, TEMP_COLORS, useChartSize, CHART_RANGES } from '@/components/Widgets';
 import { ControlPanel } from '@/components/ControlPanel';
 import { ServoPanel } from '@/components/ServoPanel';
-import { Download, Pause, Play, ZoomIn, ZoomOut } from 'lucide-react';
+import { Download, Pause, Play, Trash2, ZoomIn, ZoomOut } from 'lucide-react';
 import uPlot from 'uplot';
 import UplotReact from 'uplot-react';
 import * as DB from '@/utils/db';
@@ -17,6 +17,8 @@ interface AnalysisViewProps {
         connectionStatus: ConnectionState;
         isSimulating: boolean;
         commandsEnabled: boolean;
+        /** Deletes all stored telemetry history in this browser. */
+        onClearHistory?: () => Promise<void> | void;
 }
 
 const formatSecondsFromMs = (timestampMs: number): string => {
@@ -36,6 +38,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
     connectionStatus,
     isSimulating,
     commandsEnabled,
+    onClearHistory,
 }) => {
     const sensorLabels: Record<string, string> = {
         tensometer: 'tensometer',
@@ -356,6 +359,27 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
       }
   };
 
+  const handleClearHistory = async () => {
+      if (!onClearHistory) return;
+      const proceed = window.confirm(
+          'Delete all telemetry history stored in this browser? Export the CSV first if you need it. '
+          + 'MQTT recordings and calibration are not affected.',
+      );
+      if (!proceed) return;
+
+      try {
+          await onClearHistory();
+          setChartData(null);
+          setExportBeginSecondsInput('');
+          setExportEndSecondsInput('');
+          setExportStatus('History cleared.');
+      } catch (error) {
+          console.error('Clearing history failed', error);
+          const reason = error instanceof Error ? error.message : 'unknown error';
+          setExportStatus(`Clearing history failed: ${reason}`);
+      }
+  };
+
   // Visibility flags for axes
   const showAxisPressure = visibleLines.pressureTank || visibleLines.pressureCombustion;
   const showAxisVoltage = visibleLines.batteryStand || visibleLines.batteryComputer || visibleLines.boostVoltage;
@@ -664,6 +688,18 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
                                 <Download size={14} />
                                 {isExporting ? 'Exporting...' : 'Export CSV'}
                             </button>
+                            {onClearHistory && (
+                                <button
+                                    onClick={handleClearHistory}
+                                    disabled={isExporting}
+                                    className="h-8 px-3 border rounded text-xs font-bold uppercase flex items-center
+                                      gap-2 border-red-700 text-red-300 bg-red-900/30 disabled:opacity-50
+                                      disabled:cursor-not-allowed"
+                                >
+                                    <Trash2 size={14} />
+                                    Clear History
+                                </button>
+                            )}
                             <div className="text-[11px] text-slate-500 font-mono">
                                 {exportStatus ?? 'CSV columns: timestamp_ms,sensor_id,value (seconds input)'}
                             </div>

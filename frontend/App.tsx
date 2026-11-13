@@ -172,6 +172,7 @@ const App = () => {
           connectionStatus={connectionStatus}
           isSimulating={isSimulating}
           commandsEnabled={commandsEnabled}
+          onClearHistory={resetData}
         />
       );
     }

@@ -203,11 +203,13 @@ empty history.
 
 ### Emptying the history
 
-There is no button for this outside the lockout screen. In the browser's developer tools
-(F12) open **Application → Storage → IndexedDB**, select `rocket_telemetry_db`, and delete it;
-then reload the page.
+In **ANALYSIS**, at the bottom of **DATA CONTROL**, click **Clear History** and confirm. This
+deletes the stored samples in this browser and resets the live charts. It does not touch the
+calibration, the MQTT recordings or the blackbox, and it does not disconnect: data that
+arrives afterwards is stored again.
 
-Do not use "Clear site data" for this. It also deletes the calibration stored in this browser.
+Do not use the browser's "Clear site data" for this. It also deletes the calibration stored
+in this browser.
 
 ## 4. Checklist state
 
