@@ -5,6 +5,8 @@ export const MAX_CHUNK_DURATION_MS = 1000;
 const PANDAS_CSV_HEADER = 'timestamp_ms,sensor_id,value';
 
 export interface MeasurementChunk {
+  /** Controller boot the samples belong to; controller timestamps restart at every boot. */
+  bootId: number;
   sensorId: string;
   chunkStart: number;
   chunkEnd: number;
@@ -12,16 +14,28 @@ export interface MeasurementChunk {
   values: Float32Array;
 }
 
+export interface BootRecord {
+  id: number;
+  /** Wall-clock time (ms since epoch) at which this browser first saw the boot. */
+  firstSeenAtWall: number;
+}
+
+export interface BootSummary extends BootRecord {
+  /** Controller time range of the stored samples, in ms; both 0 when the boot has none. */
+  start: number;
+  end: number;
+}
+
 interface RocketDB extends DBSchema {
   measurements: {
-    key: [string, number];
+    key: [number, string, number];
     value: MeasurementChunk;
-    indexes: { 'by-sensor': string; 'by-chunk-start': number };
+    indexes: { 'by-boot-chunk-start': [number, number] };
   };
-  meta: {
-    key: string;
-    value: any;
-  }
+  boots: {
+    key: number;
+    value: BootRecord;
+  };
 }
 
 interface CsvExportRow {
@@ -37,7 +51,7 @@ export interface PandasCsvExport {
 }
 
 const DB_NAME = 'rocket_telemetry_db';
-const DB_VERSION = 2;
+const DB_VERSION = 3;
 
 let dbPromise: Promise<IDBPDatabase<RocketDB>> | null = null;
 
@@ -45,17 +59,16 @@ export const initDB = () => {
   if (!dbPromise) {
     dbPromise = openDB<RocketDB>(DB_NAME, DB_VERSION, {
       upgrade(db) {
-        if (db.objectStoreNames.contains('measurements')) {
-          db.deleteObjectStore('measurements');
-        }
-        if (db.objectStoreNames.contains('meta')) {
-          db.deleteObjectStore('meta');
+        // Older layouts kept a single time axis and cannot be split into boots; start over.
+        for (const name of Array.from(db.objectStoreNames)) {
+          db.deleteObjectStore(name);
         }
 
-        const store = db.createObjectStore('measurements', { keyPath: ['sensorId', 'chunkStart'] });
-        store.createIndex('by-chunk-start', 'chunkStart');
-        store.createIndex('by-sensor', 'sensorId');
-        db.createObjectStore('meta');
+        const store = db.createObjectStore('measurements', {
+          keyPath: ['bootId', 'sensorId', 'chunkStart'],
+        });
+        store.createIndex('by-boot-chunk-start', ['bootId', 'chunkStart']);
+        db.createObjectStore('boots', { keyPath: 'id' });
       },
     });
   }
@@ -76,10 +89,15 @@ export const addChunks = async (chunks: MeasurementChunk[]) => {
   await tx.done;
 };
 
-export const getMeasurementsInRange = async (sensorId: string, start: number, end: number): Promise<SensorDataPoint[]> => {
+export const getMeasurementsInRange = async (
+  bootId: number,
+  sensorId: string,
+  start: number,
+  end: number,
+): Promise<SensorDataPoint[]> => {
   const db = await initDB();
   const queryStart = Math.max(0, start - MAX_CHUNK_DURATION_MS);
-  const range = IDBKeyRange.bound([sensorId, queryStart], [sensorId, end]);
+  const range = IDBKeyRange.bound([bootId, sensorId, queryStart], [bootId, sensorId, end]);
   const chunks = await db.getAll('measurements', range);
   const points: SensorDataPoint[] = [];
 
@@ -95,13 +113,15 @@ export const getMeasurementsInRange = async (sensorId: string, start: number, en
   return points;
 };
 
-export const getSensorIds = async (): Promise<string[]> => {
+export const getSensorIds = async (bootId: number): Promise<string[]> => {
   const db = await initDB();
-  const keys = await db.getAllKeys('measurements');
+  // An array key sorts after every string, so [bootId, []] is past the boot's last sensor.
+  const range = IDBKeyRange.bound([bootId], [bootId, []]);
+  const keys = await db.getAllKeys('measurements', range);
   const sensorIds = new Set<string>();
 
   for (const key of keys) {
-    const sensorId = key[0];
+    const sensorId = key[1];
     if (typeof sensorId === 'string' && sensorId.length > 0) {
       sensorIds.add(sensorId);
     }
@@ -110,17 +130,39 @@ export const getSensorIds = async (): Promise<string[]> => {
   return Array.from(sensorIds);
 };
 
-export const getMeasurementTimeRange = async (): Promise<{ start: number; end: number }> => {
+export const getMeasurementTimeRange = async (
+  bootId: number,
+): Promise<{ start: number; end: number }> => {
   const db = await initDB();
   const tx = db.transaction('measurements', 'readonly');
-  const index = tx.objectStore('measurements').index('by-chunk-start');
-  const firstCursor = await index.openCursor(null, 'next');
-  const lastCursor = await index.openCursor(null, 'prev');
+  const index = tx.objectStore('measurements').index('by-boot-chunk-start');
+  const range = IDBKeyRange.bound([bootId, -Infinity], [bootId, Infinity]);
+  const firstCursor = await index.openCursor(range, 'next');
+  const lastCursor = await index.openCursor(range, 'prev');
 
   const start = firstCursor ? firstCursor.value.chunkStart : 0;
   const end = lastCursor ? lastCursor.value.chunkEnd : 0;
 
   return { start, end };
+};
+
+export const registerBoot = async (boot: BootRecord): Promise<void> => {
+  const db = await initDB();
+  await db.put('boots', boot);
+};
+
+/** Boots known to this browser, oldest first, with the time range of their stored samples. */
+export const listBoots = async (): Promise<BootSummary[]> => {
+  const db = await initDB();
+  const boots = await db.getAll('boots');
+  const summaries: BootSummary[] = [];
+
+  for (const boot of boots) {
+    const range = await getMeasurementTimeRange(boot.id);
+    summaries.push({ ...boot, ...range });
+  }
+
+  return summaries;
 };
 
 const validateExportRange = (begin: number, end: number): void => {
@@ -157,10 +199,12 @@ const buildCsvLine = (row: CsvExportRow): string =>
   `${row.timestamp},${escapeCsvField(row.sensorId)},${row.value}`;
 
 export const exportMeasurementsForPandas = async ({
+  bootId,
   begin,
   end,
   sensorIds,
 }: {
+  bootId: number;
   begin: number;
   end: number;
   sensorIds?: string[];
@@ -170,11 +214,12 @@ export const exportMeasurementsForPandas = async ({
   const normalizedBegin = Math.floor(begin);
   const normalizedEnd = Math.ceil(end);
   const requestedSensorIds = normalizeSensorIds(sensorIds);
-  const selectedSensorIds = requestedSensorIds.length > 0 ? requestedSensorIds : await getSensorIds();
+  const selectedSensorIds =
+    requestedSensorIds.length > 0 ? requestedSensorIds : await getSensorIds(bootId);
   const rows: CsvExportRow[] = [];
 
   for (const sensorId of selectedSensorIds) {
-    const points = await getMeasurementsInRange(sensorId, normalizedBegin, normalizedEnd);
+    const points = await getMeasurementsInRange(bootId, sensorId, normalizedBegin, normalizedEnd);
     for (const point of points) {
       if (!Number.isFinite(point.value)) continue;
       rows.push({ timestamp: point.timestamp, sensorId, value: point.value });
@@ -196,31 +241,10 @@ export const exportMeasurementsForPandas = async ({
   };
 };
 
-export const getLastTimestamp = async (): Promise<number> => {
-    const db = await initDB();
-    const val = await db.get('meta', 'lastTimestamp');
-    return val || 0;
-}
-
-export const setLastTimestamp = async (ts: number) => {
-    const db = await initDB();
-    await db.put('meta', ts, 'lastTimestamp');
-}
-
-export const getFirstTimestamp = async (): Promise<number> => {
-     const db = await initDB();
-     const tx = db.transaction('measurements', 'readonly');
-     const cursor = await tx.objectStore('measurements').index('by-chunk-start').openCursor(null, 'next');
-     if (cursor) {
-         return cursor.value.chunkStart;
-     }
-     return 0;
-}
-
 export const clearDB = async () => {
   const db = await initDB();
-  const tx = db.transaction(['measurements', 'meta'], 'readwrite');
+  const tx = db.transaction(['measurements', 'boots'], 'readwrite');
   await tx.objectStore('measurements').clear();
-  await tx.objectStore('meta').clear();
+  await tx.objectStore('boots').clear();
   await tx.done;
 };

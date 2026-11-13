@@ -40,6 +40,7 @@ import { RocketSimulator, PacketEmit } from '@/utils/simulator';
 import { appendStatusLogEntries, makeStatusLogEntry } from '@/utils/statusLog';
 
 const DEFAULT_TELEMETRY: SystemTelemetry = {
+  bootId: 1,
   startTime: 0,
   lastPacketTimestamp: 0,
   avgFastAdcPacketLength: 0,
@@ -78,6 +79,17 @@ const MAX_SERVO_LIVE_POINTS = 500;
 const FLUSH_INTERVAL_MS = 500;
 const roundTimestamp = (timestamp: number): number => Math.round(timestamp);
 const STALE_CHUNK_FLUSH_MS = 500;
+// Controller time is "ms since boot". A packet this much older than the newest one seen
+// means the controller restarted and its clock began again.
+const REBOOT_TIME_STEP_BACK_MS = 1000;
+
+export interface RebootNotice {
+  bootId: number;
+  detectedAtWall: number;
+}
+
+export const isControllerReboot = (newestTimestamp: number, receivedTimestamp: number): boolean =>
+  newestTimestamp > 0 && newestTimestamp - receivedTimestamp > REBOOT_TIME_STEP_BACK_MS;
 
 const cloneTelemetry = (t: SystemTelemetry): SystemTelemetry => JSON.parse(JSON.stringify(t));
 
@@ -149,7 +161,8 @@ type SlowHistoryKey = 'batteryStand' | 'batteryComputer' | 'boostVoltage' | 'sta
 export const useMqttSystem = () => {
   const [connectionStatus, setConnectionStatus] = useState<ConnectionState>(ConnectionState.DISCONNECTED);
   const [isSimulating, setIsSimulating] = useState(false);
-  const [criticalError, setCriticalError] = useState<string | null>(null);
+  const [boots, setBoots] = useState<DB.BootSummary[]>([]);
+  const [rebootNotice, setRebootNotice] = useState<RebootNotice | null>(null);
   const [telemetry, setTelemetry] = useState<SystemTelemetry>(cloneTelemetry(DEFAULT_TELEMETRY));
   const [checklistPointStates, setChecklistPointStates] = useState<
     Record<string, ChecklistPointRuntimeState>
@@ -157,6 +170,8 @@ export const useMqttSystem = () => {
   
   const clientRef = useRef<MqttClient | null>(null);
   const telemetryRef = useRef<SystemTelemetry>(cloneTelemetry(DEFAULT_TELEMETRY));
+  const bootIdRef = useRef(DEFAULT_TELEMETRY.bootId);
+  const bootReadyRef = useRef<Promise<void>>(Promise.resolve());
   const telemetryVersionRef = useRef(0);
   const publishedTelemetryVersionRef = useRef(-1);
   const simulatorRef = useRef<RocketSimulator | null>(null);
@@ -180,28 +195,34 @@ export const useMqttSystem = () => {
   const sealedChunksRef = useRef<DB.MeasurementChunk[]>([]);
   const flushIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Load initial state from DB
+  // Load the newest stored boot; new data continues it until the controller clock steps back.
   useEffect(() => {
     const loadState = async () => {
-        try {
-                        const [lastTsMeta, measurementRange] = await Promise.all([
-                            DB.getLastTimestamp(),
-                            DB.getMeasurementTimeRange(),
-                        ]);
-                        const lastTs = Math.max(lastTsMeta, measurementRange.end);
-                        telemetryRef.current.lastPacketTimestamp = lastTs;
-                        telemetryRef.current.startTime = measurementRange.start;
-            setTelemetry({ ...telemetryRef.current });
-        } catch (e) {
-            console.error("Failed to load DB state", e);
+      try {
+        let storedBoots = await DB.listBoots();
+        if (storedBoots.length === 0) {
+          await DB.registerBoot({ id: DEFAULT_TELEMETRY.bootId, firstSeenAtWall: Date.now() });
+          storedBoots = await DB.listBoots();
         }
+
+        const newest = storedBoots[storedBoots.length - 1];
+        bootIdRef.current = newest.id;
+        telemetryRef.current.bootId = newest.id;
+        telemetryRef.current.lastPacketTimestamp = newest.end;
+        telemetryRef.current.startTime = newest.start;
+        setBoots(storedBoots);
+        setTelemetry({ ...telemetryRef.current });
+      } catch (e) {
+        console.error("Failed to load DB state", e);
+      }
     };
-    loadState();
+    bootReadyRef.current = loadState();
   }, []);
 
   const sealActiveChunk = (sensorId: string, chunk: ActiveChunkBuffer) => {
       if (chunk.timestamps.length === 0) return;
       sealedChunksRef.current.push({
+          bootId: bootIdRef.current,
           sensorId,
           chunkStart: chunk.chunkStart,
           chunkEnd: chunk.chunkEnd,
@@ -251,9 +272,22 @@ export const useMqttSystem = () => {
       for (const point of points) appendPointToChunk(sensorId, point);
   };
 
+  const flushSealedChunks = useCallback(async () => {
+      const chunks = sealedChunksRef.current;
+      if (chunks.length === 0) return;
+
+      sealedChunksRef.current = [];
+
+      try {
+          await DB.addChunks(chunks);
+      } catch (e) {
+          console.error("DB Flush Error", e);
+      }
+  }, []);
+
   // Flush buffer to DB periodically
   useEffect(() => {
-      flushIntervalRef.current = setInterval(async () => {
+      flushIntervalRef.current = setInterval(() => {
           const now = performance.now();
 
           for (const [sensorId, chunk] of Object.entries(activeChunksRef.current) as [
@@ -266,39 +300,10 @@ export const useMqttSystem = () => {
               }
           }
 
-          const chunks = sealedChunksRef.current;
-          if (chunks.length === 0) return;
-
-          sealedChunksRef.current = [];
-
-          try {
-              await DB.addChunks(chunks);
-              
-              const maxTs = Math.max(...chunks.map(chunk => chunk.chunkEnd));
-              if (maxTs > 0) await DB.setLastTimestamp(maxTs);
-
-          } catch (e) {
-              console.error("DB Flush Error", e);
-          }
+          void flushSealedChunks();
       }, FLUSH_INTERVAL_MS); 
       return () => clearInterval(flushIntervalRef.current!);
-  }, []);
-
-  const forceDisconnect = useCallback((reason: string) => {
-      console.error(`CRITICAL SYSTEM ERROR: ${reason}`);
-      setCriticalError(reason);
-      setConnectionStatus(ConnectionState.ERROR);
-      
-      if (clientRef.current) {
-          clientRef.current.end(true); 
-          clientRef.current = null;
-      }
-      if (simulatorRef.current) {
-          simulatorRef.current.stop();
-          simulatorRef.current = null;
-      }
-      setIsSimulating(false);
-  }, []);
+  }, [flushSealedChunks]);
 
   const disconnect = useCallback(() => {
       if (clientRef.current) {
@@ -311,11 +316,11 @@ export const useMqttSystem = () => {
 
   const resetData = useCallback(async () => {
     await DB.clearDB();
-    setCriticalError(null);
-        setConnectionStatus((prev) => prev === ConnectionState.ERROR ? ConnectionState.DISCONNECTED : prev);
-    
+    await DB.registerBoot({ id: DEFAULT_TELEMETRY.bootId, firstSeenAtWall: Date.now() });
+
     activeChunksRef.current = {};
     sealedChunksRef.current = [];
+    bootIdRef.current = DEFAULT_TELEMETRY.bootId;
 
     // Reset Telemetry
     telemetryRef.current = cloneTelemetry(DEFAULT_TELEMETRY);
@@ -323,6 +328,8 @@ export const useMqttSystem = () => {
     fastPacketDurationWindowSumRef.current = 0;
     telemetryVersionRef.current += 1;
     setTelemetry(cloneTelemetry(DEFAULT_TELEMETRY));
+    setRebootNotice(null);
+    setBoots(await DB.listBoots());
     
     // Reset Simulator Time if running
     if (simulatorRef.current) {
@@ -505,8 +512,59 @@ export const useMqttSystem = () => {
     defmtDecodeBlockedRef.current = false;
   }, []);
 
+  // The controller clock restarted: close the current boot's history and continue in a new
+  // one, so both stay browsable. Mutates the live telemetry object in place because message
+  // handling keeps a reference to it.
+  const startNewBoot = (receivedTimestamp: number) => {
+    const current = telemetryRef.current;
+    const previousNewest = current.lastPacketTimestamp;
+
+    for (const [sensorId, chunk] of Object.entries(activeChunksRef.current) as [
+      string,
+      ActiveChunkBuffer,
+    ][]) {
+      sealActiveChunk(sensorId, chunk);
+    }
+    activeChunksRef.current = {};
+
+    const bootId = bootIdRef.current + 1;
+    const detectedAtWall = Date.now();
+    bootIdRef.current = bootId;
+
+    Object.assign(current, {
+      bootId,
+      startTime: 0,
+      lastPacketTimestamp: 0,
+      avgFastAdcPacketLength: 0,
+      tensometer: [],
+      pressureTank: [],
+      pressureCombustion: [],
+      pressureTankRaw: null,
+      pressureCombustionRaw: null,
+      batteryStand: [],
+      batteryComputer: [],
+      boostVoltage: [],
+      starterSense: [],
+      servoPosition: [],
+      temperatures: {},
+    });
+    fastPacketDurationWindowRef.current = [];
+    fastPacketDurationWindowSumRef.current = 0;
+
+    appendStatusLogEntry(
+      `Controller reboot detected: time went from T+${previousNewest} back to T+${receivedTimestamp}. History continues as boot ${bootId}.`,
+      'warning',
+    );
+    setRebootNotice({ bootId, detectedAtWall });
+
+    void (async () => {
+      await DB.registerBoot({ id: bootId, firstSeenAtWall: detectedAtWall });
+      await flushSealedChunks();
+      setBoots(await DB.listBoots());
+    })().catch((error) => console.error('Failed to store new boot', error));
+  };
+
   const handleMessage = (topic: string, message: any, isRetained = false) => {
-    if (connectionStatus === ConnectionState.ERROR) return;
 
     if (topic === CONVERSION_SETTINGS_MQTT_TOPIC) {
       const decoded = decodeConversionSettingsPayload(toMessageText(message));
@@ -540,17 +598,13 @@ export const useMqttSystem = () => {
     const current = telemetryRef.current;
 
     const checkTime = (ts: number) => {
-        if (current.lastPacketTimestamp > 0 && ts < current.lastPacketTimestamp) {
-             if (current.lastPacketTimestamp - ts > 1000) {
-                 forceDisconnect(`TIME TRAVEL DETECTED. Received: ${ts}, System Last: ${current.lastPacketTimestamp}.`);
-                 return false;
-             }
+        if (isControllerReboot(current.lastPacketTimestamp, ts)) {
+            startNewBoot(ts);
         }
-        return true;
     };
 
     const updateFastSensor = (key: FastHistoryKey, dbKey: string, tStart: number, tEnd: number, values: number[]) => {
-      if (!checkTime(tStart)) return;
+      checkTime(tStart);
 
       const packetDuration = Math.max(0, tEnd - tStart);
       fastPacketDurationWindowRef.current.push(packetDuration);
@@ -586,7 +640,7 @@ export const useMqttSystem = () => {
         timestamp: number, 
         value: number
     ) => {
-        if (!checkTime(timestamp)) return;
+        checkTime(timestamp);
 
         current.lastPacketTimestamp = Math.max(current.lastPacketTimestamp, timestamp);
         if (current.startTime === 0) current.startTime = timestamp;
@@ -629,7 +683,7 @@ export const useMqttSystem = () => {
     }
     else if (topic.startsWith('sensor/temp/')) {
         const { timestampStart, timestampEnd, values } = Parser.parseTemp(buffer);
-        if (!checkTime(timestampStart)) return;
+        checkTime(timestampStart);
         current.lastPacketTimestamp = Math.max(current.lastPacketTimestamp, timestampEnd);
         if (current.startTime === 0) current.startTime = timestampStart;
         const sensorId = topic.split('/').pop() || 'unknown';
@@ -727,7 +781,7 @@ export const useMqttSystem = () => {
   handleMessageRef.current = handleMessage;
 
   const connect = useCallback(async (config: MqttConfig) => {
-    setCriticalError(null);
+    await bootReadyRef.current;
     if (clientRef.current) { clientRef.current.end(); clientRef.current = null; }
     resetDefmtState();
     
@@ -837,18 +891,15 @@ export const useMqttSystem = () => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      // Only update state if not in critical error
-      if (connectionStatus !== ConnectionState.ERROR) {
-          if (publishedTelemetryVersionRef.current === telemetryVersionRef.current) {
-              return;
-          }
-
-          publishedTelemetryVersionRef.current = telemetryVersionRef.current;
-          setTelemetry({ ...telemetryRef.current });
+      if (publishedTelemetryVersionRef.current === telemetryVersionRef.current) {
+          return;
       }
+
+      publishedTelemetryVersionRef.current = telemetryVersionRef.current;
+      setTelemetry({ ...telemetryRef.current });
     }, 33);
     return () => clearInterval(interval);
-  }, [connectionStatus]);
+  }, []);
 
   const sendCommand = (topic: string, payload: string) => {
     // 1. If connected to MQTT, send it there.
@@ -919,6 +970,8 @@ export const useMqttSystem = () => {
     sendCommand('cmd/servo', cmd);
   };
   
+  const dismissRebootNotice = useCallback(() => setRebootNotice(null), []);
+
   const toggleSimSafety = () => {
       if (simulatorRef.current) {
           simulatorRef.current.toggleSafety();
@@ -928,8 +981,10 @@ export const useMqttSystem = () => {
   return {
     connectionStatus,
     isSimulating,
-    criticalError,
     telemetry,
+    boots,
+    rebootNotice,
+    dismissRebootNotice,
     checklistPointStates,
     connect,
     disconnect,

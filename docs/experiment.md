@@ -94,14 +94,15 @@ nothing else:
 1. If the controller was rebooted since the check, or you want a fresh time base, reboot it
    now and wait for telemetry. Not later.
 2. `docker compose restart mqtt-recorder` — a new recording file for this run.
-3. Empty the frontend history ([data-and-history.md](data-and-history.md), section 3). If the
-   controller was rebooted, the frontend demands this anyway.
+3. Empty the frontend history ([data-and-history.md](data-and-history.md), section 3), so
+   that the run is boot 1 and nothing else is in the way.
 4. In **CHECKLIST**, **RESET ALL CHECKLISTS**.
 5. Write down the controller time (`LAST PACKET T+…`) next to the wall-clock time. It lets
    you match the charts to video and notes later.
 
 From here on **do not reboot the controller** and leave the blackbox running until the
-data is secured (section 6).
+data is secured (section 6). A reboot does not lose data, but it splits the run across two
+time axes and puts the controller back into its start-up state.
 
 ## 5. Firing
 
@@ -175,8 +176,8 @@ is easiest to destroy.
    overwrites the recording when it is powered up again with the card inside
    ([blackbox.md](blackbox.md), section 2); taking the card out first is safe with either.
 2. **Frontend:** in **ANALYSIS**, export the CSV for the whole run
-   ([data-and-history.md](data-and-history.md), section 3). This copy is lost with the next
-   controller reboot.
+   ([data-and-history.md](data-and-history.md), section 3). If the controller rebooted
+   during the run, export each boot.
 3. **Recording:** `docker compose restart mqtt-recorder` to close the run's file, then copy
    that file from `recordings/` to a second medium.
 4. **Calibration:** keep the `conversion-settings.json` that was active with the run.
@@ -195,4 +196,4 @@ Repeat section 4 (clean start) after securing the data of the previous run. In p
 
 - a second blackbox card, or copy and zero the first one;
 - a new recording file;
-- CSV exported before the controller is rebooted.
+- the CSV of the previous run exported before the history is cleared.

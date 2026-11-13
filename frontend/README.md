@@ -124,7 +124,8 @@ DEFMT log requirements:
   - Fire allowed only when system is ARMED and physical safety is unsafe/armed
   - Servo commands blocked during FIRE
   - Countdown displays client-side seconds from the observed `COUNTDOWN` state transition
-  - Critical time-travel check can force disconnect and display lockout modal
+  - A controller clock that steps back is treated as a reboot: a banner is shown and the
+    history continues as a new boot, selectable in the Analysis view
 - Live packet clock shown as `T+timestamp`
 - Config modal for broker host/port
 - Checklist modes:
@@ -138,7 +139,7 @@ DEFMT log requirements:
 - IndexedDB storage is chunked by sensor and time window (`1000ms` chunks) rather than
   one-record-per-point, which reduces write amplification under high-rate telemetry.
 - Major views and MQTT transport runtime are lazy-loaded to reduce cold-start JS payload.
-- `Reset` in critical modal clears IndexedDB and in-memory telemetry.
+- `Clear History` in the Analysis view clears IndexedDB and in-memory telemetry.
 - `Status log` now renders decoded `defmt` lines plus decoder/runtime warnings instead of
   `status/cmd`.
 - `vite.config.ts` exposes `GEMINI_API_KEY` defines, but this frontend currently does not use Gemini APIs.

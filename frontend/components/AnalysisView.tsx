@@ -17,6 +17,8 @@ interface AnalysisViewProps {
         connectionStatus: ConnectionState;
         isSimulating: boolean;
         commandsEnabled: boolean;
+        /** Controller boots with stored history, oldest first. */
+        boots?: DB.BootSummary[];
         /** Deletes all stored telemetry history in this browser. */
         onClearHistory?: () => Promise<void> | void;
 }
@@ -38,6 +40,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
     connectionStatus,
     isSimulating,
     commandsEnabled,
+    boots = [],
     onClearHistory,
 }) => {
     const sensorLabels: Record<string, string> = {
@@ -61,8 +64,58 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
   const [isExporting, setIsExporting] = useState(false);
   const [exportStatus, setExportStatus] = useState<string | null>(null);
 
-  const timelineStart = telemetry.startTime;
-  const timelineEnd = Math.max(telemetry.startTime, telemetry.lastPacketTimestamp);
+  // Controller timestamps restart at every controller boot, so each boot has its own
+  // timeline. null follows the boot that is currently receiving data.
+  const [selectedBootId, setSelectedBootId] = useState<number | null>(null);
+  const currentBootId = telemetry.bootId;
+  const viewedBootId = selectedBootId ?? currentBootId;
+  const isViewingCurrentBoot = viewedBootId === currentBootId;
+  const viewedBoot = boots.find((boot) => boot.id === viewedBootId);
+
+  const timelineStart = isViewingCurrentBoot ? telemetry.startTime : viewedBoot?.start ?? 0;
+  const timelineEnd = isViewingCurrentBoot
+      ? Math.max(telemetry.startTime, telemetry.lastPacketTimestamp)
+      : Math.max(timelineStart, viewedBoot?.end ?? 0);
+
+  const bootOptions = React.useMemo(() => {
+      const options = boots.map((boot) => ({ ...boot }));
+      const current = options.find((boot) => boot.id === currentBootId);
+      const liveRange = {
+          start: telemetry.startTime,
+          end: Math.max(telemetry.startTime, telemetry.lastPacketTimestamp),
+      };
+      if (current) {
+          Object.assign(current, liveRange);
+      } else {
+          options.push({ id: currentBootId, firstSeenAtWall: Date.now(), ...liveRange });
+      }
+      return options.sort((left, right) => left.id - right.id);
+  }, [boots, currentBootId, telemetry.startTime, telemetry.lastPacketTimestamp]);
+
+  const selectBoot = (bootId: number) => {
+      const boot = bootOptions.find((option) => option.id === bootId);
+      setSelectedBootId(bootId === currentBootId ? null : bootId);
+      setIsLive(false);
+      setViewStart(boot?.start ?? 0);
+      setChartData(null);
+      setExportBeginSecondsInput('');
+      setExportEndSecondsInput('');
+      setExportStatus(null);
+  };
+
+  // A reboot while paused: keep showing the boot that was being inspected.
+  const previousCurrentBootIdRef = useRef(currentBootId);
+  useEffect(() => {
+      const previousBootId = previousCurrentBootIdRef.current;
+      previousCurrentBootIdRef.current = currentBootId;
+      if (previousBootId === currentBootId) return;
+
+      if (selectedBootId === currentBootId) {
+          setSelectedBootId(null);
+      } else if (selectedBootId === null && !isLive && currentBootId > previousBootId) {
+          setSelectedBootId(previousBootId);
+      }
+  }, [currentBootId, selectedBootId, isLive]);
 
   const [visibleLines, setVisibleLines] = useState<Record<string, boolean>>({
     tensometer: true,
@@ -81,7 +134,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
   useEffect(() => {
      const loadKnownSensors = async () => {
          try {
-             const sensorIds = await DB.getSensorIds();
+             const sensorIds = await DB.getSensorIds(viewedBootId);
              const baseSensors = new Set([
                  'tensometer',
                  'pressureTank',
@@ -104,7 +157,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
      };
 
      void loadKnownSensors();
-  }, []);
+  }, [viewedBootId]);
 
   useEffect(() => {
      const temps = Object.keys(telemetry.temperatures);
@@ -134,7 +187,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
   // --- DATABASE FETCHING LOGIC (DEBOUNCED QUEUE) ---
   const fetchState = useRef<{
       isFetching: boolean;
-      pending: { start: number; end: number; keys: string[] } | null;
+      pending: { bootId: number; start: number; end: number; keys: string[] } | null;
   }>({ isFetching: false, pending: null });
   
   const isMountedRef = useRef(true);
@@ -143,7 +196,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
       return () => { isMountedRef.current = false; };
   }, []);
 
-  const performFetch = async (start: number, end: number, keys: string[]) => {
+  const performFetch = async (bootId: number, start: number, end: number, keys: string[]) => {
       const dataMap: Record<string, SensorDataPoint[]> = {};
       const dbKeyMap: Record<string, string> = {
           tensometer: 'tensometer', pressureTank: 'pressureTank', pressureCombustion: 'pressureCombustion',
@@ -153,7 +206,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
 
       await Promise.all(keys.map(async (uiKey) => {
           const dbKey = dbKeyMap[uiKey] || uiKey;
-          const pts = await DB.getMeasurementsInRange(dbKey, start, end);
+          const pts = await DB.getMeasurementsInRange(bootId, dbKey, start, end);
           dataMap[uiKey] = pts;
       }));
       return dataMap;
@@ -172,7 +225,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
       fetchState.current.pending = null; 
       // Note: isFetching is already true here
 
-      performFetch(next.start, next.end, next.keys).then(data => {
+      performFetch(next.bootId, next.start, next.end, next.keys).then(data => {
           if (isMountedRef.current) {
               setChartData(data);
           }
@@ -184,14 +237,14 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
       });
   };
 
-  const requestFetch = (start: number, end: number, keys: string[]) => {
+  const requestFetch = (bootId: number, start: number, end: number, keys: string[]) => {
       if (fetchState.current.isFetching) {
           // If fetching (or in cooldown), replace pending with this new request
-          fetchState.current.pending = { start, end, keys };
+          fetchState.current.pending = { bootId, start, end, keys };
       } else {
           // Start immediately
           fetchState.current.isFetching = true;
-          performFetch(start, end, keys).then(data => {
+          performFetch(bootId, start, end, keys).then(data => {
               if (isMountedRef.current) {
                   setChartData(data);
               }
@@ -220,10 +273,10 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
       if (!isLive) {
            const activeKeys = Object.keys(visibleLines).filter(k => visibleLines[k]);
            if (activeKeys.length > 0) {
-               requestFetch(viewStart, viewStart + windowSize, activeKeys);
+               requestFetch(viewedBootId, viewStart, viewStart + windowSize, activeKeys);
            }
       }
-  }, [viewStart, windowSize, isLive, visibleLines]);
+  }, [viewedBootId, viewStart, windowSize, isLive, visibleLines]);
 
   useEffect(() => {
       if (timelineEnd <= 0) {
@@ -339,17 +392,19 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
       setIsExporting(true);
       setExportStatus(null);
       try {
-          const result = await DB.exportMeasurementsForPandas({ begin, end });
+          const result = await DB.exportMeasurementsForPandas({ bootId: viewedBootId, begin, end });
           const blob = new Blob([result.csv], { type: 'text/csv;charset=utf-8' });
           const url = URL.createObjectURL(blob);
           const link = document.createElement('a');
           link.href = url;
-          link.download = `telemetry_pandas_${begin}_${end}.csv`;
+          link.download = `telemetry_pandas_boot${viewedBootId}_${begin}_${end}.csv`;
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
           URL.revokeObjectURL(url);
-          setExportStatus(`Exported ${result.rowCount} rows from ${result.sensorCount} sensors.`);
+          setExportStatus(
+              `Exported ${result.rowCount} rows from ${result.sensorCount} sensors (boot ${viewedBootId}).`,
+          );
       } catch (error) {
           console.error('Export failed', error);
           const reason = error instanceof Error ? error.message : 'unknown error';
@@ -369,6 +424,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
 
       try {
           await onClearHistory();
+          setSelectedBootId(null);
           setChartData(null);
           setExportBeginSecondsInput('');
           setExportEndSecondsInput('');
@@ -615,12 +671,30 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
                 <div className="mt-auto bg-scada-surface-soft p-2 rounded border border-scada flex flex-col gap-2">
                         <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-4">
                             <button 
-                            onClick={() => setIsLive(!isLive)} 
+                            onClick={() => {
+                                if (!isLive) setSelectedBootId(null);
+                                setIsLive(!isLive);
+                            }} 
                             className={`delight-press flex min-h-11 items-center justify-center gap-2 px-3 py-2 rounded text-xs font-bold border shadow-lg lg:min-h-0 lg:py-1 ${isLive ? 'bg-scada-accent-strong border-scada-accent text-scada-accent' : 'bg-scada-surface-soft-strong border-scada-strong text-scada-secondary'}`}
                             >
                             {isLive ? <Pause size={14} fill="currentColor" className="delight-icon-shift"/> : <Play size={14} fill="currentColor" className="delight-icon-shift"/>}
                             {isLive ? 'LIVE' : 'PAUSED'}
                             </button>
+
+                            {bootOptions.length > 1 && (
+                                <select
+                                    aria-label="Controller boot"
+                                    value={viewedBootId}
+                                    onChange={(event) => selectBoot(Number(event.target.value))}
+                                    className="scada-input !w-auto max-w-full text-xs"
+                                >
+                                    {bootOptions.map((boot) => (
+                                        <option key={boot.id} value={boot.id}>
+                                            {`BOOT ${boot.id}${boot.id === currentBootId ? ' (CURRENT)' : ''} · T+${formatSecondsFromMs(boot.start)}s–${formatSecondsFromMs(boot.end)}s`}
+                                        </option>
+                                    ))}
+                                </select>
+                            )}
 
                             <div className="hidden h-6 w-px bg-scada-surface-strong md:block"></div>
 

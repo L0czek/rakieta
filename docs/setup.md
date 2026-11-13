@@ -223,6 +223,6 @@ command, the shutdown takes effect when you unplug it.
 | --- | --- |
 | Frontend stays red after CONNECT | wrong host, or port 8000 not reachable from the browser's machine |
 | Connected, but no telemetry | controller not on the network, or `MQTT_HOST` does not point to the laptop. Attach with `cargo run` and read the log: it prints `MQTT resolving host: …` and the session errors |
-| `CRITICAL FAILURE … TIME TRAVEL DETECTED` | the controller rebooted, so its clock restarted. See [data-and-history.md](data-and-history.md) |
+| Red **CONTROLLER REBOOTED** banner | the controller restarted, so its clock began again. The history continues as a new boot; see [data-and-history.md](data-and-history.md) |
 | Status log shows `DEFMT decoder WebAssembly package is unavailable` | the frontend was built without the decoder; rebuild with `docker compose up --build` |
 | Values are present but wrong | calibration, see [calibration.md](calibration.md) |

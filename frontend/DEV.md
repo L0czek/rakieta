@@ -19,7 +19,7 @@ This is a single-page React+TypeScript application built on Vite. The architectu
   - App bootstrap and React root mount.
 - `App.tsx`
   - Top-level shell, header, view switch (`DASHBOARD`/`ANALYSIS`/`CHECKLIST`/`CONFIGURATION`),
-    config modal, critical error modal.
+    config modal, controller reboot banner.
   - Owns broker host/port UI state.
 - `types.ts`
   - Core enums/interfaces for telemetry and command state.
@@ -67,7 +67,7 @@ This is a single-page React+TypeScript application built on Vite. The architectu
 - `utils/simulator.ts`
   - Deterministic-ish telemetry generator + command handling state machine.
 - `utils/db.ts`
-  - IndexedDB storage adapter with chunked time-series rows (`measurements`, `meta` stores).
+  - IndexedDB storage adapter with chunked time-series rows (`measurements`, `boots` stores), keyed by controller boot.
 - `index.html`
   - Tailwind CDN injection + global SCADA CSS effects.
 - `docs/design-system.md`
@@ -88,18 +88,20 @@ This is a single-page React+TypeScript application built on Vite. The architectu
 - MQTT `message` callback dispatches by topic.
 - Parser outputs normalized packet objects.
 - Conversion functions map raw payloads to physical values.
-- `checkTime` guards against severe timestamp rollback (`>1000`) and triggers critical lockout.
+- `checkTime` treats a timestamp rollback of more than 1000 ms as a controller reboot and
+  starts a new boot (`startNewBoot`): history is stored per boot, nothing is discarded.
 
 ### [3] Persistence
 
 - Buffered writes by sensor key in memory.
 - Active sensor chunks are sealed at `MAX_CHUNK_DURATION_MS = 1000` or inactivity timeout.
 - Flush timer every 500 ms bulk writes sealed chunks to IndexedDB.
-- `meta.lastTimestamp` and earliest chunk start timestamp are used for timeline bounds.
+- Chunks are keyed `[bootId, sensorId, chunkStart]`; the `boots` store lists the boots this
+  browser has seen. Timeline bounds come from the first and last chunk of a boot.
 
 ### [4] Analysis mode retrieval
 
-- In paused/history mode, visible line keys are fetched from IndexedDB by `[sensorId, timestamp]` range.
+- In paused/history mode, visible line keys are fetched from IndexedDB by `[bootId, sensorId, timestamp]` range.
 - Debounced queue avoids overloading IndexedDB during rapid scrolling/zooming.
 
 ### [5] Simulator integration
@@ -143,7 +145,7 @@ This is a single-page React+TypeScript application built on Vite. The architectu
 - Panels: bordered cards with corner accents and neon-like glow
 - Motion:
   - Pulsing alerts for dangerous states
-  - Critical failure modal emphasis
+  - Controller reboot banner
 - Major features:
   - Connection config modal
   - Live dashboard charts and thermal tiles

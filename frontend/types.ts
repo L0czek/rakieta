@@ -38,6 +38,8 @@ export interface StatusLogEntry {
 }
 
 export interface SystemTelemetry {
+  /** Controller boot the live data belongs to; timestamps restart at every boot. */
+  bootId: number;
   startTime: number;
   lastPacketTimestamp: number;
   avgFastAdcPacketLength: number;

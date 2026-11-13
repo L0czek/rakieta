@@ -5,7 +5,7 @@ The same measurements end up in three independent places. Each has a different p
 | Store | Contents | Where | Survives |
 | --- | --- | --- | --- |
 | **MQTT recording** | every MQTT message, raw | `recordings/*.tsv` on the laptop | everything except loss of the radio link or of the laptop |
-| **Frontend history** | converted values, for charts and CSV export | the browser's IndexedDB | page reloads; **not** a controller reboot |
+| **Frontend history** | converted values, for charts and CSV export | the browser's IndexedDB | page reloads and controller reboots; not clearing the browser's site data |
 | **Blackbox** | raw sensor stream | SD card at the test stand | loss of the radio link; see [blackbox.md](blackbox.md) |
 
 The MQTT recording is the master copy on the ground. The frontend history is a working view
@@ -46,13 +46,11 @@ docker compose logs mqtt-recorder
 Do this before every experiment. A recorder that cannot write to `recordings/` fails without
 any sign in the frontend.
 
-### One file per controller boot
+### One file per experiment
 
-Controller timestamps restart from zero at every controller boot. A recording that spans a
-reboot cannot be replayed into the frontend in one go: the frontend stops at the point where
-time jumps back (section 3).
-
-Start a new file after every controller boot and before every experiment:
+A recording can span any number of controller reboots; the frontend keeps the boots apart
+when the file is replayed (section 3). Starting a new file before each experiment is still
+worthwhile, because it keeps the files small and each one about a single run:
 
 ```bash
 docker compose restart mqtt-recorder
@@ -71,8 +69,10 @@ data, so it rebuilds its charts and history from the recording.
    mix with the recorded telemetry, and the replayed state messages would make the frontend
    show a state the real controller is not in.
 2. Start the stack: `docker compose up -d`.
-3. Empty the frontend history (section 3, "Emptying the history"). Old history with higher
-   timestamps makes the frontend reject the replay.
+3. Empty the frontend history (section 3, "Emptying the history") if you want it to hold this
+   recording only. Without that, the replay is stored next to what is already there: as a new
+   boot when its timestamps start below the newest stored one, or appended to the current
+   boot when they happen to continue past it.
 4. Open the frontend and **CONNECT**.
 5. Replay:
 
@@ -83,7 +83,8 @@ data, so it rebuilds its charts and history from the recording.
    Optional second and third arguments are the broker host and port (default
    `127.0.0.1:1883`).
 6. Wait for `Replayed N messages, skipped M on cmd/#.`
-7. In **ANALYSIS**, switch **LIVE** to **PAUSED** and browse or export (section 3).
+7. In **ANALYSIS**, switch **LIVE** to **PAUSED** and browse or export (section 3). A
+   recording that contains controller reboots shows up as several boots in the boot selector.
 
 ### What replay does and does not do
 
@@ -91,6 +92,10 @@ data, so it rebuilds its charts and history from the recording.
   than real time. Recorded wall-clock times are ignored; the charts are placed by the
   controller timestamps inside the payloads, so the result is the same.
 - The countdown clock in the frontend is meaningless during a replay.
+- Each controller reboot in the recording raises the **CONTROLLER REBOOTED** banner, as it
+  would live. Dismiss it.
+- A recording that was started while the controller was off begins with the controller's old
+  retained state. On replay this can appear as an extra boot holding a single servo sample.
 - Retained messages are replayed as retained. After a replay the broker holds the **recorded**
   ELF, calibration and checklist state, not the ones it had before. Every connected frontend
   takes over the recorded calibration. To get the current one back, **IMPORT JSON** your
@@ -120,6 +125,8 @@ grep -vP '\tconfig/conversions/state\t' recordings/<file>.tsv > /tmp/replay.tsv
   charts (about the last five seconds of the fast channels).
 - Twice a second the new samples are written to the browser database `rocket_telemetry_db`
   (IndexedDB), at full resolution. Nothing is thinned out.
+- Samples are stored per **controller boot**. Controller time restarts at zero when the
+  controller reboots, so each boot has its own time axis (see "Controller reboots" below).
 - The database belongs to one browser on one machine, under one address. Another browser, a
   phone, or the same browser under a different URL has its own, separate history, containing
   only what it received while it was open and connected.
@@ -138,12 +145,14 @@ In **ANALYSIS**:
 | Control | Function |
 | --- | --- |
 | **LIVE / PAUSED** | LIVE follows the newest data from memory. PAUSED reads the visible window from the database |
-| Slider | moves the window through the whole stored time range (PAUSED only; moving it switches to PAUSED) |
+| Boot selector | chooses which controller boot to look at. It appears once more than one boot is stored; the one receiving data is marked `(CURRENT)`. Choosing an earlier boot switches to PAUSED; **LIVE** returns to the current one |
+| Slider | moves the window through the stored time range of the selected boot (PAUSED only; moving it switches to PAUSED) |
 | Zoom in / out | halves or doubles the window, from 1 s to 600 s |
 | Series buttons | show or hide each channel |
 | `CURSOR: T+…` | start of the window, in controller milliseconds |
 
-Time on the charts is controller time: seconds since the controller booted.
+Time on the charts is controller time: seconds since the controller booted, for the selected
+boot.
 
 ### Exporting to CSV
 
@@ -153,8 +162,8 @@ At the bottom of **DATA CONTROL** in **ANALYSIS**:
    **Use Displayed Window** to take over the range currently on the chart.
 2. Click **Export CSV**.
 
-The file `telemetry_pandas_<begin>_<end>.csv` contains every stored channel in that range,
-whatever is visible on the chart, in long format:
+The file `telemetry_pandas_boot<N>_<begin>_<end>.csv` contains every stored channel of the
+selected boot in that range, whatever is visible on the chart, in long format:
 
 ```
 timestamp_ms,sensor_id,value
@@ -175,36 +184,41 @@ wide = df.pivot_table(index="timestamp_ms", columns="sensor_id", values="value")
 The values carry the calibration that was active when each sample arrived
 ([calibration.md](calibration.md), section 5).
 
-### Controller reboots: `TIME TRAVEL DETECTED`
+### Controller reboots
 
-The history is indexed by controller time, which restarts at zero when the controller
-reboots. The frontend cannot place new data from "second 5" into a history that already
-reaches "second 3000". When a packet arrives more than one second older than the newest
-stored one, the frontend disconnects and shows:
+Controller time is "milliseconds since the controller booted", so it starts again from zero
+after a reboot. When a packet arrives more than one second older than the newest one, the
+frontend takes that as a reboot and:
 
-```
-CRITICAL FAILURE — TIME TRAVEL DETECTED. Received: …, System Last: …
-```
+- closes the history of the boot so far and starts a new boot, numbered one higher;
+- clears the live charts, which then show the new boot;
+- shows a red **CONTROLLER REBOOTED** banner until you dismiss it, and writes a line to the
+  status log;
+- stays connected. Commands keep working.
 
-The only button is **WIPE DATA & RESET**, which deletes the history in this browser. The MQTT
-recording and the blackbox are not affected.
+Nothing is deleted. Earlier boots remain in the boot selector in **ANALYSIS** and can be
+browsed and exported like the current one. If you were looking at a paused chart when the
+reboot happened, the view stays on the boot you were inspecting.
 
-To keep the old history before wiping:
+The banner matters for more than the charts: a rebooted controller is back in state `ARMED`
+with the valve servo closed, whatever it was doing before. Check the state before continuing.
 
-1. Reload the page and **do not connect**. The lockout is gone and the history is intact.
-2. Open **ANALYSIS**, export the CSV.
-3. Connect. The lockout appears again; now click **WIPE DATA & RESET**.
+Boot numbers are local to one browser. They count the reboots this browser has seen since its
+history was last cleared, and say nothing about how often the controller really started.
 
-The same lockout appears, for the same reason, when you replay a recording into a frontend
-that still holds newer history, and when a recording spans a controller reboot.
+Limits:
 
-Rule of thumb: **export before you reboot the controller**, and start each experiment with an
-empty history.
+- A boot that lasted only a few seconds can go unnoticed, because the next boot's first
+  packets are then not more than a second older. Its samples are merged into the following
+  boot.
+- Data that arrives while the page is closed is not stored, and a reboot during that time is
+  noticed only when the page is open again.
 
 ### Emptying the history
 
 In **ANALYSIS**, at the bottom of **DATA CONTROL**, click **Clear History** and confirm. This
-deletes the stored samples in this browser and resets the live charts. It does not touch the
+deletes the stored samples of all boots in this browser, resets the live charts, and starts
+again at boot 1. It does not touch the
 calibration, the MQTT recordings or the blackbox, and it does not disconnect: data that
 arrives afterwards is stored again.
 

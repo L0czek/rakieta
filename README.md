@@ -46,7 +46,8 @@ verification steps are in [docs/setup.md](docs/setup.md).
 3. A blackbox that still runs firmware from before the append fix starts writing at the
    beginning of the card every time it powers up. Reflash it, or take the card out before
    powering it again.
-4. The frontend's history does not survive a controller reboot. Export the CSV first.
+4. The frontend's history lives in one browser. Export the CSV; clearing the browser's site
+   data deletes it.
 5. The firmware ELF must match the flashed build exactly. Publish it again after every flash.
 
 ## Subprojects

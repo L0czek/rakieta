@@ -16,6 +16,7 @@ vi.stubGlobal(
 );
 
 const telemetry: SystemTelemetry = {
+  bootId: 1,
   startTime: 0,
   lastPacketTimestamp: 0,
   avgFastAdcPacketLength: 0,
@@ -47,7 +48,7 @@ const actions = {
   requestShutdown: vi.fn(),
 };
 
-const renderView = (onClearHistory: () => Promise<void>) =>
+const renderView = (onClearHistory: () => Promise<void> = async () => {}) =>
   render(
     <AnalysisView
       telemetry={telemetry}
@@ -84,5 +85,47 @@ describe('AnalysisView clear history', () => {
     fireEvent.click(screen.getByRole('button', { name: /clear history/i }));
 
     expect(onClearHistory).not.toHaveBeenCalled();
+  });
+});
+
+describe('AnalysisView controller boots', () => {
+  afterEach(cleanup);
+
+  const boots = [
+    { id: 1, firstSeenAtWall: 1000, start: 5000, end: 6500 },
+    { id: 2, firstSeenAtWall: 2000, start: 0, end: 3000 },
+  ];
+  const liveTelemetry: SystemTelemetry = { ...telemetry, bootId: 2, lastPacketTimestamp: 3000 };
+
+  const renderWithBoots = () =>
+    render(
+      <AnalysisView
+        telemetry={liveTelemetry}
+        actions={actions}
+        connectionStatus={ConnectionState.DISCONNECTED}
+        isSimulating={false}
+        commandsEnabled={false}
+        boots={boots}
+      />,
+    );
+
+  it('offers no boot selector while there is a single boot', () => {
+    renderView();
+    expect(screen.queryByLabelText('Controller boot')).not.toBeInTheDocument();
+  });
+
+  it('shows the current boot first and switches the timeline to an earlier one', async () => {
+    renderWithBoots();
+
+    const selector = screen.getByLabelText('Controller boot') as HTMLSelectElement;
+    expect(selector.value).toBe('2');
+    expect(screen.getByRole('option', { name: /BOOT 2 \(CURRENT\)/ })).toBeInTheDocument();
+    expect(await screen.findByDisplayValue('3')).toBe(screen.getByLabelText('End (s)'));
+
+    fireEvent.change(selector, { target: { value: '1' } });
+
+    expect(selector.value).toBe('1');
+    expect(await screen.findByDisplayValue('6.5')).toBe(screen.getByLabelText('End (s)'));
+    expect(screen.getByLabelText('Begin (s)')).toHaveValue('5');
   });
 });

@@ -14,7 +14,6 @@ import {
   Settings,
   ShieldAlert,
   SlidersHorizontal,
-  Trash2,
   Wifi,
   WifiOff,
 } from 'lucide-react';
@@ -105,8 +104,10 @@ const App = () => {
   const {
     connectionStatus,
     isSimulating,
-    criticalError,
     telemetry,
+    boots,
+    rebootNotice,
+    dismissRebootNotice,
     checklistPointStates,
     connect,
     toggleSimulation,
@@ -172,6 +173,7 @@ const App = () => {
           connectionStatus={connectionStatus}
           isSimulating={isSimulating}
           commandsEnabled={commandsEnabled}
+          boots={boots}
           onClearHistory={resetData}
         />
       );
@@ -206,31 +208,6 @@ const App = () => {
   return (
     <div className="w-screen h-screen overflow-hidden bg-scada-app flex flex-col relative">
       <div className="absolute inset-0 pointer-events-none z-50 crt-lines opacity-20"></div>
-
-      {criticalError && (
-        <div className="absolute inset-0 z-[100] bg-scada-danger-overlay backdrop-blur-md flex items-center justify-center p-8">
-          <div className="bg-scada-danger-strong border-4 border-scada-danger rounded-lg p-8 max-w-2xl shadow-scada-danger-xl">
-            <div className="flex items-center gap-4 mb-4 text-scada-inverse">
-              <ShieldAlert size={64} className="animate-pulse" />
-              <div>
-                <h1 className="text-4xl font-bold tracking-widest">CRITICAL FAILURE</h1>
-                <p className="text-xl opacity-80">SAFETY PROTOCOL ENGAGED</p>
-              </div>
-            </div>
-            <div className="bg-scada-surface-soft p-4 rounded border border-scada-danger font-mono text-scada-danger-soft mb-6">
-              {criticalError}
-            </div>
-            <div className="flex gap-4">
-              <button
-                onClick={resetData}
-                className="delight-press flex-1 py-4 bg-scada-danger hover-bg-scada-danger-strong text-scada-inverse font-bold rounded text-xl shadow-lg transition-colors flex items-center justify-center gap-2"
-              >
-                <Trash2 className="delight-icon-shift" /> WIPE DATA & RESET
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       <header className="bg-scada-app border-b border-scada-weak px-2 py-2 md:px-4 md:py-0 shrink-0 z-10">
         <div className="flex flex-wrap items-center gap-2 md:gap-3 xl:gap-4 md:min-h-14">
@@ -345,6 +322,28 @@ const App = () => {
           </div>
         </div>
       </header>
+
+      {rebootNotice && (
+        <div
+          role="alert"
+          className="shrink-0 z-10 flex flex-wrap items-center gap-x-4 gap-y-2 border-b-2 border-scada-danger bg-scada-danger-strong px-3 py-2 text-scada-inverse"
+        >
+          <div className="flex items-center gap-2 text-sm font-bold tracking-widest">
+            <ShieldAlert size={18} className="animate-pulse" />
+            <span>CONTROLLER REBOOTED</span>
+          </div>
+          <div className="flex-1 min-w-[16rem] text-xs">
+            Controller time restarted. Check the controller state before continuing. History
+            continues as boot {rebootNotice.bootId}; earlier boots stay available in ANALYSIS.
+          </div>
+          <button
+            onClick={dismissRebootNotice}
+            className="delight-press min-h-11 px-3 border border-scada-danger rounded text-xs font-bold lg:min-h-0 lg:py-1"
+          >
+            DISMISS
+          </button>
+        </div>
+      )}
 
       <main className={`flex-1 p-2 ${mobileMainPaddingBottomClass} min-h-0 overflow-auto md:pb-0 md:overflow-hidden relative z-0`}>
         {showConfig && (
