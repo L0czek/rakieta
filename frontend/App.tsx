@@ -190,6 +190,7 @@ const App = () => {
           getStepContext={checklistEngine.getStepContext}
           setStepContextField={checklistEngine.setStepContextField}
           onCompleteCurrentStep={checklistEngine.completeStep}
+          onOverrideCurrentStep={checklistEngine.overrideStep}
           onResetChecklist={() => checklistEngine.resetChecklist(checklistEngine.selectedChecklistId)}
           onResetAllChecklists={checklistEngine.resetAllChecklists}
           isReadOnly={checklistEngine.isReadOnly}

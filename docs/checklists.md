@@ -6,17 +6,12 @@ Water tests are run manually and are not covered here.
 This file is the reference for the content of the lists: what each step checks and why it is
 where it is. The lists themselves live in `frontend/config/checklists.ts`.
 
-> **Status: approved content, not yet implemented.** The frontend still holds three
-> placeholder lists. The section [Implementation](#implementation) at the end says what has
-> to be built. Once that is done, delete that section and this box; the rest of the file
-> stays as documentation.
-
 ## How to read the lists
 
 | Kind | Meaning |
 | --- | --- |
 | **A** | Auto-checked against telemetry. The step can be ticked only while the condition holds, unless it is overridden. |
-| **A+** | Auto-checked, with a rule type the frontend does not have yet (WiFi RSSI, thermometers). |
+| **A+** | Auto-checked like A, with a rule of its own: WiFi RSSI above a limit, or thermometers (at least N sensors that have reported, and the latest value of every one in range). |
 | **M** | Manual confirmation. |
 
 - **Item** and **Response** are what the frontend shows, in the style "Safety switch … SAFE".
@@ -36,6 +31,15 @@ lock on a miscalibrated sensor would only make the operator abandon the list.
 The reading itself is not stored with the step. Each step stores the controller time at
 which it was completed, and the recording holds all telemetry, so the reading can be looked
 up afterwards.
+
+A reading must also be fresh. Voltages, pressures and thermometers fail the check when
+their latest value is more than 5 s older than the newest packet from the controller (the
+controller sends the ADC channels every 100 ms and each thermometer once a second). The step
+then shows `STALE`. This catches a sensor that stopped answering while the rest of the
+telemetry goes on, for example a thermometer chain that was unplugged. It does not catch a
+lost link, where everything stops together: watch the packet clock for that. The safety
+switch, the servo, the controller state and the WiFi RSSI are sent only when they change, so
+they have no such check.
 
 Ranges such as −3 to 3 bar are sanity checks: they catch a dead or disconnected sensor and
 tolerate a zero offset. "BELOW 3 bar" means −3 to 3 bar as well.
@@ -166,8 +170,9 @@ No igniter and no propellant on the stand.
 
 Step 1 comes before the readings, because every range below depends on the calibration.
 
-Step 6: the number of thermometers is not final. Replace "at least 1" with the exact count
-once it is.
+Step 6: the number of thermometers is not final. Once it is, set
+`REQUIRED_THERMOMETER_COUNT` in `frontend/config/checklists.ts` to the exact count and
+replace "at least 1" here.
 
 ## 4. ENGINE SETUP
 
@@ -183,7 +188,8 @@ once it is.
 | 8 | A | Safety switch | SAFE |  |
 
 Step 4: the engine thermometers are already on the chain since ASSEMBLY and are only mounted
-here. This step confirms that they all still answer after being handled. A sensor that was
+here. This step confirms that they all still answer after being handled: a sensor that has
+gone silent fails it as stale. A sensor that was
 unplugged and plugged back in needs a controller restart to appear again; that is harmless
 here, because the clean start for the run comes later, in list 5.
 
@@ -318,55 +324,3 @@ Bench measurements that the values above still depend on:
   after the switch goes to SAFE, and how long it takes.
 - **Thermometer count**: "at least 1" until the number of sensors is final.
 - **Waiting times** in lists 6 and 7: suggestions without a firm basis.
-
-## Implementation
-
-*Delete this section once it is done.*
-
-The checklist engine exists and stays: `frontend/config/checklists.ts` (definitions),
-`frontend/types/checklist.ts` (types), `frontend/hooks/useChecklistEngine.ts` (order,
-validation, completion, reset), `frontend/components/ChecklistView.tsx` (UI),
-`frontend/hooks/useMqttSystem.ts` (retained MQTT state under
-`checklist/<checklist>/points/<point>/state`). Its design is in
-`frontend/docs/plans/2026-02-21-aviation-checklist-design.md`. Read `frontend/AGENTS.md`
-first.
-
-What has to be built:
-
-1. **Content.** Replace the three placeholder lists in `frontend/config/checklists.ts` with
-   lists 1 to 8 above, in this order, with these labels. Item maps to `callout`, Response to
-   `response`. Do not set `note`: the view displays it, and the Note column here is not meant
-   for the operator. Give every step an id that is unique within its list; several lists
-   contain the same item more than once (for example "Safety switch").
-2. **Fields.** Steps marked *field* get a typed-in value (`contextFields`): tensometer
-   reading and reference weight reading in list 3; experiment name, controller time and N2O
-   final weight in list 5. The value is stored only; nothing else reads it.
-3. **Two new rule types.** WiFi RSSI above a limit (`wifiRssiDbm` in the telemetry), and
-   thermometers: at least N sensors present and the latest value of every sensor inside a
-   range (`temperatures` in the telemetry). N is 1 for now and must be easy to change.
-4. **Override.** For every auto step, as described under "How to read the lists": a reason
-   is typed in, the step completes, the stored state marks it as overridden, and it shows
-   amber on all clients. This needs a new action in the engine, new fields in the stored
-   step state (the payload parser in `useMqttSystem.ts` must accept old and new payloads),
-   and UI in the active step.
-5. **Tests.** The existing tests (`App.checklist.test.tsx`, `ChecklistView.test.tsx`,
-   `useChecklistEngine.test.ts`, `useMqttChecklistTransport.test.ts`,
-   `checklistTopics.test.ts`) use their own definitions or the placeholder ids; keep them
-   passing and cover the new rule types and the override. Run
-   `npm test` and `npm run typecheck` in `frontend/`.
-6. **Docs.** Update the parts that describe the placeholder lists:
-   `docs/experiment.md` (section "Checklists in the frontend", the firing sequence, and
-   "RESET ALL CHECKLISTS" in the clean start, which contradicts the rule above),
-   `frontend/README.md` and `frontend/DEV.md`. Point them here instead of repeating the
-   lists.
-
-Decided, do not reopen:
-
-- No action buttons in the checklist. It only observes.
-- Notes are not displayed.
-- No hard-locked steps: every auto step can be overridden.
-- List 5 ends before the FIRE button. There is no step for `COUNTDOWN` or `FIRE`.
-- The retained state of the old placeholder lists stays on the broker; the frontend ignores
-  topics of unknown lists.
-
-Out of scope: anything in the controller or blackbox firmware.

@@ -13,6 +13,7 @@ interface ChecklistViewProps {
   getStepContext: (pointId: string) => Record<string, ChecklistContextValue>;
   setStepContextField: (pointId: string, fieldId: string, value: ChecklistContextValue) => void;
   onCompleteCurrentStep: (stepIndex: number) => Promise<{ ok: boolean; error?: string }>;
+  onOverrideCurrentStep: (stepIndex: number, reason: string) => Promise<{ ok: boolean; error?: string }>;
   onResetChecklist: () => Promise<{ ok: boolean; error?: string }>;
   onResetAllChecklists: () => Promise<{ ok: boolean; error?: string }>;
   isReadOnly: boolean;
@@ -28,6 +29,9 @@ const getStatusClassName = (step: ChecklistStepState): string => {
   return 'text-scada-danger-soft bg-scada-danger-soft border-scada-danger';
 };
 
+const isOverridden = (step: ChecklistStepState): boolean =>
+  step.isCompleted && step.runtimeState.overridden === true;
+
 const getRowClassName = (step: ChecklistStepState): string => {
   const baseClass =
     'grid grid-cols-[2.5rem_minmax(0,1fr)] md:grid-cols-[3.25rem_minmax(0,1fr)] text-sm font-mono border-b border-scada-weak';
@@ -37,7 +41,9 @@ const getRowClassName = (step: ChecklistStepState): string => {
   }
 
   if (step.isCompleted) {
-    return `${baseClass} border-l-2 border-scada-success bg-scada-success-soft`;
+    return isOverridden(step)
+      ? `${baseClass} border-l-2 border-scada-warning bg-scada-warning-soft`
+      : `${baseClass} border-l-2 border-scada-success bg-scada-success-soft`;
   }
 
   return `${baseClass} border-l-2 border-scada-weak bg-scada-app-soft`;
@@ -58,10 +64,15 @@ const getAutoValidationSummary = (step: ChecklistStepState): string | null => {
     const decimals = rule.decimals ?? 1;
     const rawCurrent = Number(step.validation.displayValue);
     const unit = rule.unit ? ` ${rule.unit.toUpperCase()}` : '';
-    const required = `${rule.min.toFixed(decimals)}-${rule.max.toFixed(decimals)}${unit}`;
+    const separator = rule.min < 0 ? ' to ' : '-';
+    const required = `${rule.min.toFixed(decimals)}${separator}${rule.max.toFixed(decimals)}${unit}`;
 
     if (!Number.isFinite(rawCurrent)) {
       return `LIVE -- | REQUIRED ${required}`;
+    }
+
+    if (step.validation.isStale) {
+      return `LAST ${rawCurrent.toFixed(decimals)}${unit} | REQUIRED ${required} | STALE`;
     }
 
     if (step.validation.isValid) {
@@ -82,6 +93,16 @@ const getAutoValidationSummary = (step: ChecklistStepState): string | null => {
     return `LIVE ${step.validation.displayValue} | REQUIRED ${String(rule.equals)} | ${step.validation.isValid ? 'OK' : 'MISMATCH'}`;
   }
 
+  if (rule.type === 'wifi_rssi_above') {
+    const live = step.validation.displayValue === '--' ? '--' : `${step.validation.displayValue} dBm`;
+    return `LIVE ${live} | REQUIRED ABOVE ${rule.min} dBm | ${step.validation.isValid ? 'OK' : 'MISMATCH'}`;
+  }
+
+  if (rule.type === 'thermometers') {
+    const required = `${rule.minCount}+ SENSORS, ${rule.min} to ${rule.max} °C`;
+    return `LIVE ${step.validation.displayValue} | REQUIRED ${required} | ${step.validation.isValid ? 'OK' : 'MISMATCH'}`;
+  }
+
   return null;
 };
 
@@ -95,6 +116,7 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
   getStepContext,
   setStepContextField,
   onCompleteCurrentStep,
+  onOverrideCurrentStep,
   onResetChecklist,
   onResetAllChecklists,
   isReadOnly,
@@ -103,6 +125,7 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isMobileActionsOpen, setIsMobileActionsOpen] = useState(false);
   const [expandedStepIds, setExpandedStepIds] = useState<Record<string, boolean>>({});
+  const [overrideReasons, setOverrideReasons] = useState<Record<string, string>>({});
 
   const runAction = async (action: () => Promise<{ ok: boolean; error?: string }>): Promise<void> => {
     setIsSubmitting(true);
@@ -242,7 +265,17 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
             const autoValidationSummary = getAutoValidationSummary(step);
             const isExpanded = expandedStepIds[step.point.id] ?? false;
             const showStepDetails = step.isCurrent || isExpanded;
-            const compactStateLabel = step.isCompleted ? 'COMPLETE' : step.isLocked ? 'LOCKED' : 'PENDING';
+            const overridden = isOverridden(step);
+            const compactStateLabel = overridden
+              ? 'OVERRIDDEN'
+              : step.isCompleted
+                ? 'COMPLETE'
+                : step.isLocked
+                  ? 'LOCKED'
+                  : 'PENDING';
+            const overrideKey = `${selectedChecklistId}/${step.point.id}`;
+            const overrideReason = overrideReasons[overrideKey] ?? '';
+            const canOverride = step.validation.isAutoRule && !step.validation.isValid;
 
             return (
               <div key={step.point.id}>
@@ -253,9 +286,11 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
                         flex items-center justify-center ${
                           step.isCurrent
                             ? 'border-scada-accent text-scada-accent bg-scada-accent-soft'
-                            : step.isCompleted
-                              ? 'border-scada-success text-scada-success-soft bg-scada-success-soft'
-                              : 'border-scada text-scada-muted bg-scada-surface-elevated'
+                            : overridden
+                              ? 'border-scada-warning text-scada-warning-soft bg-scada-warning-soft'
+                              : step.isCompleted
+                                ? 'border-scada-success text-scada-success-soft bg-scada-success-soft'
+                                : 'border-scada text-scada-muted bg-scada-surface-elevated'
                         }`}
                     >
                       {stepNumber}
@@ -278,7 +313,11 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
                           </div>
                           <span
                             className={`text-[10px] tracking-[0.16em] ${
-                              step.isCompleted ? 'text-scada-success-soft' : 'text-scada-muted'
+                              overridden
+                                ? 'text-scada-warning-soft'
+                                : step.isCompleted
+                                  ? 'text-scada-success-soft'
+                                  : 'text-scada-muted'
                             }`}
                           >
                             {compactStateLabel}
@@ -299,9 +338,14 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
                                 CURRENT
                               </span>
                             )}
-                            {step.isCompleted && (
+                            {step.isCompleted && !overridden && (
                               <span className="px-1.5 py-0.5 rounded-sm border border-scada-success text-scada-success-soft bg-scada-success-soft">
                                 COMPLETE
+                              </span>
+                            )}
+                            {overridden && (
+                              <span className="px-1.5 py-0.5 rounded-sm border border-scada-warning text-scada-warning-soft bg-scada-warning-soft">
+                                OVERRIDDEN
                               </span>
                             )}
                             {step.isLocked && (
@@ -314,6 +358,11 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
                           <div className="mt-0.5 font-semibold tracking-wide text-scada-primary">{step.point.callout}</div>
                           {step.point.note && (
                             <div className="text-xs text-scada-secondary mt-1">{step.point.note}</div>
+                          )}
+                          {overridden && (
+                            <div className="text-xs text-scada-warning-soft mt-1">
+                              Override reason: {step.runtimeState.overrideReason || '(none given)'}
+                            </div>
                           )}
                         </div>
 
@@ -376,6 +425,43 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
                           >
                             COMPLETE STEP
                           </button>
+
+                          {canOverride && (
+                            <div className="flex flex-col gap-2 border-t border-scada-weak pt-2 md:pt-3">
+                              <label className="text-xs text-scada-secondary flex flex-col gap-1">
+                                Override reason
+                                <input
+                                  className="scada-input rounded-sm px-2"
+                                  type="text"
+                                  placeholder="Why the step is completed although the check fails"
+                                  value={overrideReason}
+                                  onChange={(event) => {
+                                    const value = event.target.value;
+                                    setOverrideReasons((previous) => ({ ...previous, [overrideKey]: value }));
+                                  }}
+                                />
+                              </label>
+                              <button
+                                className="delight-press self-start px-3 py-2.5 min-h-11 rounded-sm bg-scada-warning-soft text-scada-warning-soft
+                                  font-bold text-sm tracking-wide border border-scada-warning disabled:opacity-50"
+                                disabled={isReadOnly || isSubmitting || overrideReason.trim() === ''}
+                                onClick={() =>
+                                  runAction(async () => {
+                                    const result = await onOverrideCurrentStep(step.index, overrideReason);
+                                    if (result.ok) {
+                                      setOverrideReasons((previous) => {
+                                        const { [overrideKey]: _used, ...rest } = previous;
+                                        return rest;
+                                      });
+                                    }
+                                    return result;
+                                  })
+                                }
+                              >
+                                OVERRIDE STEP
+                              </button>
+                            </div>
+                          )}
                         </div>
                       </div>
                     )}

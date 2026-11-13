@@ -96,7 +96,9 @@ nothing else:
 2. `docker compose restart mqtt-recorder` — a new recording file for this run.
 3. Empty the frontend history ([data-and-history.md](data-and-history.md), section 3), so
    that the run is boot 1 and nothing else is in the way.
-4. In **CHECKLIST**, **RESET ALL CHECKLISTS**.
+4. In **CHECKLIST**, select list 5 (FIRE) and press **RESET CHECKLIST**. Do not press
+   **RESET ALL CHECKLISTS** here: lists 1 to 4 hold the state of the set-up. Everything is
+   reset once, at the start of the test day.
 5. Write down the controller time (`LAST PACKET T+…`) next to the wall-clock time. It lets
    you match the charts to video and notes later.
 
@@ -143,29 +145,29 @@ Points that are easy to get wrong:
 
 ### Checklists in the frontend
 
-**CHECKLIST** offers three lists. Steps must be completed in order; a step with an automatic
-condition can be completed only while the condition holds.
+**CHECKLIST** holds the procedure for an N2O hot fire as eight lists, from GROUND STATION to
+SECURE DATA. Their content, and the reason for every step, is in
+[checklists.md](checklists.md).
 
-| List | Steps |
-| --- | --- |
-| PRE-FLIGHT | experiment name (typed in) · safety switch `SAFE` · controller state `ARMED` |
-| PRESSURIZATION | tank pressure 40–50 bar · main valve servo `CLOSED` · operator confirmation |
-| FIRING | combustion pressure 0–2 bar · safety switch `ARMED` · final call |
-
-These lists are defined in `frontend/config/checklists.ts`. They cover only what the software
-can see and are not the complete procedure.
+- Steps of a list must be completed in order. The lists are independent of each other.
+- A step with an automatic condition can be completed only while the condition holds. It can
+  be **overridden** instead: type in a reason and press **OVERRIDE STEP**. The step then
+  shows amber instead of green, with the reason, on every connected frontend.
+- The checklist only observes. It sends no commands and does not gate the **FIRE** button.
 
 ### Sequence
 
-1. Work through PRE-FLIGHT and PRESSURIZATION.
-2. Everyone clear. Safety switch to **armed**. Work through FIRING.
-3. Open the valve with **OPN** when the procedure calls for it; wait for `OPEN`.
-4. Press **FIRE**. State `COUNTDOWN`, red light and buzzer, 10 seconds.
+1. Work through list 5 (FIRE). It covers filling, clearing the area, arming the safety
+   switch and opening the valve with **OPN**, and ends with the final call.
+2. Press **FIRE**. State `COUNTDOWN`, red light and buzzer, 10 seconds.
    - To stop: **ABORT** in the frontend, or the safety switch to safe.
-5. State `FIRE`: ignition.
-6. When the burn is over, press **END FIRE**. State `POSTFIRE`.
-7. Close the valve with **CLS**. Safety switch to **safe**.
-8. Leave the state in `POSTFIRE` until the stand is safe to approach, then **RESET STATE**.
+3. State `FIRE`: ignition.
+4. When the burn is over, press **END FIRE**. State `POSTFIRE`.
+5. Work through list 6 (POSTFIRE): close the valve with **CLS**, safety switch to **safe**,
+   and **RESET STATE** only once the stand is safe to approach.
+
+After an attempt without a burn (**ABORT**, safety switch during the countdown, or a misfire)
+use list 7 (ABORTED) instead of list 6.
 
 If the link drops during the run, the frontend shows the connection as red and the values
 freeze. The controller keeps its state and reconnects by itself; the blackbox keeps recording

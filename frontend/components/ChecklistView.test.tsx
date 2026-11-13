@@ -1,7 +1,8 @@
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { ChecklistView } from '@/components/ChecklistView';
+import { ChecklistStepState } from '@/hooks/useChecklistEngine';
 import { ChecklistMode } from '@/types/checklist';
 
 describe('ChecklistView', () => {
@@ -41,6 +42,7 @@ describe('ChecklistView', () => {
         getStepContext={() => ({})}
         setStepContextField={vi.fn()}
         onCompleteCurrentStep={vi.fn()}
+        onOverrideCurrentStep={vi.fn()}
         onResetChecklist={vi.fn()}
         onResetAllChecklists={vi.fn()}
         isReadOnly={false}
@@ -105,6 +107,7 @@ describe('ChecklistView', () => {
         getStepContext={() => ({})}
         setStepContextField={vi.fn()}
         onCompleteCurrentStep={vi.fn(async () => ({ ok: true }))}
+        onOverrideCurrentStep={vi.fn()}
         onResetChecklist={vi.fn(async () => ({ ok: true }))}
         onResetAllChecklists={vi.fn(async () => ({ ok: true }))}
         isReadOnly={false}
@@ -166,6 +169,7 @@ describe('ChecklistView', () => {
         getStepContext={() => ({})}
         setStepContextField={vi.fn()}
         onCompleteCurrentStep={vi.fn(async () => ({ ok: true }))}
+        onOverrideCurrentStep={vi.fn()}
         onResetChecklist={vi.fn(async () => ({ ok: true }))}
         onResetAllChecklists={vi.fn(async () => ({ ok: true }))}
         isReadOnly={false}
@@ -252,6 +256,7 @@ describe('ChecklistView', () => {
         getStepContext={() => ({})}
         setStepContextField={vi.fn()}
         onCompleteCurrentStep={vi.fn(async () => ({ ok: true }))}
+        onOverrideCurrentStep={vi.fn()}
         onResetChecklist={vi.fn(async () => ({ ok: true }))}
         onResetAllChecklists={vi.fn(async () => ({ ok: true }))}
         isReadOnly={false}
@@ -265,5 +270,94 @@ describe('ChecklistView', () => {
     fireEvent.click(summaryToggle);
 
     expect(summaryToggle).toHaveAttribute('aria-expanded', 'true');
+  });
+
+  describe('override', () => {
+    const makeStep = (overrides: Partial<ChecklistStepState> = {}): ChecklistStepState => ({
+      index: 0,
+      point: {
+        id: 'safety_switch',
+        callout: 'Safety switch',
+        response: 'ARMED',
+        rule: { type: 'boolean_equals', source: 'isUnsafe', equals: true },
+      },
+      runtimeState: { completed: false, completedAtWall: null, completedAtTelemetry: null, context: {} },
+      validation: { isAutoRule: true, isValid: false, displayValue: 'FALSE' },
+      isCurrent: true,
+      isCompleted: false,
+      isLocked: false,
+      ...overrides,
+    });
+
+    const renderView = (step: ChecklistStepState, onOverride = vi.fn(async () => ({ ok: true }))) => {
+      const utils = render(
+        <ChecklistView
+          mode="MQTT_SYNC"
+          summaries={[{ checklistId: 'list', label: 'LIST', done: 0, total: 1 }]}
+          selectedChecklistId="list"
+          onSelectChecklist={vi.fn()}
+          stepStates={[step]}
+          activeStep={step.isCurrent ? step : null}
+          getStepContext={() => ({})}
+          setStepContextField={vi.fn()}
+          onCompleteCurrentStep={vi.fn(async () => ({ ok: true }))}
+          onOverrideCurrentStep={onOverride}
+          onResetChecklist={vi.fn(async () => ({ ok: true }))}
+          onResetAllChecklists={vi.fn(async () => ({ ok: true }))}
+          isReadOnly={false}
+        />,
+      );
+      return { ...utils, onOverride };
+    };
+
+    it('overrides a failing auto step only after a reason is typed in', async () => {
+      const { container, onOverride } = renderView(makeStep());
+      const view = within(container);
+
+      expect(view.getByRole('button', { name: 'COMPLETE STEP' })).toBeDisabled();
+      const overrideButton = view.getByRole('button', { name: 'OVERRIDE STEP' });
+      expect(overrideButton).toBeDisabled();
+
+      fireEvent.change(view.getByLabelText('Override reason'), { target: { value: 'switch sense broken' } });
+      expect(overrideButton).toBeEnabled();
+      fireEvent.click(overrideButton);
+
+      await waitFor(() => expect(onOverride).toHaveBeenCalledWith(0, 'switch sense broken'));
+    });
+
+    it('offers no override while the check passes or on a manual step', () => {
+      const passing = renderView(makeStep({ validation: { isAutoRule: true, isValid: true, displayValue: 'TRUE' } }));
+      expect(within(passing.container).queryByRole('button', { name: 'OVERRIDE STEP' })).not.toBeInTheDocument();
+
+      const manual = renderView(
+        makeStep({
+          point: { id: 'confirm', callout: 'Confirm', response: 'DONE', rule: { type: 'manual' } },
+          validation: { isAutoRule: false, isValid: true, displayValue: 'MANUAL' },
+        }),
+      );
+      expect(within(manual.container).queryByRole('button', { name: 'OVERRIDE STEP' })).not.toBeInTheDocument();
+    });
+
+    it('shows an overridden step as overridden with its reason, not as complete', () => {
+      const { container } = renderView(
+        makeStep({
+          isCurrent: false,
+          isCompleted: true,
+          runtimeState: {
+            completed: true,
+            completedAtWall: 1,
+            completedAtTelemetry: 2,
+            context: {},
+            overridden: true,
+            overrideReason: 'switch sense broken',
+          },
+        }),
+      );
+      const view = within(container);
+
+      expect(view.getAllByText('OVERRIDDEN').length).toBeGreaterThan(0);
+      expect(view.queryByText('COMPLETE')).not.toBeInTheDocument();
+      expect(view.getByText('Override reason: switch sense broken')).toBeInTheDocument();
+    });
   });
 });

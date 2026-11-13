@@ -20,13 +20,34 @@ const EMPTY_POINT_STATE: ChecklistPointRuntimeState = {
 
 const getPointMapKey = (checklistId: string, pointId: string): string => `${checklistId}/${pointId}`;
 
-const getNumericSourceValue = (source: string, telemetry: SystemTelemetry): number | null => {
-  const value = telemetry[source as keyof SystemTelemetry];
-  if (typeof value === 'number') return value;
-  if (!Array.isArray(value) || value.length === 0) return null;
+/**
+ * A reading counts as stale when it is this much older than the newest packet from the
+ * controller. The controller publishes the ADC channels every 100 ms and each thermometer
+ * once a second (20 samples at 50 ms), so this is several missed packets.
+ *
+ * The age is measured on the controller's clock, against the newest packet of any kind. It
+ * shows a sensor that stopped while the rest of the telemetry goes on. It does not show a
+ * lost link: then nothing advances.
+ */
+export const CHECKLIST_STALE_AFTER_MS = 5000;
 
-  const last = value[value.length - 1] as { value?: unknown };
-  return typeof last.value === 'number' ? last.value : null;
+const isStaleTimestamp = (timestamp: number, telemetry: SystemTelemetry): boolean =>
+  telemetry.lastPacketTimestamp - timestamp > CHECKLIST_STALE_AFTER_MS;
+
+const getNumericSourceValue = (
+  source: string,
+  telemetry: SystemTelemetry,
+): { value: number; isStale: boolean } | null => {
+  const raw = telemetry[source as keyof SystemTelemetry];
+  if (typeof raw === 'number') return { value: raw, isStale: false };
+  if (!Array.isArray(raw) || raw.length === 0) return null;
+
+  const last = raw[raw.length - 1] as { value?: unknown; timestamp?: unknown };
+  if (typeof last.value !== 'number') return null;
+  return {
+    value: last.value,
+    isStale: typeof last.timestamp === 'number' && isStaleTimestamp(last.timestamp, telemetry),
+  };
 };
 
 const formatNumeric = (value: number | null, decimals: number = 2): string => {
@@ -71,15 +92,16 @@ export const evaluateChecklistPoint = (
   }
 
   if (point.rule.type === 'number_range') {
-    const numericValue = getNumericSourceValue(point.rule.source, telemetry);
-    if (numericValue === null) {
+    const reading = getNumericSourceValue(point.rule.source, telemetry);
+    if (reading === null) {
       return { isAutoRule: true, isValid: false, displayValue: '--' };
     }
 
     return {
       isAutoRule: true,
-      isValid: numericValue >= point.rule.min && numericValue <= point.rule.max,
-      displayValue: formatNumeric(numericValue, point.rule.decimals),
+      isValid: !reading.isStale && reading.value >= point.rule.min && reading.value <= point.rule.max,
+      displayValue: formatNumeric(reading.value, point.rule.decimals),
+      isStale: reading.isStale,
     };
   }
 
@@ -93,6 +115,51 @@ export const evaluateChecklistPoint = (
       isAutoRule: true,
       isValid: value === point.rule.equals,
       displayValue: value ? 'TRUE' : 'FALSE',
+    };
+  }
+
+  if (point.rule.type === 'wifi_rssi_above') {
+    const rssi = telemetry.wifiRssiDbm;
+    if (rssi === null || Number.isNaN(rssi)) {
+      return { isAutoRule: true, isValid: false, displayValue: '--' };
+    }
+
+    return {
+      isAutoRule: true,
+      isValid: rssi > point.rule.min,
+      displayValue: rssi.toFixed(0),
+    };
+  }
+
+  if (point.rule.type === 'thermometers') {
+    const latestPoints = Object.values(telemetry.temperatures)
+      .filter((history) => history.length > 0)
+      .map((history) => history[history.length - 1]);
+    const latestValues = latestPoints.map((latest) => latest.value);
+    // A sensor that was seen since the controller started and has gone silent.
+    const staleCount = latestPoints.filter((latest) => isStaleTimestamp(latest.timestamp, telemetry)).length;
+    if (latestValues.length === 0) {
+      return { isAutoRule: true, isValid: false, displayValue: 'NO SENSORS' };
+    }
+
+    const { min, max, minCount } = point.rule;
+    const lowest = Math.min(...latestValues);
+    const highest = Math.max(...latestValues);
+    const range =
+      latestValues.length === 1
+        ? `${lowest.toFixed(1)} °C`
+        : `${lowest.toFixed(1)} to ${highest.toFixed(1)} °C`;
+    return {
+      isAutoRule: true,
+      // Written so that a NaN reading fails the check.
+      isValid:
+        staleCount === 0 &&
+        latestValues.length >= minCount &&
+        latestValues.every((value) => value >= min && value <= max),
+      displayValue:
+        `${latestValues.length} SENSOR${latestValues.length === 1 ? '' : 'S'}, ${range}` +
+        (staleCount > 0 ? `, ${staleCount} STALE` : ''),
+      isStale: staleCount > 0,
     };
   }
 
@@ -260,6 +327,44 @@ export const useChecklistEngine = ({
     ],
   );
 
+  const overrideStep = useCallback(
+    async (stepIndex: number, reason: string): Promise<{ ok: boolean; error?: string }> => {
+      if (!selectedChecklist) return { ok: false, error: 'Checklist not selected.' };
+      if (isReadOnly) return { ok: false, error: 'Checklist is read-only without MQTT connection.' };
+
+      const step = stepStates.find((state) => state.index === stepIndex);
+      if (!step) return { ok: false, error: 'Checklist step does not exist.' };
+      if (stepIndex !== currentStepIndex) {
+        return { ok: false, error: 'Only the current step can be overridden.' };
+      }
+      if (!step.validation.isAutoRule) {
+        return { ok: false, error: 'Manual steps cannot be overridden.' };
+      }
+
+      const trimmedReason = reason.trim();
+      if (trimmedReason === '') return { ok: false, error: 'An override needs a reason.' };
+
+      await publishChecklistPointState(selectedChecklist.id, step.point.id, {
+        completed: true,
+        completedAtWall: Date.now(),
+        completedAtTelemetry: telemetry.lastPacketTimestamp,
+        context: getStepContext(step.point.id),
+        overridden: true,
+        overrideReason: trimmedReason,
+      });
+      return { ok: true };
+    },
+    [
+      currentStepIndex,
+      getStepContext,
+      isReadOnly,
+      publishChecklistPointState,
+      selectedChecklist,
+      stepStates,
+      telemetry.lastPacketTimestamp,
+    ],
+  );
+
   const resetChecklist = useCallback(
     async (checklistId: string): Promise<{ ok: boolean; error?: string }> => {
       if (isReadOnly) return { ok: false, error: 'Checklist is read-only without MQTT connection.' };
@@ -315,6 +420,7 @@ export const useChecklistEngine = ({
     getStepContext,
     setStepContextField,
     completeStep,
+    overrideStep,
     resetChecklist,
     resetAllChecklists,
   };

@@ -7,6 +7,9 @@ export interface ChecklistPointRuntimeState {
   completedAtWall: number | null;
   completedAtTelemetry: number | null;
   context: Record<string, ChecklistContextValue>;
+  /** Set when an auto-checked step was completed although its condition did not hold. */
+  overridden?: boolean;
+  overrideReason?: string;
 }
 
 export interface ChecklistTopicUpdate {
@@ -51,6 +54,18 @@ export type ChecklistRule =
       type: 'enum_equals';
       source: EnumTelemetryKey;
       equals: SystemState | ServoState;
+    }
+  | {
+      /** WiFi RSSI of the controller strictly above `min` dBm. */
+      type: 'wifi_rssi_above';
+      min: number;
+    }
+  | {
+      /** At least `minCount` thermometers, and the latest value of every one within range. */
+      type: 'thermometers';
+      minCount: number;
+      min: number;
+      max: number;
     };
 
 export interface ChecklistPointDefinition {
@@ -74,4 +89,6 @@ export interface ChecklistValidationResult {
   isAutoRule: boolean;
   isValid: boolean;
   displayValue: string;
+  /** The reading is older than the controller's latest packet by more than the allowed age. */
+  isStale?: boolean;
 }

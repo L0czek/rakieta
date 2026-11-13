@@ -147,12 +147,21 @@ export const parseChecklistPointStatePayload = (
     context[key] = value;
   }
 
-  return {
+  // Override fields are absent in payloads written before overrides existed.
+  if (record.overridden !== undefined && typeof record.overridden !== 'boolean') return null;
+  if (record.overrideReason !== undefined && typeof record.overrideReason !== 'string') return null;
+
+  const state: ChecklistPointRuntimeState = {
     completed: record.completed,
     completedAtWall: record.completedAtWall as number | null,
     completedAtTelemetry: record.completedAtTelemetry as number | null,
     context,
   };
+  if (record.overridden === true) {
+    state.overridden = true;
+    state.overrideReason = typeof record.overrideReason === 'string' ? record.overrideReason : '';
+  }
+  return state;
 };
 
 type FastHistoryKey = 'tensometer' | 'pressureTank' | 'pressureCombustion';

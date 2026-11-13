@@ -26,7 +26,8 @@ This is a single-page React+TypeScript application built on Vite. The architectu
 - `types/checklist.ts`
   - Checklist domain types: definitions, runtime point state, rule variants, mode labels.
 - `config/checklists.ts`
-  - Static checklist templates and ordered point definitions.
+  - The eight hot fire lists and their ordered point definitions. The content is documented
+    in `../docs/checklists.md`; keep the two in step.
 - `hooks/useMqttSystem.ts`
   - Main runtime orchestration:
     - MQTT lifecycle (`connect`, subscriptions, publish)
@@ -41,6 +42,7 @@ This is a single-page React+TypeScript application built on Vite. The architectu
     - mode derivation (`MQTT_SYNC` / `SIM_LOCAL` / `READ_ONLY_SNAPSHOT`)
     - strict sequential gating and step completion checks
     - telemetry/state rule evaluation
+    - override of a failing auto-checked step, with a reason
     - per-checklist and global reset actions
 - `components/DashboardView.tsx`
   - Live operations layout with 5-second fast-signal charts and control cards.
@@ -116,6 +118,10 @@ This is a single-page React+TypeScript application built on Vite. The architectu
 ### [6] Checklist runtime
 
 - Definitions are frontend-only (`config/checklists.ts`), with manual and auto-validated points.
+  What each step checks and why is in `../docs/checklists.md`.
+- Rule types: `manual`, `number_range`, `boolean_equals`, `enum_equals`, `wifi_rssi_above`
+  and `thermometers` (at least `minCount` sensors with data, latest value of each in range;
+  the count is `REQUIRED_THERMOMETER_COUNT`).
 - Runtime point state uses per-point retained topics:
   - `checklist/<checklistId>/points/<pointId>/state`
 - `useChecklistEngine` computes current step as first incomplete point.
@@ -123,6 +129,13 @@ This is a single-page React+TypeScript application built on Vite. The architectu
   - point is current step
   - mode is not read-only
   - auto-check point is green (manual points can always complete)
+- Timestamped readings (`number_range` sources and thermometers) fail when they are more than
+  `CHECKLIST_STALE_AFTER_MS` (5 s) older than the newest packet, on the controller's clock.
+  This shows a sensor that stopped, not a lost link.
+- A failing auto-check point can be overridden instead (`overrideStep`): it needs a reason,
+  and the stored state gets `overridden: true` and `overrideReason`. Payloads without these
+  fields are read as not overridden. The view shows such a step amber.
+- Retained state of lists that are no longer defined stays on the broker and is ignored.
 - Disconnected behavior:
   - simulation on: `SIM_LOCAL` (fully usable, local ephemeral)
   - simulation off: `READ_ONLY_SNAPSHOT` (browse only, no writes)

@@ -107,6 +107,15 @@ Published commands:
 - `cmd/shutdown` with payload: `SHUTDOWN`
 - `checklist/<checklistId>/points/<pointId>/state` (retained JSON):
   `{"completed":boolean,"completedAtWall":number|null,"completedAtTelemetry":number|null,"context":{...}}`
+  An overridden step also carries `"overridden":true,"overrideReason":string`.
+
+Checklists:
+
+- The lists are the N2O hot fire procedure, defined in `config/checklists.ts`. Their content
+  is documented in `../docs/checklists.md`.
+- Steps are manual or auto-checked against telemetry. An auto-checked step whose condition
+  does not hold can be overridden with a typed-in reason; it then shows amber on all clients.
+- The checklist only observes: it sends no commands and does not gate FIRE.
 
 DEFMT log requirements:
 

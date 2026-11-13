@@ -19,6 +19,35 @@ describe('checklist MQTT payload parsing', () => {
     });
   });
 
+  it('parses an overridden step', () => {
+    const state = {
+      completed: true,
+      completedAtWall: 1000,
+      completedAtTelemetry: 2000,
+      context: {},
+      overridden: true,
+      overrideReason: 'sensor miscalibrated',
+    };
+
+    expect(parseChecklistPointStatePayload(JSON.stringify(state))).toEqual(state);
+  });
+
+  it('reads a payload without override fields as not overridden', () => {
+    const parsed = parseChecklistPointStatePayload(
+      JSON.stringify({ completed: true, completedAtWall: 1, completedAtTelemetry: 2, context: {} }),
+    );
+
+    expect(parsed?.overridden).toBeUndefined();
+    expect(parsed?.overrideReason).toBeUndefined();
+  });
+
+  it('returns null for override fields of the wrong type', () => {
+    const base = { completed: true, completedAtWall: 1, completedAtTelemetry: 2, context: {} };
+
+    expect(parseChecklistPointStatePayload(JSON.stringify({ ...base, overridden: 'yes' }))).toBeNull();
+    expect(parseChecklistPointStatePayload(JSON.stringify({ ...base, overridden: true, overrideReason: 5 }))).toBeNull();
+  });
+
   it('returns null for malformed JSON', () => {
     expect(parseChecklistPointStatePayload('{invalid json')).toBeNull();
   });
