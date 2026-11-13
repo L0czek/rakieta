@@ -41,7 +41,8 @@ router.
 | --- | --- |
 | Docker with the Compose plugin | broker, recorder, frontend |
 | `rustup` | building the controller firmware and the host tools (the pinned nightly toolchain installs itself) |
-| `probe-rs` | flashing the controller (`cargo run` calls it) and the blackbox |
+| `probe-rs` | flashing the controller (`cargo run` calls it) |
+| `st-flash` (package `stlink-tools`) | flashing the blackbox |
 | `mosquitto_pub` (package `mosquitto-clients`) | publishing the firmware ELF, replaying recordings with `replay-mqtt.sh` |
 | `xxd` | replaying recordings with `replay-mqtt.sh` |
 | Python 3 with `paho-mqtt` | replaying recordings with the faster `replay-mqtt.py` ([data-and-history.md](data-and-history.md), section 2) |

@@ -237,15 +237,23 @@ recent fast sample before it.
 
 ## 6. Flashing the blackbox firmware
 
-Only needed after a firmware change. Requires `arm-none-eabi-gcc`, CMake, Ninja and a debug
-probe.
+Only needed after a firmware change. Requires `arm-none-eabi-gcc`, CMake, Ninja, `st-flash`
+(package `stlink-tools`) and an ST-Link debug probe.
 
 ```bash
 cd blackbox-firmware
 cmake --preset Release
 cmake --build --preset Release
-probe-rs download --chip STM32C011F6Px build/Release/blackbox-firmware.elf
+arm-none-eabi-objcopy -O binary build/Release/blackbox-firmware.elf build/Release/blackbox-firmware.bin
+st-flash --reset write build/Release/blackbox-firmware.bin 0x08000000
 ```
+
+It must end with `Flash written and verified!`.
+
+The blackbox is flashed with `st-flash` because `probe-rs` has had problems with this board
+in the past: depending on its version it flashed slowly or failed. A flash that fails part
+way can leave the board without firmware, and the blackbox then does not start until a
+flash succeeds.
 
 ### Programming header
 

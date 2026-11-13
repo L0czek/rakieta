@@ -142,7 +142,8 @@ These are current behaviors of the checked-in firmware, not future plans:
 - `arm-none-eabi-gcc`
 - CMake `3.22+`
 - Ninja
-- `probe-rs` or another STM32 flashing tool
+- `st-flash` (package `stlink-tools`) for flashing
+- `probe-rs` for running the SD driver tests
 - A populated `lib/stm32-spi-dma-sdcard/` dependency
 
 ### Main Firmware
@@ -172,8 +173,12 @@ Output:
 ### Main Firmware
 
 ```bash
-probe-rs download --chip STM32C011F6Px build/Release/blackbox-firmware.elf
+arm-none-eabi-objcopy -O binary build/Release/blackbox-firmware.elf build/Release/blackbox-firmware.bin
+st-flash --reset write build/Release/blackbox-firmware.bin 0x08000000
 ```
+
+`st-flash` is used because `probe-rs` has had problems flashing this board in
+the past: depending on its version it flashed slowly or failed.
 
 ### SD Driver Tests
 
