@@ -52,25 +52,62 @@ These are properties of the current firmware. Each one can cost you the data.
 
 ## 3. Preparing the card
 
-Zero a card before its first use, and again whenever it should start empty. Starting each
-experiment with an empty card keeps the decoded output to that experiment only. On the laptop:
+The blackbox decides where to write by looking for the first all-zero sector, so the card has
+to be zero everywhere except where the blackbox itself has written. There are two ways to
+zero it, and which one is correct depends on the card's history.
+
+Build the tool once, as your user. Only the built binary runs with `sudo`, which it needs to
+write to the card:
 
 ```bash
-lsblk                       # find the card, for example /dev/sdX; check the size
 cd esp32-mainboard/tools/blackbox-decoder
 cargo build --release
+lsblk                       # find the card, for example /dev/sdX; check the size
+```
+
+**Full zeroing** — for a new card, a card that was used for anything else, or a card of
+unknown history:
+
+```bash
+sudo target/*/release/blackbox-decoder format /dev/sdX
+```
+
+This writes zeros over the whole card. It takes a few minutes for a card of a few gigabytes
+and proportionally longer for a larger one; a small card is enough, since an hour of recording
+is about 30 MB.
+
+**Quick zeroing** — only for a card that was fully zeroed once and has been written by
+nothing but the blackbox since:
+
+```bash
 sudo target/*/release/blackbox-decoder format --quick /dev/sdX
 ```
 
-The tool is built as your user and only the built binary runs with `sudo`, which it needs to
-write to the card.
+This zeros from the start of the card and stops at the first 1 MiB block that is already
+zero. Blackbox recordings are one unbroken run from the start of the card, so this removes
+all of them in seconds. On a card with other content it stops at the first gap and leaves
+everything behind the gap in place, and the blackbox will then start somewhere in the middle
+of the card.
 
-- `format` overwrites the device with zeros and asks for confirmation first. **It destroys
-  whatever device you name.** Check the device with `lsblk` every time.
-- `--quick` stops at the first 1 MiB block that is already zero. It is the right choice for a
-  card that has only ever been used in the blackbox. Without `--quick` the whole card is
-  written, which takes long on a large card.
-- Copy the previous experiment off the card first (section 5).
+Both forms ask for confirmation first and **destroy whatever device you name.** Check the
+device with `lsblk` every time, and copy the previous experiment off the card first
+(section 5).
+
+When to zero:
+
+- once, fully, before a card's first use in the blackbox;
+- quickly, before each experiment, so that the card holds that experiment only. This is
+  optional with firmware that appends, but it keeps the decoded output short and
+  unambiguous.
+
+To check that a card is completely zero:
+
+```bash
+sudo cmp /dev/sdX /dev/zero
+```
+
+`cmp: EOF on /dev/sdX` means every byte is zero. A line starting with `/dev/sdX /dev/zero
+differ` means it is not.
 
 ## 4. Verifying that the blackbox works
 
