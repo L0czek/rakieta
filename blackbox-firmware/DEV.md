@@ -63,7 +63,7 @@ Notes:
 | `SPI1` | Mode 0, 8-bit, prescaler `/4` | SD-card transfers on `PA5/PA6/PA7` |
 | `DMA1 Ch1/Ch2` | SPI TX/RX DMA | Bulk SD-card data movement |
 | `TIM14` | Prescaler `47`, period `999` | 1 kHz periodic task scheduler |
-| `ADC1` | Channel 11 on `PA11` | Battery threshold check at startup |
+| `ADC1` | Channel 11 on `PA11` | Battery threshold check at startup and every second |
 | `GPIOA PA2` | Push-pull output | Status LED |
 | `GPIOA PA3` | Push-pull output | Activity LED |
 | `GPIOA PA8` | Input with pull-up, active low | SD card detect |
@@ -137,7 +137,7 @@ clears the previous error bitmask before the new startup attempt proceeds.
 | Bit value | Symbol | Meaning |
 | --- | --- | --- |
 | `1` | `BLACKBOX_ERR_SD` | SD init/read/write/card-detect failure |
-| `2` | `BLACKBOX_ERR_BATTERY` | Startup battery below threshold |
+| `2` | `BLACKBOX_ERR_BATTERY` | Battery below threshold; set and cleared by the check every second |
 | `4` | `BLACKBOX_ERR_FULL` | Next write would exceed card capacity |
 | `8` | `BLACKBOX_ERR_OVERRUN` | UART DMA filled a half-buffer while an SD write was still running |
 
@@ -170,8 +170,8 @@ These are the most relevant non-obvious behaviors in the checked-in firmware:
   filled, so that half (2 KiB) is lost, and the half still waiting for its SD
   write can be partly overwritten before it reaches the card. The flag stays
   set until the next SD reinitialization.
-- The periodic battery re-check block exists only as commented code in
-  `main.c`; the active implementation checks battery once at startup.
+- The main loop re-checks the battery every `BATTERY_CHECK_MS` and sets or
+  clears `BLACKBOX_ERR_BATTERY` accordingly.
 - Semihosting logging (`Core/Src/logging.c`) is disabled by default; see Flash
   Budget.
 

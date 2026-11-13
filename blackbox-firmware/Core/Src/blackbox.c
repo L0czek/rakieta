@@ -20,7 +20,9 @@ void blackbox_init(Blackbox *bb, SD_Context *sd,
      * transfer does not look like incoming data on the first tick. */
     bb->last_ndtr = (uint16_t)__HAL_DMA_GET_COUNTER(huart->hdmarx);
     bb->idle_ticks = 0;
-    bb->error = 0;
+    /* A reinitialization answers for the card, so it drops the card errors and
+     * the overrun of the previous session. The battery does not depend on it. */
+    bb->error &= BLACKBOX_ERR_BATTERY;
     bb->separator_pending = 0;
     bb->separator_byte = BLACKBOX_SEPARATOR_BYTE;
     bb->sd = sd;

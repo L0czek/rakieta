@@ -128,6 +128,11 @@ seconds, and repeats. The count is the sum of the active errors:
 
 For example 3 blinks = card problem + low battery.
 
+Taking the card out and putting it back clears the card codes (1 and 4) and the overrun
+code (8); 1 and 4 come back if they still apply to the card now in the socket. The low
+battery code follows the battery: it is checked every second and is not affected by the
+card.
+
 **Activity LED** — blinks once per second while UART data is arriving, and goes dark about
 one second after the data stops. It is dark after power-up until the first byte arrives.
 

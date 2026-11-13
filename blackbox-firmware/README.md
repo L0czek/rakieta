@@ -23,8 +23,8 @@ of a session.
 - Writes each completed 2 KiB half-buffer to the SD card as raw sectors.
 - Detects SD-card removal and retries initialization every 2 seconds after the
   card is reinserted.
-- Samples the battery input once at startup and sets a low-battery error if it
-  is below the configured threshold.
+- Samples the battery input at startup and then every second, and shows a
+  low-battery error while it is below the configured threshold.
 - Exposes two LEDs:
   - `PA2`: status / error code LED
   - `PA3`: activity LED
@@ -91,7 +91,7 @@ Error flag weights:
 | Blink value contribution | Meaning |
 | --- | --- |
 | `1` | SD error or SD card missing/removal |
-| `2` | Battery below threshold at startup |
+| `2` | Battery below threshold |
 | `4` | Card full |
 | `8` | UART overrun while an SD write is still in progress; about 2 KiB was lost, logging continues |
 
@@ -106,8 +106,9 @@ How to interpret combined errors:
 - `9` blinks: UART overrun + SD problem (`8 + 1`)
 
 The firmware uses the summed bitmask value, not separate blink groups per flag.
-On a successful SD reinitialization, `blackbox_init()` clears the error bitmask
-before logging restarts.
+Every SD reinitialization (a card put back in) starts by clearing the SD, card
+full and overrun flags in `blackbox_init()`; the first two are set again if they
+still apply. The battery flag is left alone: it follows the battery check.
 
 ## Storage Format
 
@@ -132,8 +133,7 @@ These are current behaviors of the checked-in firmware, not future plans:
   not flushed when the UART stream stops.
 - The push-button input is debounced in software, but the separator-write path
   is currently disabled.
-- Battery is checked once at startup against a `3.3 V` threshold. The periodic
-  battery re-check logic is present in comments but not active.
+- Battery is checked at startup and every second against a `3.3 V` threshold.
 
 ## Build
 
