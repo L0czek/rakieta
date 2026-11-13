@@ -144,8 +144,22 @@ slow client other than your frontend also trips it. `--no-drop-check` skips the 
   ELF, calibration and checklist state, not the ones it had before. Every connected frontend
   takes over the recorded calibration. To get the current one back, **IMPORT JSON** your
   exported calibration ([calibration.md](calibration.md)) and publish the current ELF again.
-- The recorder is running during a replay, so the replay itself is written to a new recording
-  file. Delete that file afterwards.
+- The replay is recorded again; see the next section.
+
+### Replays are recorded too
+
+The recorder subscribes to every topic and cannot tell a replayed message from a live one.
+Everything a replay publishes is appended to the recording file that is currently open, with
+the retain flags of the original and with the wall-clock time of the replay. Commands are the
+exception, because they are never replayed.
+
+So the file being recorded during a replay repeats what was played back. That is harmless:
+it only makes that file larger.
+
+The one case to avoid is replaying **the file the recorder is currently writing** (the newest
+one in `recordings/`). The script would read back its own replayed messages as the recorder
+appends them and keep feeding on its own output. To replay that file, close it first with
+`docker compose restart mqtt-recorder`, which makes the recorder start a new one.
 
 ### Re-converting with a new calibration
 
