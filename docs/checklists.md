@@ -67,9 +67,11 @@ Taken from the firmware and the board schematics.
 7. The phone records only while its camera app is open and awake. The controller presses the
    shutter when FIRE is pressed (start of the countdown) and again at `POSTFIRE`.
 8. The safety switch ends a `COUNTDOWN` (state goes to `POSTFIRE`) but does nothing to the
-   state in `FIRE`. In `FIRE` the igniter stays triggered until END FIRE. Arming the switch
-   again while the state is still `FIRE` fires the igniter again. So: state `POSTFIRE` before
-   the switch is ever armed again.
+   state in `FIRE`: a burn that has started cannot be stopped, and leaving `FIRE` would stop
+   the phone recording. The igniter is triggered only for the first 3 s of `FIRE`
+   (`FIRE_TRIGGER_PULSE_MS`); the controller log then shows `Fire trigger released`. Arming
+   the switch again within those 3 s fires the igniter again; later it does not. The rule
+   stays: state `POSTFIRE` before the switch is armed again.
 9. The igniter board's capacitors stay charged for a while after the switch goes to SAFE.
    According to the schematic, starter sense keeps reading their voltage through an intact
    igniter, so "starter sense below 0.5 V" in SAFE shows they have drained.
@@ -280,12 +282,14 @@ How this fits the controller's states:
   Step 4 powers it again; nothing moves, because the servo is still commanded open. FIRE is
   rejected in `POSTFIRE`, and the igniter trigger is reset on entering it.
 - **Misfire, or switch flipped in `FIRE`.** The state stays `FIRE` (fact 8). Step 1 forces
-  END FIRE before step 4 allows the switch to be armed again.
+  END FIRE before step 4 allows the switch to be armed again. The servo also needs it: it
+  takes no commands in `FIRE` (fact 5).
 - **RESET STATE is last** in both lists. After it the controller accepts FIRE again.
 - **Link lost in `FIRE`.** END FIRE cannot be sent. The switch still cuts the igniter and
-  servo power, but must not be armed again until the link is back and the state is
-  `POSTFIRE`, or the controller has been restarted (it then starts in `ARMED` with the
-  trigger reset and the servo commanded closed).
+  servo power. The trigger is released 3 s into `FIRE` without the link (fact 8), so arming
+  again would not fire the igniter, but it would not close the valve either. Wait for the
+  link and state `POSTFIRE`, or restart the controller (it then starts in `ARMED` with the
+  servo commanded closed).
 
 ## 8. SECURE DATA
 
@@ -303,16 +307,6 @@ How this fits the controller's states:
 
 Steps 8 and 9 cannot be ticked, because the frontend runs on the laptop. They are the
 reminder of what comes last.
-
-## Follow-ups outside the checklists
-
-- **Safety switch is ignored in state `FIRE`** (fact 8). Flipping it to SAFE cuts the igniter
-  and servo power but leaves the state in `FIRE` with the igniter still triggered, so arming
-  the switch again re-fires the igniter. Lists 6 and 7 work around this by requiring state
-  `POSTFIRE` before the switch is armed again. The better fix is probably in the controller's
-  state machine: the switch going to SAFE in `FIRE` should move the state to `POSTFIRE`, as it
-  already does in `COUNTDOWN` (`handle_command`, `StateCommand::SafetySafe`, in
-  `esp32-mainboard/src/bin/test_stand_controller/sequencer.rs`). Not decided, not started.
 
 ## Open points
 
@@ -375,5 +369,4 @@ Decided, do not reopen:
 - The retained state of the old placeholder lists stays on the broker; the frontend ignores
   topics of unknown lists.
 
-Out of scope: the firmware change under "Follow-ups outside the checklists", and anything in
-the controller or blackbox firmware.
+Out of scope: anything in the controller or blackbox firmware.

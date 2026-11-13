@@ -115,7 +115,7 @@ by the signal lights on the stand.
 | --- | --- | --- | --- |
 | `ARMED` | green | idle, ready for commands | **FIRE**, **LAMP TEST**, **CAMERA TEST** |
 | `COUNTDOWN` | red + buzzer | 10 seconds to ignition; camera recording started | timer → `FIRE`; **ABORT** or safety switch to safe → `POSTFIRE` |
-| `FIRE` | red | igniter triggered | **END FIRE** → `POSTFIRE` |
+| `FIRE` | red | igniter triggered for the first 3 seconds; burn in progress | **END FIRE** → `POSTFIRE` |
 | `POSTFIRE` | red + green | igniter output safe; camera stopped | **RESET STATE** → `ARMED` |
 
 Points that are easy to get wrong:
@@ -126,7 +126,11 @@ Points that are easy to get wrong:
   otherwise and says what is missing.
 - At the end of the countdown the controller checks the safety switch once more. If it is
   safe, there is no ignition and the state goes to `POSTFIRE`.
-- `FIRE` does not end by itself. It lasts until someone presses **END FIRE**.
+- `FIRE` does not end by itself. It lasts until someone presses **END FIRE**. The safety
+  switch does not end it either, so that the camera keeps recording the burn.
+- The igniter output is on only for the first 3 seconds of `FIRE`. The log then shows
+  `Fire trigger released`. After that, arming the safety switch again does not fire the
+  igniter.
 - The countdown shown in the frontend runs on the laptop's clock from the moment the frontend
   saw the state change. It can be off by the network delay.
 - The valve servo buttons are disabled during `FIRE`. **SHUTDOWN** is disabled during
