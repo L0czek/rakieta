@@ -155,7 +155,7 @@ matters, do a dry run:
    count is small.
 5. Put the card back, power the blackbox and the controller for another minute, and decode
    again. With current firmware the output now holds both sessions: the first one unchanged,
-   then a second `experiment_separator` (or a backwards jump in `timestamp_ms`) and the new
+   then a second `experiment_separator` and the new
    data. If only the second session is there, the board runs the old firmware that overwrites
    from sector 0.
 6. Zero the card again before the real run.
@@ -217,11 +217,11 @@ Output is one JSON object per line. Warnings and the final `decoded N packets` g
 What to expect in a healthy decode:
 
 - The first line is `experiment_separator`. Each later session on the same card starts with
-  another one. Where the previous session ended in the middle of a packet, the decoder can
-  miss that separator; the backwards jump in `timestamp_ms` still marks the new session.
-- A few warnings right after it (`unknown packet id`, `dropping … before first timing sync`):
-  the recording starts in the middle of a packet, and the decoder locks on at the first
-  timing sync.
+  another one, also where the previous session ended in the middle of a packet (that packet
+  gives one `truncated packet … resynchronizing` warning).
+- One `skipped … bytes between session start and the first timing sync` warning right after
+  it: the recording starts in the middle of the stream, and the decoder drops everything up
+  to the first timing sync instead of guessing at it.
 - One `truncated packet … resynchronizing` near the end, where the stream stops.
 - Timestamps that jump backwards mean a new session, or a controller reboot during a session.
 
