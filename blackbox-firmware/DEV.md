@@ -170,6 +170,12 @@ These are the most relevant non-obvious behaviors in the checked-in firmware:
   filled, so that half (2 KiB) is lost, and the half still waiting for its SD
   write can be partly overwritten before it reaches the card. The flag stays
   set until the next SD reinitialization.
+- UART line errors (framing, noise, receiver overrun) do not stop logging and
+  set no error flag. `HAL_UART_Receive_DMA()` enables the UART error interrupt,
+  and the HAL handler for it aborts DMA reception on any error, with nothing to
+  restart it. `blackbox_start(...)` therefore clears `USART_CR3_EIE` right after
+  starting reception. The UART (with `DDRE` at its reset value) drops the byte
+  that had the error and passes the following bytes to DMA as usual.
 - The overrun flag is not set while card detect reports an empty socket. A
   card pulled out mid-write stalls the write long enough to overrun, and that
   case is reported by `BLACKBOX_ERR_SD` alone.

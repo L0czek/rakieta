@@ -38,6 +38,10 @@ void blackbox_start(Blackbox *bb)
 {
     HAL_UART_Receive_DMA(bb->huart, bb->dma_buf,
                          BLACKBOX_DMA_BUF_SIZE);
+    /* With the error interrupt on, the HAL aborts DMA reception for good on any
+     * framing, noise or overrun error, such as the break when the controller
+     * loses power. Without it the UART skips the bad byte and keeps receiving. */
+    ATOMIC_CLEAR_BIT(bb->huart->Instance->CR3, USART_CR3_EIE);
     bb->last_ndtr = (uint16_t)__HAL_DMA_GET_COUNTER(bb->huart->hdmarx);
 }
 
