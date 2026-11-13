@@ -247,4 +247,48 @@ cmake --build --preset Release
 probe-rs download --chip STM32C011F6Px build/Release/blackbox-firmware.elf
 ```
 
+### Programming header
+
+The probe connects to `J3`, the 2×5 pin header (2.54 mm pitch) in the corner of the board
+below the microSD socket. Seen from the component side, with the microSD socket on the right
+and the two LEDs on the left, it sits in the bottom-right corner:
+
+```text
+        RST button                                        │
+           [ ]                                            │
+                                                          │
+            ┌────────────────────────────────┐            │
+            │ SWDIO   GND  SWCLK    –    5V  │            │
+            │   2      4     6      8    10  │            │
+            │                                │            │ right
+            │   1      3     5      7     9  │            │ board
+            │  RST    GND    –      –    5V  │            │ edge
+            └───────────┐      ┌─────────────┘            │
+                        └──────┘ key notch                │
+                                                          │
+  ────────────────────────────────────────────────────────┘
+                     bottom board edge
+```
+
+Pin 1 is the pin of the row next to the board edge that is farthest from the corner. Pins 9
+and 10 are the ones nearest the corner: their centres are 5.7 mm from the right edge, and
+the odd row is 3.8 mm from the bottom edge. The key notch of the shroud faces the bottom
+edge.
+
+| Pin | Signal | Notes |
+| --- | --- | --- |
+| 1 | `RST` | MCU reset, also on the RST button |
+| 2 | `SWDIO` | |
+| 3, 4 | `GND` | |
+| 6 | `SWCLK` | |
+| 9, 10 | 5 V in | to the charger input through the 200 mA fuse `F1`, the same rail as the barrel jack |
+| 5, 7, 8 | not connected | |
+
+This is the pin order of the 10-pin connector on the small ST-Link V2 USB dongles, so their
+ribbon cable plugs in directly. It is not the ARM Cortex debug pin order. With any other
+probe, wire `SWDIO`, `SWCLK`, `GND` and optionally `RST` one by one.
+
+The header has no 3.3 V pin: the probe does not power the MCU directly and gets no target
+voltage reference from the board. Switch the blackbox on before flashing.
+
 Developer notes are in `blackbox-firmware/README.md` and `blackbox-firmware/DEV.md`.
