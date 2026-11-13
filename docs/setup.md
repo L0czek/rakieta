@@ -35,6 +35,18 @@ needs to show controller logs.
 The controller must be able to reach the laptop on TCP port 1883 across the dish and the
 router.
 
+### Ground station power
+
+The ground station runs from one box with a battery pack (a power bank with a barrel jack
+output), which powers both the WiFi router and the laptop. The laptop's internal battery is
+only a reserve.
+
+After plugging in, check that the laptop actually sees the power input and is not running
+on its internal battery: the battery indicator shows "plugged in" or "charging".
+
+A laptop that silently runs on its internal battery can shut down in the middle of a run and
+take the broker, the recorder and the frontend with it.
+
 ## 2. Prerequisites on the laptop
 
 | Tool | Needed for |
@@ -138,6 +150,17 @@ esp32-mainboard/target/riscv32imac-unknown-none-elf/release/test-stand-controlle
 - Drives the valve servo to **closed**.
 - Starts in state `ARMED` with the green light on. `ARMED` is the name of the sequencer's idle
   state; it is not the position of the physical safety switch.
+- Looks for the hardware on the stand cable **once**: the igniter board, the signal light
+  board and the chain of thermometers. Nothing is detected again later.
+  - A thermometer that is plugged into the chain after start does not appear until the
+    controller is restarted. If the chain does not answer at start, no temperatures are sent
+    at all.
+  - If the igniter board or the signal light board does not answer at start, the sequencer
+    does not run: the state still shows `ARMED`, but FIRE, LAMP TEST and the other state
+    commands do nothing.
+
+  So connect the stand cable and every thermometer **before** starting the controller, and
+  restart the controller after changing any of them.
 - Connects to WiFi and the broker and reconnects by itself whenever the link drops.
 - Counts time from zero. Every timestamp in the system is "milliseconds since the controller
   booted", so a reboot restarts the clock. This matters for the frontend history, see
