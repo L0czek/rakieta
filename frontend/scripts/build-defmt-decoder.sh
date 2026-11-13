@@ -14,4 +14,7 @@ fi
 mkdir -p "${out_dir}"
 
 cd "${decoder_dir}"
-RUSTFLAGS='' wasm-pack build --target web --out-dir "${out_dir}"
+# esp32-mainboard/tools/.cargo/config.toml sets build.target to the host for the native
+# tools, and wasm-pack builds for whatever build.target says. Point it back at WebAssembly.
+RUSTFLAGS='' CARGO_BUILD_TARGET=wasm32-unknown-unknown \
+  wasm-pack build --target web --out-dir "${out_dir}"
