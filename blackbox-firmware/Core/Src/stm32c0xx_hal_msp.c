@@ -91,21 +91,14 @@ void HAL_MspInit(void)
 void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
-  RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
   if(hadc->Instance==ADC1)
   {
     /* USER CODE BEGIN ADC1_MspInit 0 */
 
     /* USER CODE END ADC1_MspInit 0 */
 
-  /** Initializes the peripherals clocks
-  */
-    PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_ADC;
-    PeriphClkInit.AdcClockSelection = RCC_ADCCLKSOURCE_SYSCLK;
-    if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
-    {
-      Error_Handler();
-    }
+    /* Kernel clock left at its reset default (RCC_ADCCLKSOURCE_SYSCLK). The generated
+     * HAL_RCCEx_PeriphCLKConfig() call is removed to save flash; see DEV.md. */
 
     /* Peripheral clock enable */
     __HAL_RCC_ADC_CLK_ENABLE();
@@ -164,21 +157,14 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* hadc)
 void HAL_SPI_MspInit(SPI_HandleTypeDef* hspi)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
-  RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
   if(hspi->Instance==SPI1)
   {
     /* USER CODE BEGIN SPI1_MspInit 0 */
 
     /* USER CODE END SPI1_MspInit 0 */
 
-  /** Initializes the peripherals clocks
-  */
-    PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_I2S1;
-    PeriphClkInit.I2s1ClockSelection = RCC_I2S1CLKSOURCE_SYSCLK;
-    if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
-    {
-      Error_Handler();
-    }
+    /* Kernel clock left at its reset default (RCC_I2S1CLKSOURCE_SYSCLK). The generated
+     * HAL_RCCEx_PeriphCLKConfig() call is removed to save flash; see DEV.md. */
 
     /* Peripheral clock enable */
     __HAL_RCC_SPI1_CLK_ENABLE();
@@ -338,21 +324,14 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* htim_base)
 void HAL_UART_MspInit(UART_HandleTypeDef* huart)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
-  RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
   if(huart->Instance==USART1)
   {
     /* USER CODE BEGIN USART1_MspInit 0 */
 
     /* USER CODE END USART1_MspInit 0 */
 
-  /** Initializes the peripherals clocks
-  */
-    PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART1;
-    PeriphClkInit.Usart1ClockSelection = RCC_USART1CLKSOURCE_PCLK1;
-    if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
-    {
-      Error_Handler();
-    }
+    /* Kernel clock left at its reset default (RCC_USART1CLKSOURCE_PCLK1). The generated
+     * HAL_RCCEx_PeriphCLKConfig() call is removed to save flash; see DEV.md. */
 
     /* Peripheral clock enable */
     __HAL_RCC_USART1_CLK_ENABLE();

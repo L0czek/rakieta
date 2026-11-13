@@ -170,6 +170,27 @@ These are the most relevant non-obvious behaviors in the checked-in firmware:
   `main.c`; the active implementation checks battery once at startup.
 - `Core/Src/logging.c` and `Core/Inc/logging.h` are currently placeholders.
 
+## Flash Budget
+
+The target is an STM32C011F4 with 16 KiB of flash, and the Release build uses
+most of it. The link step prints the usage; an overflow fails the build.
+
+To make room, three pieces of STM32CubeMX-generated code are removed by hand.
+Regenerating the project from the `.ioc` file puts them back, and they must be
+removed again:
+
+- `MX_USART1_UART_Init()` in `Core/Src/main.c`: the
+  `HAL_UARTEx_SetTxFifoThreshold()`, `HAL_UARTEx_SetRxFifoThreshold()` and
+  `HAL_UARTEx_DisableFifoMode()` calls. FIFO mode is off after reset and the
+  thresholds are the reset values; the calls only pull in signed division.
+- `HAL_ADC_MspInit()`, `HAL_SPI_MspInit()` and `HAL_UART_MspInit()` in
+  `Core/Src/stm32c0xx_hal_msp.c`: the `HAL_RCCEx_PeriphCLKConfig()` calls. Each
+  one selected the kernel clock that is already the reset default (SYSCLK for
+  ADC and I2S1, PCLK1 for USART1).
+
+The debug-only UART rate statistics that fed the disabled semihosting log are
+removed for the same reason.
+
 ## Dependency Note
 
 The build expects the external SD driver to exist under
