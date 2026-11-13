@@ -19,7 +19,7 @@ small amount of handwritten application logic.
 | `Core/Inc/blackbox.h` | Logger configuration, buffer sizes, error bit definitions |
 | `Core/Src/stm32c0xx_it.c` | IRQ handlers, including `SysTick` forwarding to the SD driver |
 | `Core/Src/stm32c0xx_hal_msp.c` | Low-level GPIO, DMA, SPI, ADC, and UART pin/peripheral wiring |
-| `Core/Src/logging.c` | Currently unused stub |
+| `Core/Src/logging.c` | Semihosting log output; compiled to no-ops unless `ENABLE_SEMIHOST_LOGGING` is defined |
 | `cmake/stm32cubemx/CMakeLists.txt` | Generated source list and HAL driver wiring |
 | `lib/stm32-spi-dma-sdcard/` | External SPI SD-card driver dependency used by the app |
 | `tests/sdcard/test_main.c` | On-target SD driver test entrypoint |
@@ -170,7 +170,8 @@ These are the most relevant non-obvious behaviors in the checked-in firmware:
   effectively halted until reset.
 - The periodic battery re-check block exists only as commented code in
   `main.c`; the active implementation checks battery once at startup.
-- `Core/Src/logging.c` and `Core/Inc/logging.h` are currently placeholders.
+- Semihosting logging (`Core/Src/logging.c`) is disabled by default; see Flash
+  Budget.
 
 ## Flash Budget
 
@@ -190,8 +191,9 @@ removed again:
   one selected the kernel clock that is already the reset default (SYSCLK for
   ADC and I2S1, PCLK1 for USART1).
 
-The debug-only UART rate statistics that fed the disabled semihosting log are
-removed for the same reason.
+The UART rate statistics only feed the semihosting log, so they are compiled
+only when `ENABLE_SEMIHOST_LOGGING` is defined (`Core/Inc/logging.h`). With
+logging enabled the image is about 17.1 KiB and does not fit the 16 KiB part.
 
 ## Dependency Note
 

@@ -25,6 +25,7 @@
 #include <string.h>
 #include "sd_functions.h"
 #include "blackbox.h"
+#include "logging.h"
 #include "stm32c0xx_hal_gpio.h"
 #include "stm32c0xx_hal_spi.h"
 #include "stm32c0xx_hal_tim.h"
@@ -110,6 +111,70 @@ static void log_blackbox_error(const char *prefix)
   sh_puts(prefix);
   sh_put_hex8(blackbox.error);
 }
+
+#ifdef ENABLE_SEMIHOST_LOGGING
+/* UART rate statistics. They only feed the semihosting log, so they are
+ * compiled out together with it to save flash. */
+static volatile uint32_t uart_rx_bytes_total;
+static volatile uint32_t uart_avg_bps;
+static volatile uint32_t uart_pending_bps;
+static volatile uint8_t uart_rate_log_pending;
+static uint32_t uart_last_event_ms;
+static uint32_t uart_interval_sum_ms;
+static uint32_t uart_interval_events;
+
+static void update_uart_rate_average(void)
+{
+  uint32_t now = HAL_GetTick();
+  uint32_t elapsed_ms;
+  uint32_t bytes_total;
+  uint32_t avg_bps;
+
+  uart_rx_bytes_total += BLACKBOX_HALF_SIZE;
+
+  if (uart_last_event_ms == 0U) {
+    uart_last_event_ms = now;
+    return;
+  }
+
+  elapsed_ms = now - uart_last_event_ms;
+  uart_last_event_ms = now;
+  if (elapsed_ms == 0U) {
+    return;
+  }
+
+  uart_interval_sum_ms += elapsed_ms;
+  uart_interval_events++;
+
+  if (uart_interval_sum_ms < 1000U) {
+    return;
+  }
+
+  bytes_total = uart_interval_events * BLACKBOX_HALF_SIZE;
+  avg_bps = (bytes_total * 1000UL) / uart_interval_sum_ms;
+  if (avg_bps > uart_avg_bps) {
+    uart_avg_bps = avg_bps;
+    uart_pending_bps = avg_bps;
+    uart_rate_log_pending = 1U;
+  }
+  uart_interval_sum_ms = 0U;
+  uart_interval_events = 0U;
+}
+
+static void log_uart_rate_if_pending(void)
+{
+  if (uart_rate_log_pending == 0U) {
+    return;
+  }
+
+  uart_rate_log_pending = 0U;
+  sh_puts("uavg\n");
+  sh_put_hex32(uart_pending_bps);
+}
+#else
+#define update_uart_rate_average() ((void)0)
+#define log_uart_rate_if_pending() ((void)0)
+#endif
 
 static void log_dma_overrun(uint8_t is_half)
 {
@@ -243,6 +308,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+    log_uart_rate_if_pending();
     {
       while (blackbox.error & BLACKBOX_ERR_OVERRUN)
           ;
@@ -587,6 +653,7 @@ void HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart)
             blackbox.buffer_to_write = 0;
         }
         blackbox.do_write |= 0x01U;
+        update_uart_rate_average();
     }
 }
 
@@ -601,6 +668,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
             blackbox.buffer_to_write = 1;
         }
         blackbox.do_write |= 0x02U;
+        update_uart_rate_average();
     }
 }
 

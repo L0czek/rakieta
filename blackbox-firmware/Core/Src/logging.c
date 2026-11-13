@@ -1,8 +1,5 @@
 #include "logging.h"
 
-// NOTE: Enabling logging causes overflows!
-//#define ENABLE_SEMIHOST_LOGGING
-
 void Log_SemihostText(const char *text)
 {
 #ifdef ENABLE_SEMIHOST_LOGGING
