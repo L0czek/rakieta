@@ -14,7 +14,8 @@ Operator guides, in the order you need them:
 | [docs/calibration.md](docs/calibration.md) | what the conversion settings mean, how to calibrate, where the calibration is stored, how not to lose it |
 | [docs/blackbox.md](docs/blackbox.md) | preparing the SD card, verifying that the blackbox records, reading the data back |
 | [docs/data-and-history.md](docs/data-and-history.md) | MQTT recording and replay, the frontend's history, CSV export, controller reboots |
-| [docs/experiment.md](docs/experiment.md) | preparing for and running a test firing, and securing the data afterwards |
+| [docs/experiment.md](docs/experiment.md) | preparing for a test firing, the controller's states, archiving the data |
+| [docs/checklists.md](docs/checklists.md) | the procedure for a hot fire day, step by step: the eight lists of the frontend's CHECKLIST tab |
 
 Developer notes live next to the code: `frontend/DEV.md`, `esp32-mainboard/DEV.md`,
 `blackbox-firmware/DEV.md`.

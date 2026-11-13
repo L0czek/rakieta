@@ -1,7 +1,7 @@
 # Running an experiment
 
-The software side of a test firing, in order: what to prepare beforehand, how to check the
-system on site, the firing sequence, and how to secure the data afterwards.
+The software side of a test firing: what to prepare beforehand, where the procedure for the
+day is, how the controller's states behave, and what to do with the data afterwards.
 
 This covers the control and data system only. Engine assembly, oxidizer handling and site
 safety have their own procedures.
@@ -25,90 +25,16 @@ Do these where there is time and a desk. Each item links to its how-to.
 - [ ] Old recordings copied off the laptop; free disk space available.
 - [ ] Laptop, controller battery, stand battery and blackbox battery charged.
 
-## 2. Bring-up on site
+## 2. On site
 
-Bring the system up in this order. Each step depends on the ones before it.
+The whole day on site, from powering the ground station to shutting it down, is one
+procedure: [checklists.md](checklists.md). It is worked through in the frontend's
+**CHECKLIST** tab, and that file says for every step what to do, where to look and why.
 
-1. **Network.** Power the WiFi router and the dish router, aim the dish at the test stand,
-   plug the laptop into the router by cable.
-2. **Ground station.** `docker compose up -d`, then `docker compose ps`: three services
-   running.
-3. **Frontend.** On the laptop open the frontend, gear icon, **CONNECT**. Use the same address
-   as always, so that the stored calibration is the one you expect.
-4. **ELF.** The status log shows `Loaded retained firmware ELF …` if the broker still holds
-   one. Publish it again if you flashed since, or if you are not sure which build it is from.
-5. **Calibration.** In **CONFIGURATION**, compare the form with your exported file. If they
-   differ, or the broker's volume was deleted, **IMPORT JSON**.
-6. **Blackbox.** Insert the zeroed card and power the blackbox.
-7. **Controller.** Power it. Within seconds the dashboard shows live values, and the status
-   log shows `DEFMT decoder ready for live log stream.` followed by controller log lines.
+It is the only place that defines the order of the steps. The other guides explain the
+individual tasks it refers to.
 
-Keep phones off the frontend during the run; they load the WiFi router.
-
-Do not press **SIM** in the header while connected. The simulator then publishes invented
-telemetry to the real broker, where it mixes with the real data and is recorded.
-
-## 3. System check
-
-Go through all of these before any propellant is on the stand.
-
-### Telemetry
-
-| Check | Where | Expect |
-| --- | --- | --- |
-| Link quality | **CONTROLLER HEALTH** | WiFi RSSI and CPU values present and updating |
-| Packet clock | `LAST PACKET T+…` in the header | counting up steadily |
-| Stand battery | **POWER SYSTEMS** | 11.5–13.5 V |
-| Computer battery, boost voltage | **POWER SYSTEMS** | plausible, boost near 12 V |
-| Pressures | dashboard | near zero with the system unpressurized |
-| Tensometer | dashboard | steady; changes when the reference weight is hung on it |
-| Temperatures | **THERMAL SENSORS** | all sensors listed, at ambient temperature |
-| Controller log | **STATUS LOG** | readable lines, no decoder errors |
-
-### Actuators and indicators
-
-All of these work only in state `ARMED`.
-
-| Check | Action | Expect |
-| --- | --- | --- |
-| Signal lights | **LAMP TEST** | green, red and buzzer on for 2 seconds, then back to green |
-| Camera | **CAMERA TEST** | recording starts, stops after 5 seconds; check that a clip exists |
-| Valve servo | **OPN**, then **CLS** in the servo panel | status goes `OPENING` → `OPEN`, then `CLOSING` → `CLOSED`; the valve moves |
-| Safety switch | flip to armed and back | the indicator in **MASTER CONTROL** follows: `ARMED` / `SAFE` |
-
-Leave the servo **closed** and the safety switch **safe**.
-
-### Data paths
-
-| Check | How |
-| --- | --- |
-| MQTT recording | the newest file in `recordings/` is growing ([data-and-history.md](data-and-history.md), section 1) |
-| Blackbox | status LED off, activity LED blinking ([blackbox.md](blackbox.md), section 4) |
-| Frontend history | **ANALYSIS** in PAUSED mode shows the last minutes |
-
-## 4. Clean start for the run
-
-Right before the firing procedure starts, so that each data store holds this experiment and
-nothing else:
-
-1. If the controller was rebooted since the check, or you want a fresh time base, reboot it
-   now and wait for telemetry. Not later.
-2. `docker compose restart mqtt-recorder` — a new recording file for this run.
-3. Empty the frontend history ([data-and-history.md](data-and-history.md), section 3), so
-   that the run is boot 1 and nothing else is in the way.
-4. In **CHECKLIST**, select list 5 (FIRE) and press **RESET CHECKLIST**. Do not press
-   **RESET ALL CHECKLISTS** here: lists 1 to 4 hold the state of the set-up. Everything is
-   reset once, at the start of the test day.
-5. Write down the controller time (`LAST PACKET T+…`) next to the wall-clock time. It lets
-   you match the charts to video and notes later.
-
-From here on **do not reboot the controller** and leave the blackbox running until the
-data is secured (section 6). A reboot does not lose data, but it splits the run across two
-time axes and puts the controller back into its start-up state.
-
-## 5. Firing
-
-### States
+## 3. Controller states
 
 The controller is always in one of these states. The state is shown in **MASTER CONTROL** and
 by the signal lights on the stand.
@@ -143,63 +69,8 @@ Points that are easy to get wrong:
 - A rejected command is explained in the controller log, for example
   `FIRE rejected: safety switch not armed`. This is why the ELF matters.
 
-### Checklists in the frontend
+## 4. Back at base
 
-**CHECKLIST** holds the procedure for an N2O hot fire as eight lists, from GROUND STATION to
-SECURE DATA. Their content, and the reason for every step, is in
-[checklists.md](checklists.md).
-
-- Steps of a list must be completed in order. The lists are independent of each other.
-- A step with an automatic condition can be completed only while the condition holds. It can
-  be **overridden** instead: type in a reason and press **OVERRIDE STEP**. The step then
-  shows amber instead of green, with the reason, on every connected frontend.
-- The checklist only observes. It sends no commands and does not gate the **FIRE** button.
-
-### Sequence
-
-1. Work through list 5 (FIRE). It covers filling, clearing the area, arming the safety
-   switch and opening the valve with **OPN**, and ends with the final call.
-2. Press **FIRE**. State `COUNTDOWN`, red light and buzzer, 10 seconds.
-   - To stop: **ABORT** in the frontend, or the safety switch to safe.
-3. State `FIRE`: ignition.
-4. When the burn is over, press **END FIRE**. State `POSTFIRE`.
-5. Work through list 6 (POSTFIRE): close the valve with **CLS**, safety switch to **safe**,
-   and **RESET STATE** only once the stand is safe to approach.
-
-After an attempt without a burn (**ABORT**, safety switch during the countdown, or a misfire)
-use list 7 (ABORTED) instead of list 6.
-
-If the link drops during the run, the frontend shows the connection as red and the values
-freeze. The controller keeps its state and reconnects by itself; the blackbox keeps recording
-throughout. The physical safety switch works without the link.
-
-## 6. Securing the data
-
-Do this before powering anything down, in this order. The first step protects the copy that
-is easiest to destroy.
-
-1. **Blackbox:** power it off, take the card out, label it. A blackbox with old firmware
-   overwrites the recording when it is powered up again with the card inside
-   ([blackbox.md](blackbox.md), section 2); taking the card out first is safe with either.
-2. **Frontend:** in **ANALYSIS**, export the CSV for the whole run
-   ([data-and-history.md](data-and-history.md), section 3). If the controller rebooted
-   during the run, export each boot.
-3. **Recording:** `docker compose restart mqtt-recorder` to close the run's file, then copy
-   that file from `recordings/` to a second medium.
-4. **Calibration:** keep the `conversion-settings.json` that was active with the run.
-5. **Notes:** the experiment name, the controller time noted in section 4, and anything
-   unusual.
-6. Only now shut the controller down (**SHUTDOWN** in MASTER CONTROL) and stop the stack
-   (`docker compose down`).
-
-Back at base, image and decode the blackbox card ([blackbox.md](blackbox.md), section 5) and
-archive the three files together: the `.tsv` recording, the blackbox image, and the
-calibration.
-
-## 7. Between two runs on the same day
-
-Repeat section 4 (clean start) after securing the data of the previous run. In particular:
-
-- a second blackbox card, or copy and zero the first one;
-- a new recording file;
-- the CSV of the previous run exported before the history is cleared.
+The data is secured on site, in list 8 of [checklists.md](checklists.md). Afterwards, image
+and decode the blackbox card ([blackbox.md](blackbox.md), section 5) and archive the three
+files together: the `.tsv` recording, the blackbox image, and the calibration.
