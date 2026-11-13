@@ -226,4 +226,3 @@ command, the shutdown takes effect when you unplug it.
 | `CRITICAL FAILURE … TIME TRAVEL DETECTED` | the controller rebooted, so its clock restarted. See [data-and-history.md](data-and-history.md) |
 | Status log shows `DEFMT decoder WebAssembly package is unavailable` | the frontend was built without the decoder; rebuild with `docker compose up --build` |
 | Values are present but wrong | calibration, see [calibration.md](calibration.md) |
-| Building a host tool fails with `unable to build with the standard library` | run `rustup component add rust-src --toolchain <the toolchain named in the error>` |
