@@ -9,14 +9,16 @@ void blackbox_init(Blackbox *bb, SD_Context *sd,
                    uint32_t timeout_ms)
 {
     memset(bb->dma_buf, 0, BLACKBOX_DMA_BUF_SIZE);
-    bb->is_active = 1;
+    bb->is_active = 0;
     bb->buffer_to_write = 0;
     bb->do_write = 0;
     bb->flush_pending = 0;
     bb->next_sector = start_sector;
     bb->total_sectors = 0;
     bb->timeout_ms = timeout_ms;
-    bb->last_ndtr = BLACKBOX_DMA_BUF_SIZE;
+    /* Track the DMA counter as it is now, so a stopped or never started
+     * transfer does not look like incoming data on the first tick. */
+    bb->last_ndtr = (uint16_t)__HAL_DMA_GET_COUNTER(huart->hdmarx);
     bb->idle_ticks = 0;
     bb->error = 0;
     bb->separator_pending = 0;
@@ -34,6 +36,7 @@ void blackbox_start(Blackbox *bb)
 {
     HAL_UART_Receive_DMA(bb->huart, bb->dma_buf,
                          BLACKBOX_DMA_BUF_SIZE);
+    bb->last_ndtr = (uint16_t)__HAL_DMA_GET_COUNTER(bb->huart->hdmarx);
 }
 
 void blackbox_tick(Blackbox *bb)
@@ -41,16 +44,15 @@ void blackbox_tick(Blackbox *bb)
     DMA_HandleTypeDef *hdma = bb->huart->hdmarx;
     uint16_t ndtr = (uint16_t)__HAL_DMA_GET_COUNTER(hdma);
 
-    if (ndtr == bb->last_ndtr && ndtr != BLACKBOX_DMA_BUF_SIZE) {
-        bb->idle_ticks++;
-        if (bb->idle_ticks >= bb->timeout_ms) {
-            bb->flush_pending = 1;
-            bb->idle_ticks = 0;
-            bb->is_active = 0;
-        }
-    } else {
-        bb->idle_ticks = 0;
+    if (ndtr != bb->last_ndtr) {
+        /* The DMA counter moved: UART bytes arrived since the last tick. */
         bb->last_ndtr = ndtr;
+        bb->idle_ticks = 0;
+        bb->is_active = 1;
+    } else if (bb->is_active && ++bb->idle_ticks >= bb->timeout_ms) {
+        bb->flush_pending = 1;
+        bb->idle_ticks = 0;
+        bb->is_active = 0;
     }
 }
 
@@ -151,6 +153,5 @@ void blackbox_write_buffer(Blackbox *bb, uint32_t sector) {
         Log_SemihostHex32(bb->max_write_ms);
     }
 
-    bb->is_active = 1;
     bb->writing_to_sd_in_progress = 0;
 }

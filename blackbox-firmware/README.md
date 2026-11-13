@@ -63,22 +63,19 @@ If the sender does not match these settings, the captured data will be garbage.
 
 ### Activity LED (`PA3`)
 
-The activity LED is a coarse capture-state indicator:
+The activity LED shows whether UART data is arriving:
 
-- It toggles every 500 ms while the firmware considers the logger active.
-- It starts in the blinking state immediately after boot because the logger is
-  initialized as active before any UART idle timeout can occur.
-- It turns off after roughly 1 second with no further UART DMA progress once a
-  partially filled buffer stops changing.
-- If the stream stops exactly on a full 4 KiB DMA boundary, the current code
-  can keep the LED blinking because idle detection does not trigger in that
-  case.
-- It is not a per-packet or per-sector write pulse.
+- It toggles every 500 ms while the UART DMA counter is advancing.
+- It is off after reset until the first byte arrives.
+- It turns off after roughly 1 second without new bytes.
+- It is not a per-packet or per-sector write pulse, and it does not show that
+  data is being written: with an SD or overrun error it can blink while nothing
+  is recorded. Read it together with the status LED.
 
 Practical interpretation:
 
-- Blinking: the logger is active or has not yet timed out of an active session.
-- Off: the current session has gone idle.
+- Blinking: data is arriving on the UART input.
+- Off: no data for the last second.
 
 ### Status LED (`PA2`)
 
@@ -133,8 +130,6 @@ These are current behaviors of the checked-in firmware, not future plans:
   is currently disabled.
 - Battery is checked once at startup against a `3.3 V` threshold. The periodic
   battery re-check logic is present in comments but not active.
-- If the UART stream stops exactly on a 4 KiB DMA wrap boundary, the current
-  idle-detection logic may never mark the logger inactive.
 
 ## Build
 

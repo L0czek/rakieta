@@ -156,9 +156,10 @@ These are the most relevant non-obvious behaviors in the checked-in firmware:
 - `BLACKBOX_DMA_BUF_SIZE` is `4096` bytes and each SD write is `2048` bytes.
 - The idle timeout is `1000` ms, but `flush_pending` is not implemented, so a
   partially filled tail buffer is not written when the UART stream stops.
-- Idle detection only advances when the DMA transfer counter is stable and not
-  equal to the full buffer size. If traffic stops exactly on a 4 KiB DMA wrap
-  boundary, `is_active` can remain set and the activity LED can keep blinking.
+- `blackbox_tick(...)` compares the UART DMA transfer counter once per
+  millisecond. A changed counter marks the logger active; `is_active` drops after
+  `timeout_ms` ticks without a change. `is_active` starts at 0 and only drives
+  the activity LED.
 - The button debounce path sets `push_separator = 1`, but the separator write
   logic in `blackbox_process(...)` is commented out. There is no active user
   separator feature.

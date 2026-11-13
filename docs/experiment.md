@@ -83,7 +83,7 @@ Leave the servo **closed** and the safety switch **safe**.
 | Check | How |
 | --- | --- |
 | MQTT recording | the newest file in `recordings/` is growing ([data-and-history.md](data-and-history.md), section 1) |
-| Blackbox | status LED off, activity LED blinking, and it goes dark when the stream is interrupted ([blackbox.md](blackbox.md), section 4) |
+| Blackbox | status LED off, activity LED blinking ([blackbox.md](blackbox.md), section 4) |
 | Frontend history | **ANALYSIS** in PAUSED mode shows the last minutes |
 
 ## 4. Clean start for the run

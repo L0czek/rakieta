@@ -83,27 +83,24 @@ seconds, and repeats. The count is the sum of the active errors:
 
 For example 3 blinks = card problem + low battery.
 
-**Activity LED** — blinks once per second while the blackbox considers the session active,
-and goes dark about one second after the data stops.
+**Activity LED** — blinks once per second while UART data is arriving, and goes dark about
+one second after the data stops. It is dark after power-up until the first byte arrives.
 
-The activity LED alone does not prove that data arrives. It also blinks from power-up until
-the *first* data is received, and keeps blinking if none ever comes. Use this sequence
-instead:
+1. Insert a zeroed card and power the blackbox. Both LEDs off.
+2. Power the controller. The activity LED starts blinking.
+3. Power the controller off or unplug the blackbox data line. The activity LED goes dark
+   within about a second.
 
-1. Insert a zeroed card and power the blackbox. Status LED off, activity LED blinking.
-2. Power the controller. The activity LED keeps blinking.
-3. Stop the stream: power the controller off or unplug the blackbox data line. The activity
-   LED goes **dark within about a second**. This is the proof that data was arriving. If it
-   keeps blinking, nothing was received (or, rarely, the stream stopped exactly on a buffer
-   boundary; repeat once).
-4. Restore the stream. The LED blinks again.
+The activity LED shows that bytes arrive, not that they are written. With an error on the
+status LED (missing card, overrun) it can blink while nothing is recorded, so always read
+both LEDs: **activity blinking and status dark** is the healthy state.
 
-Step 3 does not restart the session; only power-cycling the blackbox or reseating the card
-does.
+Interrupting the stream does not restart the session; only power-cycling the blackbox or
+reseating the card does.
 
 ### Full check: read the card back
 
-The LED check shows that bytes arrive, not that they are valid. Before an experiment that
+The LEDs do not show whether the recorded bytes are valid. Before an experiment that
 matters, do a dry run:
 
 1. Zero the card, start the blackbox and the controller, let it record for a minute.
