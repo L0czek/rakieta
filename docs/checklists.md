@@ -226,6 +226,13 @@ gone silent fails it as stale. A sensor that was unplugged and plugged back in n
 controller restart to appear again; that is harmless here, because the clean start for the
 run comes later, in list 5.
 
+Step 5 has no wait or check for the igniter capacitors, although the board was armed in
+list 3. The controller sends the fire byte only during the first 3 s of state `FIRE`
+(fact 8), and mounting the engine takes far longer than the 5 s the capacitors need with a
+load (fact 9). The switch being SAFE is not the protection here: the board's logic keeps its
+3.3 V in SAFE (fact 1), and the charged capacitors can still drive the igniter output. A check could not be automatic here anyway, because starter sense sees the
+capacitors only through an igniter.
+
 Steps 6 to 8 arm the stand only for as long as it takes to read the igniter: about 3 V
 through an intact igniter (fact 3).
 
@@ -351,8 +358,8 @@ between the servo and the injector is treated as pressurised until step 12.
 | 12 | A | Controller state | ARMED | press **RESET STATE** |
 
 Steps 2, 3 and 7 exist to put the reason in front of the operator: the re-arming decision
-and the wait for the capacitors are spelled out as steps of their own. The capacitor
-behaviour is fact 9 and still has to be confirmed on the bench.
+and the wait for the capacitors are spelled out as steps of their own. The capacitors drain
+in about 5 s (fact 9), so step 7 normally turns green almost at once.
 
 The waiting times in lists 6 and 7 are suggestions without a firm basis. The steps are
 manual and are not enforced by a timer.
@@ -451,9 +458,12 @@ Taken from the firmware and the board schematics.
    the switch again within those 3 s fires the igniter again; later it does not. The rule
    stays: state `POSTFIRE` before the switch is armed again.
 9. The igniter board's capacitors stay charged for a while after the switch goes to SAFE.
-   According to the schematic, starter sense keeps reading their voltage through an intact
-   igniter, so "starter sense below 0.5 V" in SAFE shows they have drained.
-   **TBD: confirm on the bench, and how long it takes.**
+   Starter sense keeps reading their voltage through an intact igniter, so "starter sense
+   below 0.5 V" in SAFE shows they have drained. Confirmed on the bench with a resistor in
+   place of the igniter: starter sense in the frontend falls to zero in about 5 s.
+   With nothing connected, starter sense has no path to the capacitors and reads about 0 V
+   whatever their charge. How long they hold in that case is not measured, and no step
+   depends on it.
 
 ## Open points
 
@@ -461,7 +471,5 @@ Bench measurements that the values above still depend on:
 
 - **Starter sense ranges** (fact 3): 2.5–3.6 V with an igniter connected and the switch
   armed, below 0.5 V otherwise. From memory, not measured.
-- **Capacitor drain** (fact 9): that starter sense shows the igniter capacitors draining
-  after the switch goes to SAFE, and how long it takes.
 - **Thermometer count**: "at least 1" until the number of sensors is final.
 - **Waiting times** in lists 6 and 7: suggestions without a firm basis.
